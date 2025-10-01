@@ -1,5 +1,6 @@
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
+	import '../app.css';
 	import { createWindowManager, setWindowManager } from '$lib/stores/windowStore.svelte';
 	import Window from '$lib/components/Window.svelte';
 
@@ -9,57 +10,61 @@
 	let { children } = $props();
 </script>
 
-<div class="app-container">
-	{#if children}
-		{@render children()}
-	{/if}
+<div id="desktop">
+	<div id="workspace">
+		{#if children}
+			{@render children()}
+		{/if}
+
+		<!-- Ablakok renderelése -->
+		{#each windowManager.windows as window (window.id)}
+			<Window windowState={window} />
+		{/each}
+	</div>
 
 	<!-- Taskbar a minimalizált ablakok számára -->
-	{#if windowManager.windows.length > 0}
-		<div class="taskbar">
-			{#each windowManager.windows as window}
-				<button
-					class="taskbar-item"
-					class:active={window.isActive}
-					class:minimized={window.isMinimized}
-					onclick={() => {
-						if (window.isMinimized) {
-							windowManager.minimizeWindow(window.id);
-						}
-						windowManager.activateWindow(window.id);
-					}}
-				>
-					{window.title}
-				</button>
-			{/each}
-		</div>
-	{/if}
-
-	<!-- Ablakok renderelése -->
-	{#each windowManager.windows as window (window.id)}
-		<Window windowState={window} />
-	{/each}
+	<div id="taskbar">
+		{#each windowManager.windows as window}
+			<button
+				class="taskbar-item"
+				class:active={window.isActive}
+				class:minimized={window.isMinimized}
+				onclick={() => {
+					if (window.isMinimized) {
+						windowManager.minimizeWindow(window.id);
+					}
+					windowManager.activateWindow(window.id);
+				}}
+			>
+				{window.title}
+			</button>
+		{/each}
+	</div>
 </div>
 
 <style>
-	.app-container {
+	#desktop {
+		display: flex;
 		position: relative;
+		flex-direction: column;
+		justify-content: space-between;
+
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
 	}
 
-	.taskbar {
+	#workspace {
+		position: relative;
+		flex-grow: 1;
+		overflow: hidden;
+	}
+
+	#taskbar {
 		display: flex;
-		position: fixed;
-		right: 0;
-		bottom: 0;
-		left: 0;
 		gap: 8px;
-		z-index: 10000;
 		backdrop-filter: blur(10px);
 		background: rgba(40, 40, 40, 0.95);
-		padding: 8px;
 		height: 48px;
 	}
 

@@ -6,6 +6,10 @@
 
 	const windowManager = getWindowManager();
 
+	// Minimum ablak méretek
+	const MIN_WINDOW_WIDTH = 300;
+	const MIN_WINDOW_HEIGHT = 200;
+
 	let dragStartX = 0;
 	let dragStartY = 0;
 	let isDragging = false;
@@ -38,9 +42,25 @@
 	function handleMouseMove(e: MouseEvent) {
 		if (!isDragging || windowState.isMaximized) return;
 
+		// Workspace méretek
+		const workspace = document.getElementById('workspace');
+		if (!workspace) return;
+		
+		const workspaceRect = workspace.getBoundingClientRect();
+		const workspaceWidth = workspaceRect.width;
+		const workspaceHeight = workspaceRect.height;
+
+		// Új pozíció számítása
+		let newX = e.clientX - dragStartX;
+		let newY = e.clientY - dragStartY;
+
+		// Korlátozás a workspace határain belülre
+		newX = Math.max(0, Math.min(newX, workspaceWidth - windowState.size.width));
+		newY = Math.max(0, Math.min(newY, workspaceHeight - windowState.size.height));
+
 		windowManager.updatePosition(windowState.id, {
-			x: e.clientX - dragStartX,
-			y: e.clientY - dragStartY
+			x: newX,
+			y: newY
 		});
 	}
 
@@ -105,28 +125,51 @@
 		let newLeft = resizeStartLeft;
 		let newTop = resizeStartTop;
 
-		const minWidth = 300;
-		const minHeight = 200;
+		// Workspace méretek (a taskbar nélküli terület)
+		const workspace = document.getElementById('workspace');
+		if (!workspace) return;
+		
+		const workspaceRect = workspace.getBoundingClientRect();
+		const workspaceWidth = workspaceRect.width;
+		const workspaceHeight = workspaceRect.height;
 
 		// Vízszintes méretezés
 		if (resizeDirection.includes('e')) {
-			newWidth = Math.max(minWidth, resizeStartWidth + deltaX);
+			// Jobb oldal: ne menjen túl a workspace jobb szélén
+			const maxWidth = workspaceWidth - resizeStartLeft;
+			newWidth = Math.max(MIN_WINDOW_WIDTH, Math.min(maxWidth, resizeStartWidth + deltaX));
 		} else if (resizeDirection.includes('w')) {
+			// Bal oldal: ne menjen túl a workspace bal szélén (0) és tartsa a minimum méretet
 			const potentialWidth = resizeStartWidth - deltaX;
-			if (potentialWidth >= minWidth) {
+			const potentialLeft = resizeStartLeft + deltaX;
+			
+			if (potentialWidth >= MIN_WINDOW_WIDTH && potentialLeft >= 0) {
 				newWidth = potentialWidth;
-				newLeft = resizeStartLeft + deltaX;
+				newLeft = potentialLeft;
+			} else if (potentialLeft < 0) {
+				// Ha túlmenne a bal szélen, állítsuk be a maximális méretet
+				newWidth = resizeStartLeft + resizeStartWidth;
+				newLeft = 0;
 			}
 		}
 
 		// Függőleges méretezés
 		if (resizeDirection.includes('s')) {
-			newHeight = Math.max(minHeight, resizeStartHeight + deltaY);
+			// Alsó oldal: ne menjen túl a workspace alján
+			const maxHeight = workspaceHeight - resizeStartTop;
+			newHeight = Math.max(MIN_WINDOW_HEIGHT, Math.min(maxHeight, resizeStartHeight + deltaY));
 		} else if (resizeDirection.includes('n')) {
+			// Felső oldal: ne menjen túl a workspace tetején (0) és tartsa a minimum méretet
 			const potentialHeight = resizeStartHeight - deltaY;
-			if (potentialHeight >= minHeight) {
+			const potentialTop = resizeStartTop + deltaY;
+			
+			if (potentialHeight >= MIN_WINDOW_HEIGHT && potentialTop >= 0) {
 				newHeight = potentialHeight;
-				newTop = resizeStartTop + deltaY;
+				newTop = potentialTop;
+			} else if (potentialTop < 0) {
+				// Ha túlmenne a felső szélen, állítsuk be a maximális méretet
+				newHeight = resizeStartTop + resizeStartHeight;
+				newTop = 0;
 			}
 		}
 
@@ -153,8 +196,8 @@
 	class:minimized={windowState.isMinimized}
 	style:left={windowState.isMaximized ? '0' : `${windowState.position.x}px`}
 	style:top={windowState.isMaximized ? '0' : `${windowState.position.y}px`}
-	style:width={windowState.isMaximized ? '100vw' : `${windowState.size.width}px`}
-	style:height={windowState.isMaximized ? '100vh' : `${windowState.size.height}px`}
+	style:width={windowState.isMaximized ? '100%' : `${windowState.size.width}px`}
+	style:height={windowState.isMaximized ? '100%' : `${windowState.size.height}px`}
 	style:z-index={windowState.zIndex}
 	onclick={() => windowManager.activateWindow(windowState.id)}
 >
@@ -196,7 +239,7 @@
 <style>
 	.window {
 		display: flex;
-		position: fixed;
+		position: absolute;
 		flex-direction: column;
 		transition: box-shadow 0.2s;
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
