@@ -328,7 +328,7 @@
 		flex-direction: column;
 		transition: box-shadow 0.2s;
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-		border-radius: 8px;
+		border-radius: var(--default-border-radius, 8px);
 		/*background: white;*/
 	}
 
@@ -386,6 +386,8 @@
 	.window-content {
 		flex: 1;
 		backdrop-filter: blur(10px); /* Blur effekt mértéke (px-ben) */
+		border-bottom-right-radius: var(--default-border-radius, 8px);
+		border-bottom-left-radius: var(--default-border-radius, 8px);
 		background-color: rgba(255, 255, 255, 0.95);
 		padding: 16px;
 		overflow: auto;

@@ -1,9 +1,10 @@
 // src/lib/stores/windowStore.svelte.ts
 import { getContext, setContext } from 'svelte';
+import { type AppMetadata } from '$lib/types/window';
 
 export type WindowState = {
 	id: string;
-	componentName: string;
+	appName: string;
 	title: string;
 	isActive: boolean;
 	isMinimized: boolean;
@@ -20,8 +21,8 @@ class WindowManager {
 	private nextId = 1;
 	private baseZIndex = 1000;
 
-	openWindow(componentName: string, title: string) {
-		const existingWindow = this.windows.find((w) => w.componentName === componentName);
+	openWindow(appName: string, title: string, metadata: Partial<AppMetadata> = {}) {
+		const existingWindow = this.windows.find((w) => w.appName === appName);
 
 		if (existingWindow) {
 			// Ha már nyitva van, akkor aktiváljuk és visszaállítjuk a minimalizálásból
@@ -33,14 +34,14 @@ class WindowManager {
 		const id = `window-${this.nextId++}`;
 		const newWindow: WindowState = {
 			id,
-			componentName,
+			appName,
 			title,
 			isActive: true,
 			isMinimized: false,
 			isMaximized: false,
 			zIndex: this.getNextZIndex(),
 			position: this.getNextPosition(),
-			size: { width: 600, height: 400 },
+			size: metadata.defaultSize || { width: 600, height: 400 },
 			component: null,
 			isLoading: true
 		};
@@ -49,16 +50,16 @@ class WindowManager {
 		this.windows.forEach((w) => (w.isActive = false));
 
 		this.windows.push(newWindow);
-		
+
 		// Aszinkron komponens betöltés
-		this.loadComponent(id, componentName);
-		
+		this.loadComponent(id, appName);
+
 		return id;
 	}
 
 	private async loadComponent(id: string, componentName: string) {
 		try {
-			const module = await import(`../komponensek/${componentName}.svelte`);
+			const module = await import(`../apps/${componentName}/index.svelte`);
 			const window = this.windows.find((w) => w.id === id);
 			if (window) {
 				window.component = module.default;
