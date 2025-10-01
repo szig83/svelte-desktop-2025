@@ -37,6 +37,11 @@
 		document.removeEventListener('mouseup', handleMouseUp);
 	}
 
+	function handleDoubleClick(e: MouseEvent) {
+		if ((e.target as HTMLElement).closest('.window-controls')) return;
+		maximize();
+	}
+
 	function close() {
 		windowManager.closeWindow(windowState.id);
 	}
@@ -62,7 +67,7 @@
 	style:z-index={windowState.zIndex}
 	onclick={() => windowManager.activateWindow(windowState.id)}
 >
-	<div class="window-header" onmousedown={handleMouseDown}>
+	<div class="window-header" onmousedown={handleMouseDown} ondblclick={handleDoubleClick}>
 		<div class="window-title">{windowState.title}</div>
 		<div class="window-controls">
 			<button onclick={minimize} aria-label="Minimize">−</button>
