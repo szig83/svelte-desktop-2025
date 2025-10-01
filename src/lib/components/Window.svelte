@@ -10,13 +10,26 @@
 	let dragStartY = 0;
 	let isDragging = false;
 
+	let isResizing = false;
+	let resizeDirection = '';
+	let resizeStartX = 0;
+	let resizeStartY = 0;
+	let resizeStartWidth = 0;
+	let resizeStartHeight = 0;
+	let resizeStartLeft = 0;
+	let resizeStartTop = 0;
+
 	function handleMouseDown(e: MouseEvent) {
 		if ((e.target as HTMLElement).closest('.window-controls')) return;
 
+		e.preventDefault();
 		windowManager.activateWindow(windowState.id);
 		isDragging = true;
 		dragStartX = e.clientX - windowState.position.x;
 		dragStartY = e.clientY - windowState.position.y;
+
+		// Letiltjuk a szövegkijelölést mozgatás közben
+		document.body.style.userSelect = 'none';
 
 		document.addEventListener('mousemove', handleMouseMove);
 		document.addEventListener('mouseup', handleMouseUp);
@@ -33,6 +46,10 @@
 
 	function handleMouseUp() {
 		isDragging = false;
+		
+		// Visszaállítjuk a szövegkijelölést
+		document.body.style.userSelect = '';
+		
 		document.removeEventListener('mousemove', handleMouseMove);
 		document.removeEventListener('mouseup', handleMouseUp);
 	}
@@ -52,6 +69,80 @@
 
 	function maximize() {
 		windowManager.maximizeWindow(windowState.id);
+	}
+
+	function handleResizeStart(e: MouseEvent, direction: string) {
+		if (windowState.isMaximized) return;
+
+		e.preventDefault();
+		e.stopPropagation();
+		windowManager.activateWindow(windowState.id);
+
+		isResizing = true;
+		resizeDirection = direction;
+		resizeStartX = e.clientX;
+		resizeStartY = e.clientY;
+		resizeStartWidth = windowState.size.width;
+		resizeStartHeight = windowState.size.height;
+		resizeStartLeft = windowState.position.x;
+		resizeStartTop = windowState.position.y;
+
+		// Letiltjuk a szövegkijelölést méretezés közben
+		document.body.style.userSelect = 'none';
+
+		document.addEventListener('mousemove', handleResizeMove);
+		document.addEventListener('mouseup', handleResizeEnd);
+	}
+
+	function handleResizeMove(e: MouseEvent) {
+		if (!isResizing) return;
+
+		const deltaX = e.clientX - resizeStartX;
+		const deltaY = e.clientY - resizeStartY;
+
+		let newWidth = resizeStartWidth;
+		let newHeight = resizeStartHeight;
+		let newLeft = resizeStartLeft;
+		let newTop = resizeStartTop;
+
+		const minWidth = 300;
+		const minHeight = 200;
+
+		// Vízszintes méretezés
+		if (resizeDirection.includes('e')) {
+			newWidth = Math.max(minWidth, resizeStartWidth + deltaX);
+		} else if (resizeDirection.includes('w')) {
+			const potentialWidth = resizeStartWidth - deltaX;
+			if (potentialWidth >= minWidth) {
+				newWidth = potentialWidth;
+				newLeft = resizeStartLeft + deltaX;
+			}
+		}
+
+		// Függőleges méretezés
+		if (resizeDirection.includes('s')) {
+			newHeight = Math.max(minHeight, resizeStartHeight + deltaY);
+		} else if (resizeDirection.includes('n')) {
+			const potentialHeight = resizeStartHeight - deltaY;
+			if (potentialHeight >= minHeight) {
+				newHeight = potentialHeight;
+				newTop = resizeStartTop + deltaY;
+			}
+		}
+
+		windowManager.updateSize(windowState.id, { width: newWidth, height: newHeight });
+		windowManager.updatePosition(windowState.id, { x: newLeft, y: newTop });
+	}
+
+	function handleResizeEnd() {
+		isResizing = false;
+		resizeDirection = '';
+		
+		// Visszaállítjuk a szövegkijelölést
+		document.body.style.userSelect = '';
+		
+		document.removeEventListener('mousemove', handleResizeMove);
+		document.removeEventListener('mouseup', handleResizeEnd);
 	}
 </script>
 
@@ -88,6 +179,18 @@
 			<div class="error">Nem sikerült betölteni a komponenst</div>
 		{/if}
 	</div>
+
+	<!-- Resize handles -->
+	{#if !windowState.isMaximized}
+		<div class="resize-handle resize-n" onmousedown={(e) => handleResizeStart(e, 'n')}></div>
+		<div class="resize-handle resize-s" onmousedown={(e) => handleResizeStart(e, 's')}></div>
+		<div class="resize-handle resize-e" onmousedown={(e) => handleResizeStart(e, 'e')}></div>
+		<div class="resize-handle resize-w" onmousedown={(e) => handleResizeStart(e, 'w')}></div>
+		<div class="resize-handle resize-ne" onmousedown={(e) => handleResizeStart(e, 'ne')}></div>
+		<div class="resize-handle resize-nw" onmousedown={(e) => handleResizeStart(e, 'nw')}></div>
+		<div class="resize-handle resize-se" onmousedown={(e) => handleResizeStart(e, 'se')}></div>
+		<div class="resize-handle resize-sw" onmousedown={(e) => handleResizeStart(e, 'sw')}></div>
+	{/if}
 </div>
 
 <style>
@@ -194,5 +297,78 @@
 
 	.error {
 		color: #d32f2f;
+	}
+
+	/* Resize handles */
+	.resize-handle {
+		position: absolute;
+		z-index: 10;
+		user-select: none;
+	}
+
+	/* Élek */
+	.resize-n,
+	.resize-s {
+		right: 8px;
+		left: 8px;
+		cursor: ns-resize;
+		height: 8px;
+	}
+
+	.resize-n {
+		top: -4px;
+	}
+
+	.resize-s {
+		bottom: -4px;
+	}
+
+	.resize-e,
+	.resize-w {
+		top: 8px;
+		bottom: 8px;
+		cursor: ew-resize;
+		width: 8px;
+	}
+
+	.resize-e {
+		right: -4px;
+	}
+
+	.resize-w {
+		left: -4px;
+	}
+
+	/* Sarkok */
+	.resize-ne,
+	.resize-nw,
+	.resize-se,
+	.resize-sw {
+		width: 12px;
+		height: 12px;
+	}
+
+	.resize-ne {
+		top: -4px;
+		right: -4px;
+		cursor: nesw-resize;
+	}
+
+	.resize-nw {
+		top: -4px;
+		left: -4px;
+		cursor: nwse-resize;
+	}
+
+	.resize-se {
+		right: -4px;
+		bottom: -4px;
+		cursor: nwse-resize;
+	}
+
+	.resize-sw {
+		bottom: -4px;
+		left: -4px;
+		cursor: nesw-resize;
 	}
 </style>
