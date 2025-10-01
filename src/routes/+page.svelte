@@ -26,19 +26,6 @@
 		<button onclick={openKomp2}>Komp2 megnyitása</button>
 		<button onclick={openKomp3}>Komp3 megnyitása</button>
 	</div>
-
-	<div class="info">
-		<h2>Funkciók:</h2>
-		<ul>
-			<li>✓ Ablakok mozgatása (header drag)</li>
-			<li>✓ Minimize/Maximize/Close gombok</li>
-			<li>✓ Aktív ablak kezelés (kattintással)</li>
-			<li>✓ Z-index automatikus kezelés</li>
-			<li>✓ Taskbar a minimalizált ablakokhoz</li>
-			<li>✓ Komponens állapot megőrzés (újrarenderelés nélkül)</li>
-			<li>✓ Ha már nyitva van egy ablak, azt aktiválja</li>
-		</ul>
-	</div>
 </div>
 
 <style>
@@ -72,27 +59,5 @@
 
 	button:hover {
 		background: #45a049;
-	}
-
-	.info {
-		margin-top: 40px;
-		border-radius: 8px;
-		background: #f5f5f5;
-		padding: 24px;
-	}
-
-	.info h2 {
-		margin-top: 0;
-		color: #555;
-	}
-
-	.info ul {
-		padding: 0;
-		list-style: none;
-	}
-
-	.info li {
-		padding: 8px 0;
-		color: #666;
 	}
 </style>

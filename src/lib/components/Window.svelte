@@ -1,8 +1,8 @@
 <!-- src/lib/components/Window.svelte -->
 <script lang="ts">
 	import { getWindowManager, type WindowState } from '$lib/stores/windowStore.svelte';
-
 	let { windowState }: { windowState: WindowState } = $props();
+	import WindowControlButton from './WindowControlButton.svelte';
 
 	const windowManager = getWindowManager();
 
@@ -12,9 +12,9 @@
 
 	let dragStartX = 0;
 	let dragStartY = 0;
-	let isDragging = false;
+	let isDragging = $state(false);
 
-	let isResizing = false;
+	let isResizing = $state(false);
 	let resizeDirection = '';
 	let resizeStartX = 0;
 	let resizeStartY = 0;
@@ -45,7 +45,7 @@
 		// Workspace méretek
 		const workspace = document.getElementById('workspace');
 		if (!workspace) return;
-		
+
 		const workspaceRect = workspace.getBoundingClientRect();
 		const workspaceWidth = workspaceRect.width;
 		const workspaceHeight = workspaceRect.height;
@@ -66,10 +66,10 @@
 
 	function handleMouseUp() {
 		isDragging = false;
-		
+
 		// Visszaállítjuk a szövegkijelölést
 		document.body.style.userSelect = '';
-		
+
 		document.removeEventListener('mousemove', handleMouseMove);
 		document.removeEventListener('mouseup', handleMouseUp);
 	}
@@ -92,7 +92,7 @@
 	}
 
 	function handleResizeStart(e: MouseEvent, direction: string) {
-		if (windowState.isMaximized) return;
+		if (windowState.isMaximized || isResizing) return;
 
 		e.preventDefault();
 		e.stopPropagation();
@@ -109,9 +109,19 @@
 
 		// Letiltjuk a szövegkijelölést méretezés közben
 		document.body.style.userSelect = 'none';
+		// Letiltjuk a kurzor változását méretezés közben
+		document.body.style.cursor = getCursorForDirection(direction);
 
 		document.addEventListener('mousemove', handleResizeMove);
 		document.addEventListener('mouseup', handleResizeEnd);
+	}
+
+	function getCursorForDirection(direction: string): string {
+		if (direction === 'n' || direction === 's') return 'ns-resize';
+		if (direction === 'e' || direction === 'w') return 'ew-resize';
+		if (direction === 'ne' || direction === 'sw') return 'nesw-resize';
+		if (direction === 'nw' || direction === 'se') return 'nwse-resize';
+		return 'default';
 	}
 
 	function handleResizeMove(e: MouseEvent) {
@@ -128,7 +138,7 @@
 		// Workspace méretek (a taskbar nélküli terület)
 		const workspace = document.getElementById('workspace');
 		if (!workspace) return;
-		
+
 		const workspaceRect = workspace.getBoundingClientRect();
 		const workspaceWidth = workspaceRect.width;
 		const workspaceHeight = workspaceRect.height;
@@ -142,14 +152,19 @@
 			// Bal oldal: ne menjen túl a workspace bal szélén (0) és tartsa a minimum méretet
 			const potentialWidth = resizeStartWidth - deltaX;
 			const potentialLeft = resizeStartLeft + deltaX;
-			
-			if (potentialWidth >= MIN_WINDOW_WIDTH && potentialLeft >= 0) {
-				newWidth = potentialWidth;
-				newLeft = potentialLeft;
-			} else if (potentialLeft < 0) {
+
+			if (potentialLeft < 0) {
 				// Ha túlmenne a bal szélen, állítsuk be a maximális méretet
 				newWidth = resizeStartLeft + resizeStartWidth;
 				newLeft = 0;
+			} else if (potentialWidth >= MIN_WINDOW_WIDTH) {
+				// Normál méretezés, ha a minimum méret felett vagyunk
+				newWidth = potentialWidth;
+				newLeft = potentialLeft;
+			} else {
+				// Ha elérnénk a minimum méretet, rögzítsük azt és a pozíciót
+				newWidth = MIN_WINDOW_WIDTH;
+				newLeft = resizeStartLeft + resizeStartWidth - MIN_WINDOW_WIDTH;
 			}
 		}
 
@@ -162,14 +177,19 @@
 			// Felső oldal: ne menjen túl a workspace tetején (0) és tartsa a minimum méretet
 			const potentialHeight = resizeStartHeight - deltaY;
 			const potentialTop = resizeStartTop + deltaY;
-			
-			if (potentialHeight >= MIN_WINDOW_HEIGHT && potentialTop >= 0) {
-				newHeight = potentialHeight;
-				newTop = potentialTop;
-			} else if (potentialTop < 0) {
+
+			if (potentialTop < 0) {
 				// Ha túlmenne a felső szélen, állítsuk be a maximális méretet
 				newHeight = resizeStartTop + resizeStartHeight;
 				newTop = 0;
+			} else if (potentialHeight >= MIN_WINDOW_HEIGHT) {
+				// Normál méretezés, ha a minimum méret felett vagyunk
+				newHeight = potentialHeight;
+				newTop = potentialTop;
+			} else {
+				// Ha elérnénk a minimum méretet, rögzítsük azt és a pozíciót
+				newHeight = MIN_WINDOW_HEIGHT;
+				newTop = resizeStartTop + resizeStartHeight - MIN_WINDOW_HEIGHT;
 			}
 		}
 
@@ -180,35 +200,59 @@
 	function handleResizeEnd() {
 		isResizing = false;
 		resizeDirection = '';
-		
-		// Visszaállítjuk a szövegkijelölést
+
+		// Visszaállítjuk a szövegkijelölést és a kurzort
 		document.body.style.userSelect = '';
-		
+		document.body.style.cursor = '';
+
 		document.removeEventListener('mousemove', handleResizeMove);
 		document.removeEventListener('mouseup', handleResizeEnd);
+	}
+
+	let windowStyle = $derived.by(() => {
+		const left = windowState.isMaximized ? '0' : `${windowState.position.x}px`;
+		const top = windowState.isMaximized ? '0' : `${windowState.position.y}px`;
+		const width = windowState.isMaximized ? '100%' : `${windowState.size.width}px`;
+		const height = windowState.isMaximized ? '100%' : `${windowState.size.height}px`;
+		const zIndex = windowState.zIndex;
+		return `left: ${left}; top: ${top}; width: ${width}; height: ${height}; z-index: ${zIndex};`;
+	});
+
+	function handleKeydown(e: KeyboardEvent) {
+		e.preventDefault();
+		windowManager.activateWindow(windowState.id);
 	}
 </script>
 
 <div
-	class="window"
-	class:active={windowState.isActive}
-	class:maximized={windowState.isMaximized}
-	class:minimized={windowState.isMinimized}
-	style:left={windowState.isMaximized ? '0' : `${windowState.position.x}px`}
-	style:top={windowState.isMaximized ? '0' : `${windowState.position.y}px`}
-	style:width={windowState.isMaximized ? '100%' : `${windowState.size.width}px`}
-	style:height={windowState.isMaximized ? '100%' : `${windowState.size.height}px`}
-	style:z-index={windowState.zIndex}
+	class={[
+		'window',
+		windowState.isActive ? 'active' : '',
+		windowState.isMaximized ? 'maximized' : '',
+		windowState.isMinimized ? 'minimized' : '',
+		isResizing ? 'resizing' : ''
+	]}
+	style={windowStyle}
 	onclick={() => windowManager.activateWindow(windowState.id)}
+	role="button"
+	tabindex="0"
+	onkeydown={handleKeydown}
 >
-	<div class="window-header" onmousedown={handleMouseDown} ondblclick={handleDoubleClick}>
+	<div
+		class="window-header"
+		onmousedown={handleMouseDown}
+		ondblclick={handleDoubleClick}
+		role="button"
+		tabindex="0"
+	>
 		<div class="window-title">{windowState.title}</div>
 		<div class="window-controls">
-			<button onclick={minimize} aria-label="Minimize">−</button>
-			<button onclick={maximize} aria-label="Maximize">
-				{windowState.isMaximized ? '❐' : '□'}
-			</button>
-			<button onclick={close} class="close" aria-label="Close">×</button>
+			<WindowControlButton controlType="minimize" onClick={minimize} />
+			<WindowControlButton
+				controlType={windowState.isMaximized ? 'restore' : 'maximize'}
+				onClick={maximize}
+			/>
+			<WindowControlButton controlType="close" onClick={close} />
 		</div>
 	</div>
 
@@ -225,14 +269,55 @@
 
 	<!-- Resize handles -->
 	{#if !windowState.isMaximized}
-		<div class="resize-handle resize-n" onmousedown={(e) => handleResizeStart(e, 'n')}></div>
-		<div class="resize-handle resize-s" onmousedown={(e) => handleResizeStart(e, 's')}></div>
-		<div class="resize-handle resize-e" onmousedown={(e) => handleResizeStart(e, 'e')}></div>
-		<div class="resize-handle resize-w" onmousedown={(e) => handleResizeStart(e, 'w')}></div>
-		<div class="resize-handle resize-ne" onmousedown={(e) => handleResizeStart(e, 'ne')}></div>
-		<div class="resize-handle resize-nw" onmousedown={(e) => handleResizeStart(e, 'nw')}></div>
-		<div class="resize-handle resize-se" onmousedown={(e) => handleResizeStart(e, 'se')}></div>
-		<div class="resize-handle resize-sw" onmousedown={(e) => handleResizeStart(e, 'sw')}></div>
+		<div
+			class="resize-handle resize-n"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'n')}
+			role="button"
+			tabindex="0"
+			aria-label="Resize window"
+		></div>
+		<div
+			class="resize-handle resize-s"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 's')}
+			role="button"
+			tabindex="0"
+		></div>
+		<div
+			class="resize-handle resize-e"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'e')}
+			role="button"
+			tabindex="0"
+		></div>
+		<div
+			class="resize-handle resize-w"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'w')}
+			role="button"
+			tabindex="0"
+		></div>
+		<div
+			class="resize-handle resize-ne"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'ne')}
+			role="button"
+			tabindex="0"
+		></div>
+		<div
+			class="resize-handle resize-nw"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'nw')}
+			role="button"
+			tabindex="0"
+		></div>
+		<div
+			class="resize-handle resize-se"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'se')}
+			role="button"
+			tabindex="0"
+		></div>
+		<div
+			class="resize-handle resize-sw"
+			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'sw')}
+			role="button"
+			tabindex="0"
+		></div>
 	{/if}
 </div>
 
@@ -244,19 +329,18 @@
 		transition: box-shadow 0.2s;
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 		border-radius: 8px;
-		background: white;
+		/*background: white;*/
 	}
 
 	.window.minimized {
 		display: none;
 	}
 
-	.window:not(.active) {
-		opacity: 0.95;
+	:global(.window:not(.active)) {
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 	}
 
-	.window.active {
+	:global(.window.active) {
 		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 	}
 
@@ -271,7 +355,7 @@
 		cursor: move;
 		border-bottom: 1px solid #d0d0d0;
 		border-radius: 8px 8px 0 0;
-		background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+		background: #d9d9d9;
 		padding: 8px 12px;
 		user-select: none;
 	}
@@ -299,32 +383,10 @@
 		gap: 8px;
 	}
 
-	.window-controls button {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		transition: background 0.2s;
-		cursor: pointer;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-		border: none;
-		border-radius: 4px;
-		background: #fff;
-		width: 28px;
-		height: 28px;
-		font-size: 18px;
-	}
-
-	.window-controls button:hover {
-		background: #e8e8e8;
-	}
-
-	.window-controls button.close:hover {
-		background: #ff5f57;
-		color: white;
-	}
-
 	.window-content {
 		flex: 1;
+		backdrop-filter: blur(10px); /* Blur effekt mértéke (px-ben) */
+		background-color: rgba(255, 255, 255, 0.95);
 		padding: 16px;
 		overflow: auto;
 	}
@@ -349,69 +411,72 @@
 		user-select: none;
 	}
 
-	/* Élek */
-	.resize-n,
-	.resize-s {
-		right: 8px;
-		left: 8px;
-		cursor: ns-resize;
-		height: 8px;
-	}
-
-	.resize-n {
-		top: -4px;
-	}
-
-	.resize-s {
-		bottom: -4px;
-	}
-
-	.resize-e,
-	.resize-w {
-		top: 8px;
-		bottom: 8px;
-		cursor: ew-resize;
-		width: 8px;
-	}
-
-	.resize-e {
-		right: -4px;
-	}
-
-	.resize-w {
-		left: -4px;
-	}
-
-	/* Sarkok */
+	/* Sarkok - ezek magasabb prioritásúak, ezért előbb vannak */
 	.resize-ne,
 	.resize-nw,
 	.resize-se,
 	.resize-sw {
-		width: 12px;
-		height: 12px;
+		z-index: 12;
+		width: 16px;
+		height: 16px;
 	}
 
 	.resize-ne {
-		top: -4px;
-		right: -4px;
+		top: 0;
+		right: 0;
 		cursor: nesw-resize;
 	}
 
 	.resize-nw {
-		top: -4px;
-		left: -4px;
+		top: 0;
+		left: 0;
 		cursor: nwse-resize;
 	}
 
 	.resize-se {
-		right: -4px;
-		bottom: -4px;
+		right: 0;
+		bottom: 0;
 		cursor: nwse-resize;
 	}
 
 	.resize-sw {
-		bottom: -4px;
-		left: -4px;
+		bottom: 0;
+		left: 0;
 		cursor: nesw-resize;
+	}
+
+	/* Élek - kisebb z-index, hogy a sarkok felülírják őket */
+	.resize-n,
+	.resize-s {
+		right: 16px;
+		left: 16px;
+		z-index: 11;
+		cursor: ns-resize;
+		height: 6px;
+	}
+
+	.resize-n {
+		top: 0;
+	}
+
+	.resize-s {
+		bottom: 0;
+	}
+
+	.resize-e,
+	.resize-w {
+		top: 16px;
+		bottom: 16px;
+		z-index: 11;
+		cursor: ew-resize;
+		width: 6px;
+	}
+
+	.resize-e {
+		right: 0;
+	}
+
+	.resize-w {
+		left: 0;
 	}
 </style>
