@@ -35,25 +35,8 @@ body {
 
 :root {
 	/* Colors */
-	--background: hsl(0 0% 100%);
-	--background-alt: hsl(0 0% 100%);
-	--foreground: hsl(0 0% 9%);
-	--foreground-alt: hsl(0 0% 32%);
-	--muted: hsl(240 5% 96%);
-	--muted-foreground: hsla(0 0% 9% / 0.4);
-	--border: hsl(240 6% 10%);
-	--border-input: hsla(240 6% 10% / 0.17);
-	--border-input-hover: hsla(240 6% 10% / 0.4);
-	--border-card: hsla(240 6% 10% / 0.1);
-	--dark: hsl(240 6% 10%);
-	--dark-10: hsla(240 6% 10% / 0.1);
-	--dark-40: hsla(240 6% 10% / 0.4);
-	--dark-04: hsla(240 6% 10% / 0.04);
-	--accent: hsl(204 94% 94%);
-	--accent-foreground: hsl(204 80% 16%);
-	--destructive: hsl(347 77% 50%);
-	--tertiary: hsl(37.7 92.1% 50.2%);
-	--line: hsl(0 0% 100%);
+	--accent: hsl(200, 35%, 35%);
+	--accent-text: hsl(200, 35%, 95%);
 
 	/* black */
 	--contrast: hsl(0 0% 0%);

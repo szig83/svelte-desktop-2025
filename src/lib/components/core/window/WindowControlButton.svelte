@@ -23,7 +23,10 @@
 </script>
 
 <button
-	onclick={onClick}
+	onclick={(e) => {
+		e.stopPropagation();
+		onClick(e);
+	}}
 	class="btn-window-control btn-window-{controlType}"
 	aria-label="{controlType} window"><Icon /></button
 >

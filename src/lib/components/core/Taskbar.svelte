@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Rocket } from 'lucide-svelte';
 	import { getWindowManager } from '$lib/stores/windowStore.svelte';
 	import UniversalIcon from '../UniversalIcon.svelte';
 	import StartMenu from './StartMenu.svelte';
@@ -18,7 +19,7 @@
 <div id="taskbar">
 	<div class="taskbar-left">
 		<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}
-			><UniversalIcon icon="LayoutPanelLeft" size={24} /></button
+			><Rocket size={20} /></button
 		>
 		{#each windowManager.windows as window}
 			<button
@@ -27,9 +28,15 @@
 				class:minimized={window.isMinimized}
 				onclick={() => {
 					if (window.isMinimized) {
+						// Ha minimalizált, visszaállítjuk és aktiváljuk
 						windowManager.minimizeWindow(window.id);
+					} else if (window.isActive) {
+						// Ha aktív, minimalizáljuk
+						windowManager.minimizeWindow(window.id);
+					} else {
+						// Ha inaktív (de nem minimalizált), aktiváljuk
+						windowManager.activateWindow(window.id);
 					}
-					windowManager.activateWindow(window.id);
 				}}
 			>
 				<div class="taskbar-item-icon">
@@ -84,7 +91,8 @@
 		color: rgb(185, 184, 184);
 
 		&:hover {
-			background-color: var(--startmenu-bg);
+			background-color: var(--accent);
+			color: var(--accent-text);
 		}
 	}
 
@@ -110,7 +118,7 @@
 		.taskbar-item-title {
 			display: flex;
 			align-items: center;
-			width: 100px;
+			max-width: 100px;
 			height: 100%;
 			color: rgb(178, 178, 178);
 			font-size: 0.85rem;

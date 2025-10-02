@@ -66,12 +66,16 @@ class WindowManager {
 			if (window) {
 				window.component = module.default;
 				window.isLoading = false;
+				// Trigger reactivity
+				this.windows = [...this.windows];
 			}
 		} catch (error) {
 			console.error(`Nem sikerült betölteni: ${componentName}`, error);
 			const window = this.windows.find((w) => w.id === id);
 			if (window) {
 				window.isLoading = false;
+				// Trigger reactivity
+				this.windows = [...this.windows];
 			}
 		}
 	}
@@ -87,18 +91,29 @@ class WindowManager {
 					current.zIndex > prev.zIndex ? current : prev
 				);
 				topWindow.isActive = true;
+				// Trigger reactivity
+				this.windows = [...this.windows];
 			}
 		}
 	}
 
 	activateWindow(id: string) {
+		const window = this.windows.find((w) => w.id === id);
+
+		// Ha az ablak már aktív, ne csináljunk semmit
+		if (!window || window.isActive) {
+			return;
+		}
+
+		// Deaktiváljuk az összes többi ablakot
 		this.windows.forEach((w) => (w.isActive = false));
 
-		const window = this.windows.find((w) => w.id === id);
-		if (window) {
-			window.isActive = true;
-			window.zIndex = this.getNextZIndex();
-		}
+		// Aktiváljuk az aktuális ablakot
+		window.isActive = true;
+		window.zIndex = this.getNextZIndex();
+		
+		// Trigger reactivity
+		this.windows = [...this.windows];
 	}
 
 	minimizeWindow(id: string) {
@@ -106,18 +121,24 @@ class WindowManager {
 		if (window) {
 			window.isMinimized = !window.isMinimized;
 			if (window.isMinimized) {
+				// Minimalizálás: deaktiváljuk az ablakot
 				window.isActive = false;
-				// Aktiváljuk a következő ablakot
+				// Trigger reactivity azonnal
+				this.windows = [...this.windows];
+				
+				// Aktiváljuk a következő nem-minimalizált ablakot
 				const nextWindow = this.windows
 					.filter((w) => w.id !== id && !w.isMinimized)
-					.reduce(
-						(prev, current) => (current.zIndex > prev.zIndex ? current : prev),
-						this.windows[0]
+					.reduce<WindowState | null>(
+						(prev, current) => (!prev || current.zIndex > prev.zIndex ? current : prev),
+						null
 					);
 				if (nextWindow) {
-					nextWindow.isActive = true;
-					//this.activateWindow(nextWindow.id);
+					this.activateWindow(nextWindow.id);
 				}
+			} else {
+				// Visszaállítás: aktiváljuk az ablakot
+				this.activateWindow(id);
 			}
 		}
 	}
@@ -126,6 +147,8 @@ class WindowManager {
 		const window = this.windows.find((w) => w.id === id);
 		if (window) {
 			window.isMaximized = !window.isMaximized;
+			// Trigger reactivity
+			this.windows = [...this.windows];
 		}
 	}
 

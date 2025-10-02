@@ -217,7 +217,6 @@
 		const zIndex = windowState.zIndex;
 		return `left: ${left}; top: ${top}; width: ${width}; height: ${height}; z-index: ${zIndex};`;
 	});
-
 </script>
 
 <div
