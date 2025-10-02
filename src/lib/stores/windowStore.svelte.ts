@@ -4,6 +4,7 @@ import { type AppMetadata } from '$lib/types/window';
 
 export type WindowState = {
 	id: string;
+	icon: string | null;
 	appName: string;
 	title: string;
 	isActive: boolean;
@@ -19,7 +20,7 @@ export type WindowState = {
 class WindowManager {
 	windows = $state<WindowState[]>([]);
 	private nextId = 1;
-	private baseZIndex = 1000;
+	private baseZIndex = 100;
 
 	openWindow(appName: string, title: string, metadata: Partial<AppMetadata> = {}) {
 		const existingWindow = this.windows.find((w) => w.appName === appName);
@@ -35,6 +36,7 @@ class WindowManager {
 		const newWindow: WindowState = {
 			id,
 			appName,
+			icon: metadata.icon,
 			title,
 			isActive: true,
 			isMinimized: false,

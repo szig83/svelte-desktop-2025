@@ -1,9 +1,31 @@
 import { query } from '$app/server';
 import { type AppMetadata } from '$lib/types/window';
+import { faker } from '@faker-js/faker';
 
 export const getApps = query(async () => {
 	//await new Promise((resolve) => setTimeout(resolve, 4000));
-	return [
+	const appNames = ['app1', 'app2', 'app3'];
+	const icons = ['/icons/svelte.svg', 'LayoutDashboard', 'icon.svg'];
+	for (let i = 1; i < 28; i++) {
+		icons.push(`/icons/icon_${i}.svg`);
+	}
+	const apps = [];
+
+	for (let i = 0; i < 17; i++) {
+		const icon = faker.helpers.arrayElement(icons);
+		const appName = faker.helpers.arrayElement(appNames);
+		apps.push({
+			title: faker.word.words({ count: { min: 1, max: 3 } }),
+			appName: appName,
+			icon: icon,
+			defaultSize: {
+				width: faker.number.int({ min: 300, max: 1200 }),
+				height: faker.number.int({ min: 200, max: 800 })
+			}
+		});
+	}
+
+	/*return [
 		{
 			title: 'App1',
 			appName: 'app1',
@@ -40,5 +62,6 @@ export const getApps = query(async () => {
 			icon: 'icon.svg',
 			defaultSize: { width: 300, height: 200 }
 		}
-	] as AppMetadata[];
+	] as AppMetadata[];*/
+	return apps as AppMetadata[];
 });
