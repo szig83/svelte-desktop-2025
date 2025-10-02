@@ -218,10 +218,6 @@
 		return `left: ${left}; top: ${top}; width: ${width}; height: ${height}; z-index: ${zIndex};`;
 	});
 
-	function handleKeydown(e: KeyboardEvent) {
-		e.preventDefault();
-		windowManager.activateWindow(windowState.id);
-	}
 </script>
 
 <div
@@ -236,7 +232,6 @@
 	onclick={() => windowManager.activateWindow(windowState.id)}
 	role="button"
 	tabindex="0"
-	onkeydown={handleKeydown}
 >
 	<div
 		class="window-header"

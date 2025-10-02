@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { LayoutGrid } from 'lucide-svelte';
 	import { getWindowManager } from '$lib/stores/windowStore.svelte';
 	import UniversalIcon from '../UniversalIcon.svelte';
 	import StartMenu from './StartMenu.svelte';
@@ -18,9 +17,10 @@
 <!-- Taskbar a minimalizált ablakok számára -->
 <div id="taskbar">
 	<div class="taskbar-left">
-		<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}><LayoutGrid /></button>
+		<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}
+			><UniversalIcon icon="LayoutPanelLeft" size={24} /></button
+		>
 		{#each windowManager.windows as window}
-			{$inspect(window)}
 			<button
 				class="taskbar-item"
 				class:active={window.isActive}
@@ -35,7 +35,9 @@
 				<div class="taskbar-item-icon">
 					<UniversalIcon icon={window.icon ?? 'FileX'} size={24} />
 				</div>
-				{window.title}
+				<div class="taskbar-item-title">
+					<span>{window.title}</span>
+				</div>
 			</button>
 		{/each}
 	</div>
@@ -59,6 +61,7 @@
 			flex-grow: 1;
 			justify-content: start;
 			align-items: center;
+			gap: 5px;
 		}
 
 		.taskbar-right {
@@ -74,13 +77,14 @@
 		align-items: center;
 		transition: background-color 0.2s;
 		cursor: pointer;
-		background-color: var(--startmenu-bg);
+		margin-left: 5px;
+		border-radius: 4px;
 		aspect-ratio: 1;
-		height: 100%;
+		height: calc(var(--taskbar-height) - 5px);
 		color: rgb(185, 184, 184);
 
 		&:hover {
-			background-color: rgba(0, 0, 0, 0.3);
+			background-color: var(--startmenu-bg);
 		}
 	}
 
@@ -90,18 +94,11 @@
 		gap: 10px;
 		transition: all 0.2s;
 		cursor: pointer;
-		border: none;
-		border-bottom: 3px solid transparent;
-		border-left: 1px solid rgba(255, 255, 255, 0.1);
-		background-color: rgba(0, 0, 0, 0.7);
-		padding: 0 16px;
-		max-width: 200px;
-		height: 100%;
-		overflow: hidden;
-		color: rgb(178, 178, 178);
-		font-size: 0.85rem;
-		/*text-overflow: ellipsis;
-		white-space: nowrap;*/
+		border: 1px solid transparent;
+		border-radius: 4px;
+		padding: 0 10px;
+
+		height: calc(var(--taskbar-height) - 5px);
 
 		.taskbar-item-icon {
 			display: flex;
@@ -110,18 +107,33 @@
 			transition: filter 0.2s ease-in-out;
 			height: 100%;
 		}
+		.taskbar-item-title {
+			display: flex;
+			align-items: center;
+			width: 100px;
+			height: 100%;
+			color: rgb(178, 178, 178);
+			font-size: 0.85rem;
+
+			& > span {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
 	}
 
 	.taskbar-item:hover {
-		background: rgba(255, 255, 255, 0.2);
+		background-color: rgb(255 255 255 / 7%) !important;
 		.taskbar-item-icon {
 			filter: grayscale(0);
 		}
 	}
 
 	.taskbar-item.active {
-		border-bottom-color: rgba(82, 142, 167, 0.9);
-		color: rgb(225, 225, 225);
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+		background-color: rgb(255 255 255 / 5%);
 		.taskbar-item-icon {
 			filter: grayscale(0);
 		}
