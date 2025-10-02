@@ -16,7 +16,7 @@
 
 <StartMenu bind:show={showStartMenu} />
 <!-- Taskbar a minimalizált ablakok számára -->
-<div id="taskbar">
+<div id="taskbar" class="dark">
 	<div class="taskbar-left">
 		<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}
 			><Rocket size={20} /></button
@@ -60,7 +60,7 @@
 
 		z-index: var(--taskbar-z-index);
 		backdrop-filter: blur(10px);
-		background: rgba(40, 40, 40, 0.95);
+		background: var(--color-panel-bg);
 		height: var(--taskbar-height);
 
 		.taskbar-left {
@@ -91,8 +91,8 @@
 		color: rgb(185, 184, 184);
 
 		&:hover {
-			background-color: var(--accent);
-			color: var(--accent-text);
+			background-color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 

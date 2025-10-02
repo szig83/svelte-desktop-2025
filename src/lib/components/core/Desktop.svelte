@@ -7,10 +7,17 @@
 	setWindowManager(windowManager);
 
 	let { children } = $props();
+
+	function handleWorkspaceClick(e: MouseEvent) {
+		// Ha a workspace-re kattintunk (nem ablakra), deaktiváljuk az összes ablakot
+		if (e.target === e.currentTarget) {
+			windowManager.deactivateAllWindows();
+		}
+	}
 </script>
 
 <div id="desktop">
-	<div id="workspace">
+	<div id="workspace" onclick={handleWorkspaceClick} role="button" tabindex="-1">
 		{#if children}
 			{@render children()}
 		{/if}

@@ -166,6 +166,17 @@ class WindowManager {
 		}
 	}
 
+	deactivateAllWindows() {
+		// Minden nem-minimalizált ablakot inaktívvá teszünk
+		this.windows.forEach((w) => {
+			if (!w.isMinimized) {
+				w.isActive = false;
+			}
+		});
+		// Trigger reactivity
+		this.windows = [...this.windows];
+	}
+
 	private getNextZIndex(): number {
 		if (this.windows.length === 0) return this.baseZIndex;
 		const maxZ = Math.max(...this.windows.map((w) => w.zIndex));
