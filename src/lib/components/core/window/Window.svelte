@@ -9,7 +9,7 @@
 	// Minimum ablak méretek
 	const MIN_WINDOW_WIDTH = 300;
 	const MIN_WINDOW_HEIGHT = 200;
-	const WORKSPACE_PADDING = 0;
+	const WORKSPACE_PADDING = 10;
 
 	let dragStartX = 0;
 	let dragStartY = 0;
@@ -55,9 +55,15 @@
 		let newX = e.clientX - dragStartX;
 		let newY = e.clientY - dragStartY;
 
-		// Korlátozás a workspace határain belülre
-		newX = Math.max(0, Math.min(newX, workspaceWidth - windowState.size.width));
-		newY = Math.max(0, Math.min(newY, workspaceHeight - windowState.size.height));
+		// Korlátozás a workspace határain belülre (padding figyelembevételével)
+		newX = Math.max(
+			WORKSPACE_PADDING,
+			Math.min(newX, workspaceWidth - windowState.size.width - WORKSPACE_PADDING)
+		);
+		newY = Math.max(
+			WORKSPACE_PADDING,
+			Math.min(newY, workspaceHeight - windowState.size.height - WORKSPACE_PADDING)
+		);
 
 		windowManager.updatePosition(windowState.id, {
 			x: newX,
@@ -146,18 +152,18 @@
 
 		// Vízszintes méretezés
 		if (resizeDirection.includes('e')) {
-			// Jobb oldal: ne menjen túl a workspace jobb szélén
-			const maxWidth = workspaceWidth - resizeStartLeft;
+			// Jobb oldal: ne menjen túl a workspace jobb szélén (padding figyelembevételével)
+			const maxWidth = workspaceWidth - resizeStartLeft - WORKSPACE_PADDING;
 			newWidth = Math.max(MIN_WINDOW_WIDTH, Math.min(maxWidth, resizeStartWidth + deltaX));
 		} else if (resizeDirection.includes('w')) {
-			// Bal oldal: ne menjen túl a workspace bal szélén (0) és tartsa a minimum méretet
+			// Bal oldal: ne menjen túl a workspace bal szélén (padding figyelembevételével)
 			const potentialWidth = resizeStartWidth - deltaX;
 			const potentialLeft = resizeStartLeft + deltaX;
 
-			if (potentialLeft < 0) {
+			if (potentialLeft < WORKSPACE_PADDING) {
 				// Ha túlmenne a bal szélen, állítsuk be a maximális méretet
-				newWidth = resizeStartLeft + resizeStartWidth;
-				newLeft = 0;
+				newWidth = resizeStartLeft + resizeStartWidth - WORKSPACE_PADDING;
+				newLeft = WORKSPACE_PADDING;
 			} else if (potentialWidth >= MIN_WINDOW_WIDTH) {
 				// Normál méretezés, ha a minimum méret felett vagyunk
 				newWidth = potentialWidth;
@@ -171,18 +177,18 @@
 
 		// Függőleges méretezés
 		if (resizeDirection.includes('s')) {
-			// Alsó oldal: ne menjen túl a workspace alján
-			const maxHeight = workspaceHeight - resizeStartTop;
+			// Alsó oldal: ne menjen túl a workspace alján (padding figyelembevételével)
+			const maxHeight = workspaceHeight - resizeStartTop - WORKSPACE_PADDING;
 			newHeight = Math.max(MIN_WINDOW_HEIGHT, Math.min(maxHeight, resizeStartHeight + deltaY));
 		} else if (resizeDirection.includes('n')) {
-			// Felső oldal: ne menjen túl a workspace tetején (0) és tartsa a minimum méretet
+			// Felső oldal: ne menjen túl a workspace tetején (padding figyelembevételével)
 			const potentialHeight = resizeStartHeight - deltaY;
 			const potentialTop = resizeStartTop + deltaY;
 
-			if (potentialTop < 0) {
+			if (potentialTop < WORKSPACE_PADDING) {
 				// Ha túlmenne a felső szélen, állítsuk be a maximális méretet
-				newHeight = resizeStartTop + resizeStartHeight;
-				newTop = 0;
+				newHeight = resizeStartTop + resizeStartHeight - WORKSPACE_PADDING;
+				newTop = WORKSPACE_PADDING;
 			} else if (potentialHeight >= MIN_WINDOW_HEIGHT) {
 				// Normál méretezés, ha a minimum méret felett vagyunk
 				newHeight = potentialHeight;
