@@ -17,7 +17,7 @@
 	.clock {
 		display: flex;
 		align-items: center;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--panel-text-color);
 		font-size: 12px;
 		font-variant-numeric: tabular-nums;
 	}

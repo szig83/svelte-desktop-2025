@@ -34,8 +34,8 @@
 			justify-content: center;
 			align-items: center;
 			transition: background-color 0.35s ease-out;
-			border-radius: var(--default-border-radius);
-			background-color: rgba(70, 70, 70, 0.9);
+			border-radius: var(--border-radius);
+			/*background-color: hsl(from var(--panel-bg-color) h s calc(l - 5));*/
 			aspect-ratio: 1;
 			width: 100%;
 		}
@@ -44,11 +44,10 @@
 
 			& > div {
 				display: -webkit-box;
-				transition: color 0.35s ease-out;
+				transition: color 0.25s ease-out;
 				line-clamp: 2;
 				-webkit-line-clamp: 2;
 				overflow: hidden;
-				color: rgba(255, 255, 255, 0.5);
 				font-size: 0.7rem;
 				text-overflow: ellipsis;
 				-webkit-box-orient: vertical;
@@ -59,11 +58,11 @@
 
 		&:hover {
 			.app-icon {
-				background-color: rgba(109, 109, 109, 0.9);
+				background-color: hsl(from var(--panel-bg-color) h s calc(l - 5));
 			}
 			.app-title {
 				& > div {
-					color: rgba(255, 255, 255, 0.85);
+					color: hsl(from var(--accent-color) h s calc(l + 5));
 				}
 			}
 		}

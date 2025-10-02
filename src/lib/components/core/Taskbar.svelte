@@ -14,54 +14,64 @@
 	}
 </script>
 
-<StartMenu bind:show={showStartMenu} />
-<!-- Taskbar a minimalizált ablakok számára -->
-<div id="taskbar" class="dark">
-	<div class="taskbar-left">
-		<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}
-			><Rocket size={20} /></button
-		>
-		{#each windowManager.windows as window}
-			<button
-				class="taskbar-item"
-				class:active={window.isActive}
-				class:minimized={window.isMinimized}
-				onclick={() => {
-					if (window.isMinimized) {
-						// Ha minimalizált, visszaállítjuk és aktiváljuk
-						windowManager.minimizeWindow(window.id);
-					} else if (window.isActive) {
-						// Ha aktív, minimalizáljuk
-						windowManager.minimizeWindow(window.id);
-					} else {
-						// Ha inaktív (de nem minimalizált), aktiváljuk
-						windowManager.activateWindow(window.id);
-					}
-				}}
-			>
-				<div class="taskbar-item-icon">
-					<UniversalIcon icon={window.icon ?? 'FileX'} size={24} />
-				</div>
-				<div class="taskbar-item-title">
-					<span>{window.title}</span>
-				</div>
-			</button>
-		{/each}
-	</div>
-	<div class="taskbar-right">
-		<Clock />
+<div class="dark">
+	<StartMenu bind:show={showStartMenu} />
+	<!-- Taskbar a minimalizált ablakok számára -->
+	<div id="taskbar">
+		<div>
+			<div class="taskbar-left">
+				<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}
+					><Rocket size={16} /></button
+				>
+				{#each windowManager.windows as window}
+					<button
+						class="taskbar-item"
+						class:active={window.isActive}
+						class:minimized={window.isMinimized}
+						onclick={() => {
+							if (window.isMinimized) {
+								// Ha minimalizált, visszaállítjuk és aktiváljuk
+								windowManager.minimizeWindow(window.id);
+							} else if (window.isActive) {
+								// Ha aktív, minimalizáljuk
+								windowManager.minimizeWindow(window.id);
+							} else {
+								// Ha inaktív (de nem minimalizált), aktiváljuk
+								windowManager.activateWindow(window.id);
+							}
+						}}
+					>
+						<div class="taskbar-item-icon">
+							<UniversalIcon icon={window.icon ?? 'FileX'} size={24} />
+						</div>
+						<div class="taskbar-item-title">
+							<span>{window.title}</span>
+						</div>
+					</button>
+				{/each}
+			</div>
+			<div class="taskbar-right">
+				<Clock />
+			</div>
+		</div>
 	</div>
 </div>
 
 <style>
 	#taskbar {
+		z-index: var(--taskbar-z-index);
+
+		padding: 0 var(--startmenu-margin) var(--startmenu-margin) var(--startmenu-margin);
+		height: var(--taskbar-height);
+	}
+
+	#taskbar > div {
 		display: flex;
 		justify-content: space-between;
-
-		z-index: var(--taskbar-z-index);
 		backdrop-filter: blur(10px);
-		background: var(--color-panel-bg);
-		height: var(--taskbar-height);
+		border-radius: var(--border-radius);
+		background: hsl(from var(--panel-bg-color) h s calc(l - 5));
+		width: 100%;
 
 		.taskbar-left {
 			display: flex;
@@ -84,15 +94,15 @@
 		align-items: center;
 		transition: background-color 0.2s;
 		cursor: pointer;
-		margin-left: 5px;
-		border-radius: 4px;
+
+		border-radius: var(--border-radius);
 		aspect-ratio: 1;
-		height: calc(var(--taskbar-height) - 5px);
-		color: rgb(185, 184, 184);
+		height: calc(var(--taskbar-height) - var(--startmenu-margin));
+		color: var(--panel-text-color);
 
 		&:hover {
-			background-color: var(--color-accent);
-			color: var(--color-accent-text);
+			background-color: var(--accent-color);
+			color: var(--accent-text-color);
 		}
 	}
 
@@ -103,10 +113,10 @@
 		transition: all 0.2s;
 		cursor: pointer;
 		border: 1px solid transparent;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		padding: 0 10px;
 
-		height: calc(var(--taskbar-height) - 5px);
+		height: calc(var(--taskbar-height) - var(--startmenu-margin));
 
 		.taskbar-item-icon {
 			display: flex;
@@ -120,7 +130,7 @@
 			align-items: center;
 			max-width: 100px;
 			height: 100%;
-			color: rgb(178, 178, 178);
+			color: var(--taskbar-item-text-color);
 			font-size: 0.85rem;
 
 			& > span {
@@ -132,16 +142,16 @@
 	}
 
 	.taskbar-item:hover {
-		background-color: rgb(255 255 255 / 7%) !important;
+		background-color: var(--taskbar-item-bg-color_hover) !important;
 		.taskbar-item-icon {
 			filter: grayscale(0);
 		}
 	}
 
 	.taskbar-item.active {
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+		box-shadow: var(--shadow);
 
-		background-color: rgb(255 255 255 / 5%);
+		background-color: var(--taskbar-item-bg-color_active);
 		.taskbar-item-icon {
 			filter: grayscale(0);
 		}

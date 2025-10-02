@@ -97,30 +97,18 @@
 		width: var(--startmenu-width, 300px);
 		min-height: var(--startmenu-height, 300px);
 		overflow: hidden;
-		color: #fff;
+		color: var(--panel-text-color);
 	}
 
 	.start-menu-wrapper {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		box-shadow: var(--default-shadow);
-		border-radius: var(--default-border-radius, 0);
-		background-color: var(--startmenu-bg);
+		box-shadow: var(--shadow-card);
+		border-radius: var(--border-radius, 0);
+		background-color: var(--startmenu-bg-color);
 		width: 100%;
 		overflow: auto;
-
-		/*&::after {
-			position: absolute;
-			bottom: 0;
-			left: calc(var(--startmenu-margin, 16px) + 10px);
-			transform: translateX(-50%);
-			clip-path: polygon(50% 100%, 0 0, 100% 0);
-			background: var(--startmenu-bg);
-			width: 20px;
-			height: var(--startmenu-margin, 16px);
-			content: '';
-		}*/
 	}
 
 	.start-menu-content {
@@ -181,7 +169,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		background-color: rgba(0, 0, 0, 0.1);
+		background-color: hsl(from var(--panel-bg-color) h s calc(l - 5));
 		padding: 10px 15px;
 		font-size: 0.8rem;
 	}
