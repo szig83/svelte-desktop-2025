@@ -9,6 +9,7 @@
 	// Minimum ablak méretek
 	const MIN_WINDOW_WIDTH = 300;
 	const MIN_WINDOW_HEIGHT = 200;
+	const WORKSPACE_PADDING = 0;
 
 	let dragStartX = 0;
 	let dragStartY = 0;
@@ -210,10 +211,16 @@
 	}
 
 	let windowStyle = $derived.by(() => {
-		const left = windowState.isMaximized ? '0' : `${windowState.position.x}px`;
-		const top = windowState.isMaximized ? '0' : `${windowState.position.y}px`;
-		const width = windowState.isMaximized ? '100%' : `${windowState.size.width}px`;
-		const height = windowState.isMaximized ? '100%' : `${windowState.size.height}px`;
+		const left = windowState.isMaximized
+			? 'var(--startmenu-margin)'
+			: `${windowState.position.x}px`;
+		const top = windowState.isMaximized ? 'var(--startmenu-margin)' : `${windowState.position.y}px`;
+		const width = windowState.isMaximized
+			? 'calc(100% - var(--startmenu-margin) *2 )'
+			: `${windowState.size.width}px`;
+		const height = windowState.isMaximized
+			? 'calc(100% - var(--startmenu-margin) * 2)'
+			: `${windowState.size.height}px`;
 		const zIndex = windowState.zIndex;
 		return `left: ${left}; top: ${top}; width: ${width}; height: ${height}; z-index: ${zIndex};`;
 	});
@@ -339,7 +346,7 @@
 	}
 
 	.window.maximized {
-		border-radius: 0;
+		/*border-radius: 0;*/
 	}
 
 	.window-header {
@@ -355,7 +362,7 @@
 	}
 
 	.window.maximized .window-header {
-		border-radius: 0;
+		cursor: default;
 	}
 
 	.window:not(.active) .window-header {
