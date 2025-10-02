@@ -9,16 +9,42 @@
 	let { show = $bindable() } = $props();
 
 	let apps = $state<ReturnType<typeof getApps> | null>(null);
+	let startMenuElement: HTMLDivElement;
 
 	$effect(() => {
 		if (show && !apps) {
 			apps = getApps();
 		}
 	});
+
+	// Click outside kezelés
+	$effect(() => {
+		if (!show) return;
+
+		function handleClickOutside(event: MouseEvent) {
+			if (startMenuElement && !startMenuElement.contains(event.target as Node)) {
+				// Ellenőrizzük, hogy nem a start menu gombra kattintottunk-e
+				const target = event.target as HTMLElement;
+				if (!target.closest('.btn-startmenu')) {
+					show = false;
+				}
+			}
+		}
+
+		// Kis késleltetéssel adjuk hozzá, hogy ne azonnal zárja be
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside);
+		}, 100);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 </script>
 
 {#if show}
-	<div id="startMenu" transition:fly={{ y: 20, duration: 200 }}>
+	<div id="startMenu" bind:this={startMenuElement} transition:fly={{ y: 20, duration: 200 }}>
 		<div class="start-menu-wrapper">
 			<div class="start-menu-header">
 				<div class="search-bar">
