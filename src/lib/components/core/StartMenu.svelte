@@ -6,7 +6,7 @@
 	import UniversalIcon from '../UniversalIcon.svelte';
 
 	const windowManager = getWindowManager();
-	let { show } = $props();
+	let { show = $bindable() } = $props();
 
 	let apps = $state<ReturnType<typeof getApps> | null>(null);
 
@@ -35,7 +35,10 @@
 					<div class="start-menu-apps">
 						{#each apps.current as app}
 							<AppIcon
-								onclick={() => windowManager.openWindow(app.appName, app.title, app)}
+								onclick={() => {
+									windowManager.openWindow(app.appName, app.title, app);
+									show = false;
+								}}
 								{app}
 							/>
 						{/each}

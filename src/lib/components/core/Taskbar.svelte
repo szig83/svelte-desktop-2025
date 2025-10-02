@@ -14,7 +14,7 @@
 	}
 </script>
 
-<StartMenu show={showStartMenu} />
+<StartMenu bind:show={showStartMenu} />
 <!-- Taskbar a minimalizált ablakok számára -->
 <div id="taskbar">
 	<div class="taskbar-left">

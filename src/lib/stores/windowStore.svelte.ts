@@ -4,7 +4,7 @@ import { type AppMetadata } from '$lib/types/window';
 
 export type WindowState = {
 	id: string;
-	icon: string | null;
+	icon: string | null | undefined;
 	appName: string;
 	title: string;
 	isActive: boolean;
@@ -116,6 +116,7 @@ class WindowManager {
 					);
 				if (nextWindow) {
 					nextWindow.isActive = true;
+					//this.activateWindow(nextWindow.id);
 				}
 			}
 		}
