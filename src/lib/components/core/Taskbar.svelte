@@ -21,7 +21,7 @@
 		<div>
 			<div class="taskbar-left">
 				<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}
-					><Rocket size={16} /></button
+					><Rocket size={22} /></button
 				>
 				{#each windowManager.windows as window}
 					<button
@@ -42,7 +42,7 @@
 						}}
 					>
 						<div class="taskbar-item-icon">
-							<UniversalIcon icon={window.icon ?? 'FileX'} size={24} />
+							<UniversalIcon icon={window.icon ?? 'FileX'} size={32} />
 						</div>
 						<div class="taskbar-item-title">
 							<span>{window.title}</span>

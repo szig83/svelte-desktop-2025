@@ -35,7 +35,7 @@ body {
 
 :root {
 	/* Méretek */
-	--taskbar-height: 48px;
+	--taskbar-height: 58px;
 	--taskbar-z-index: 1000;
 	--border-radius: 8px;
 
