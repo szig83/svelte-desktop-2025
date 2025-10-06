@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { X, Minus, Maximize, Minimize2 } from 'lucide-svelte';
+	import { X, Minus, Maximize, Minimize2, CircleQuestionMark } from 'lucide-svelte';
 
 	interface Props {
-		controlType: 'minimize' | 'maximize' | 'restore' | 'close';
+		controlType: 'minimize' | 'maximize' | 'restore' | 'close' | 'help';
 		onClick: (e: MouseEvent) => void;
 	}
 
@@ -28,8 +28,14 @@
 		onClick(e);
 	}}
 	class="btn-window-control btn-window-{controlType}"
-	aria-label="{controlType} window"><Icon /></button
+	aria-label="{controlType} window"
 >
+	{#if controlType === 'help'}
+		<span>?</span>
+	{:else}
+		<Icon />
+	{/if}
+</button>
 
 <style>
 	.btn-window-control {
@@ -52,6 +58,7 @@
 		--btn-color: 52 144 220; /*rgb(52, 144, 220)*/
 		border-color: rgb(var(--btn-color) / 0.5);
 		background: rgb(var(--btn-color));
+		font-size: 0.7rem;
 	}
 
 	.btn-window-minimize {
@@ -76,12 +83,14 @@
 	:global {
 		.window:not(.active) {
 			.btn-window-control {
+				span,
 				svg {
 					opacity: 0;
 				}
 			}
 
 			.btn-window-control:hover {
+				span,
 				svg {
 					opacity: 1;
 				}

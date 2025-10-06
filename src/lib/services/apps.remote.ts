@@ -12,14 +12,23 @@ export const getApps = query(async () => {
 	const apps = [];
 	apps.push({
 		title: 'Beállítások',
-		appName: 'app1',
-		icon: 'Cog',
+		appName: 'settings',
+		icon: 'icon.svg',
 		minSize: { width: 400, height: 300 },
-		defaultSize: { width: 600, height: 400, maximized: true },
+		defaultSize: { width: 600, height: 400, maximized: false },
+		allowMultiple: false,
+		helpId: 1
+	});
+	apps.push({
+		title: 'Súgó',
+		appName: 'help',
+		icon: 'icon.svg',
+		minSize: { width: 500, height: 500 },
+		defaultSize: { width: 500, height: 500, maximized: false },
 		allowMultiple: true
 	});
 
-	for (let i = 0; i < 17; i++) {
+	/*for (let i = 0; i < 17; i++) {
 		const icon = faker.helpers.arrayElement(icons);
 		const appName = faker.helpers.arrayElement(appNames);
 		apps.push({
@@ -35,7 +44,7 @@ export const getApps = query(async () => {
 				height: faker.number.int({ min: 200, max: 800 })
 			}
 		});
-	}
+	}*/
 
 	/*return [
 		{

@@ -107,6 +107,21 @@
 		windowManager.maximizeWindow(windowState.id);
 	}
 
+	function help(helpId: number | undefined) {
+		const helpApp = {
+			title: 'Súgó',
+			appName: 'help',
+			icon: 'icon.svg',
+			minSize: { width: 500, height: 500 },
+			defaultSize: { width: 500, height: 500, maximized: false },
+			allowMultiple: true
+		};
+		console.log(helpId);
+		windowManager.openWindow(helpApp.appName, helpApp.title, helpApp, {
+			helpId
+		});
+	}
+
 	function handleResizeStart(e: MouseEvent, direction: string) {
 		if (windowState.isMaximized || isResizing) return;
 
@@ -362,6 +377,9 @@
 	>
 		<div class="window-title">{windowState.title}</div>
 		<div class="window-controls">
+			{#if windowState.helpId}
+				<WindowControlButton controlType="help" onClick={() => help(windowState.helpId)} />
+			{/if}
 			<WindowControlButton controlType="minimize" onClick={minimize} />
 			<WindowControlButton
 				controlType={windowState.isMaximized ? 'restore' : 'maximize'}

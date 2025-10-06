@@ -18,6 +18,7 @@ export type WindowState = {
 	isLoading?: boolean;
 	parameters?: AppParameters; // Az appnak átadott paraméterek
 	instanceId?: string; // Példány azonosító több példány esetén
+	helpId?: number;
 };
 
 class WindowManager {
@@ -64,7 +65,7 @@ class WindowManager {
 		}
 
 		const defaultSize = metadata.defaultSize || { width: 600, height: 400 };
-		
+
 		const newWindow: WindowState = {
 			id,
 			appName,
@@ -80,7 +81,8 @@ class WindowManager {
 			component: null,
 			isLoading: true,
 			parameters,
-			instanceId
+			instanceId,
+			helpId: metadata.helpId
 		};
 
 		// Deaktiváljuk az összes többi ablakot
