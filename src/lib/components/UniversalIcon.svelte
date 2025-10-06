@@ -4,7 +4,7 @@
 	import { CircleAlert } from 'lucide-svelte'; // Fallback ikon
 
 	interface Props {
-		icon: string;
+		icon?: string;
 		size?: number;
 		color?: string;
 		strokeWidth?: number;
@@ -15,7 +15,7 @@
 	}
 
 	let {
-		icon,
+		icon = '',
 		size = 24,
 		color = 'currentColor',
 		strokeWidth = 2,
@@ -35,7 +35,8 @@
 		const loadId = ++currentLoadId;
 
 		(async () => {
-			if (!icon) {
+			// Validálás: legalább az egyik (icon vagy appName) legyen megadva
+			if (!icon && !appName) {
 				iconData = null;
 				loading = false;
 				error = true;
@@ -47,7 +48,9 @@
 			iconData = null; // Nullázás az új ikon betöltése előtt
 
 			try {
-				const result = await loadIcon(icon, appName);
+				// Ha csak appName van megadva, alapértelmezett icon.svg-t használunk
+				const iconToLoad = icon || 'icon.svg';
+				const result = await loadIcon(iconToLoad, appName);
 
 				// Race condition ellenőrzés - csak akkor frissítjük ha még ez az aktuális betöltés
 				if (loadId === currentLoadId) {

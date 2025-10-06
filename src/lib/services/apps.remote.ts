@@ -13,16 +13,26 @@ export const getApps = query(async () => {
 	apps.push({
 		title: 'Beállítások',
 		appName: 'settings',
-		icon: 'icon.svg',
+		//icon: 'icon.svg',
 		minSize: { width: 400, height: 300 },
 		defaultSize: { width: 600, height: 400, maximized: false },
 		allowMultiple: false,
 		helpId: 1
 	});
+
+	apps.push({
+		title: 'Felhasználók',
+		appName: 'users',
+		//icon: 'icon.svg',
+		minSize: { width: 500, height: 500 },
+		defaultSize: { width: 500, height: 500, maximized: false },
+		allowMultiple: false
+	});
+
 	apps.push({
 		title: 'Súgó',
 		appName: 'help',
-		icon: 'icon.svg',
+		//icon: 'icon.svg',
 		minSize: { width: 500, height: 500 },
 		defaultSize: { width: 500, height: 500, maximized: false },
 		allowMultiple: true

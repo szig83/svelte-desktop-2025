@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { X, Minus, Maximize, Minimize2, CircleQuestionMark } from 'lucide-svelte';
+	import { X, Minus, Maximize, Minimize2 } from 'lucide-svelte';
 
 	interface Props {
 		controlType: 'minimize' | 'maximize' | 'restore' | 'close' | 'help';

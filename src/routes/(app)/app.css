@@ -51,8 +51,8 @@ body {
 	--panel-bg-color: hsla(0, 0%, 73%, 0.95);
 	--panel-text-color: hsl(0, 0%, 16%);
 
-	--taskbar-item-bg-color_active: hsl(0, 1%, 63%);
-	--taskbar-item-bg-color_hover: hsl(from var(--taskbar-item-bg-color_active) h s calc(l - 2));
+	--taskbar-item-bg-color: hsl(0, 1%, 63%);
+	--taskbar-item-bg-color_hover: hsl(from var(--taskbar-item-bg-color) h s calc(l - 2));
 	--taskbar-item-text-color: hsl(0, 0%, 16%);
 
 	--startmenu-bg-color: hsla(0, 0%, 73%, 0.98);
@@ -73,8 +73,8 @@ body {
 	--panel-bg-color: hsla(0, 0%, 16%, 0.95);
 	--panel-text-color: hsl(0, 0%, 72%);
 
-	--taskbar-item-bg-color_active: hsl(223, 4%, 20%);
-	--taskbar-item-bg-color_hover: hsl(from var(--taskbar-item-bg-color_active) h s calc(l + 2));
+	--taskbar-item-bg-color: hsl(223, 4%, 20%);
+	--taskbar-item-bg-color_hover: hsl(from var(--taskbar-item-bg-color) h s calc(l + 2));
 	--taskbar-item-text-color: hsl(0, 0%, 72%);
 
 	--startmenu-bg-color: var(--panel-bg-color);

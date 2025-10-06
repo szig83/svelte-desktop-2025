@@ -42,7 +42,7 @@
 						}}
 					>
 						<div class="taskbar-item-icon">
-							<UniversalIcon icon={window.icon ?? 'FileX'} size={32} appName={window.appName} />
+							<UniversalIcon icon={window.icon ?? ''} size={32} appName={window.appName} />
 						</div>
 						<div class="taskbar-item-title">
 							<span>{window.title}</span>
@@ -115,6 +115,7 @@
 		cursor: pointer;
 		border: 1px solid transparent;
 		border-radius: var(--border-radius);
+		background-color: var(--taskbar-item-bg-color);
 		padding: 0 10px;
 
 		height: calc(var(--taskbar-height) - var(--startmenu-margin) - 5px);
@@ -122,7 +123,7 @@
 		.taskbar-item-icon {
 			display: flex;
 			align-items: center;
-			filter: grayscale(1);
+
 			transition: filter 0.2s ease-in-out;
 			height: 100%;
 		}
@@ -144,24 +145,20 @@
 
 	.taskbar-item:hover {
 		background-color: var(--taskbar-item-bg-color_hover) !important;
-		.taskbar-item-icon {
-			filter: grayscale(0);
-		}
 	}
 
 	.taskbar-item.active {
 		box-shadow:
 			var(--shadow),
 			inset -1px -8px 20px 6px rgba(from var(--accent-color) r g b / 0.4);
-		/*border-bottom: 2px solid rgba(from var(--accent-color) r g b / 0.4);*/
-		background-color: var(--taskbar-item-bg-color_active);
-
-		.taskbar-item-icon {
-			filter: grayscale(0);
-		}
 	}
 
 	.taskbar-item.minimized {
-		opacity: 0.4;
+		opacity: 0.7;
+		background-color: transparent;
+
+		.taskbar-item-icon {
+			filter: grayscale(1);
+		}
 	}
 </style>

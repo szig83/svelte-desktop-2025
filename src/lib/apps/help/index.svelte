@@ -5,12 +5,43 @@
 		getWindowId,
 		updateWindowTitleById
 	} from '$lib/services/appContext';
-	const helpId = getParameter<number>('helpId', 0);
+	import { getWindowManager } from '$lib/stores/windowStore.svelte';
+	const helpId = getParameter<number | undefined>('helpId', undefined);
 	const parameters = getAppParameters();
+	const helps = [
+		{
+			id: 1,
+			title: 'Beállítások',
+			content: 'Beállítások súgó tartalom lesz ez.'
+		},
+		{
+			id: 2,
+			title: 'Felhasználók',
+			content: 'Felhasználók súgó tartalom lesz ez.'
+		},
+		{
+			id: 3,
+			title: 'Súgó',
+			content: 'Súgó súgó tartalom lesz ez.'
+		}
+	];
+
+	const help = helps.find((h) => h.id === helpId);
+	if (help) {
+		const windowManager = getWindowManager();
+		const windowData = windowManager.windows.find((w) => w.id === getWindowId());
+		updateWindowTitleById(getWindowId(), windowData?.title + ' - ' + help.title);
+	}
 </script>
 
 <div>
-	<h2>Súgó</h2>
-	<p>Help ID: {helpId}</p>
-	<pre>{JSON.stringify(parameters, null, 2)}</pre>
+	{#if helpId}
+		{#if help}
+			<p>{help.content}</p>
+		{:else}
+			<p>Nem található súgó</p>
+		{/if}
+	{:else}
+		<p>Általános súgó alkalmazás tartalom.</p>
+	{/if}
 </div>
