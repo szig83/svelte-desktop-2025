@@ -1,6 +1,8 @@
 export interface WindowSize {
 	width: number;
 	height: number;
+	/** Whether the window should open maximized. */
+	maximized?: boolean;
 }
 
 export interface AppMetadata {
@@ -16,9 +18,6 @@ export interface AppMetadata {
 	category?: string;
 	/** Whether multiple instances are allowed. */
 	allowMultiple?: boolean;
-	/** Default window position mode. */
-	defaultPosition?: 'center' | 'cascade' | 'custom';
-	/** Custom default position if mode is 'custom'. */
 	/** Minimum window size. */
 	minSize?: WindowSize;
 	/** Maximum window size. */
@@ -29,6 +28,8 @@ export interface AppMetadata {
 	maximizable?: boolean;
 	/** Whether window can be minimized. */
 	minimizable?: boolean;
+	/** Help ID for the application. */
+	helpId?: number;
 }
 
 /** Parameters that can be passed to an app when opening. */

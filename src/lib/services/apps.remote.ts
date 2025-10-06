@@ -15,7 +15,7 @@ export const getApps = query(async () => {
 		appName: 'app1',
 		icon: 'Cog',
 		minSize: { width: 400, height: 300 },
-		defaultSize: { width: 600, height: 400 },
+		defaultSize: { width: 600, height: 400, maximized: true },
 		allowMultiple: true
 	});
 

@@ -56,13 +56,15 @@ class WindowManager {
 		}
 
 		const id = `window-${this.nextId++}`;
-		
+
 		// Több példány esetén instanceId generálása, de cím marad eredeti
 		let instanceId: string | undefined;
 		if (metadata.allowMultiple && Object.keys(parameters).length > 0) {
 			instanceId = this.generateInstanceId(parameters);
 		}
 
+		const defaultSize = metadata.defaultSize || { width: 600, height: 400 };
+		
 		const newWindow: WindowState = {
 			id,
 			appName,
@@ -70,10 +72,10 @@ class WindowManager {
 			title, // Eredeti cím marad
 			isActive: true,
 			isMinimized: false,
-			isMaximized: false,
+			isMaximized: defaultSize.maximized || false,
 			zIndex: this.getNextZIndex(),
 			position: this.getNextPosition(),
-			size: metadata.defaultSize || { width: 600, height: 400 },
+			size: { width: defaultSize.width, height: defaultSize.height },
 			minSize: metadata.minSize || { width: 300, height: 200 },
 			component: null,
 			isLoading: true,
