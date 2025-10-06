@@ -42,7 +42,7 @@
 						}}
 					>
 						<div class="taskbar-item-icon">
-							<UniversalIcon icon={window.icon ?? 'FileX'} size={32} />
+							<UniversalIcon icon={window.icon ?? 'FileX'} size={32} appName={window.appName} />
 						</div>
 						<div class="taskbar-item-title">
 							<span>{window.title}</span>

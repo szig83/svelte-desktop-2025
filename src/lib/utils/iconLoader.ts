@@ -147,14 +147,19 @@ export async function loadIcon(
 
 	//console.log(iconIdentifier, ' appname:', appName);
 
+	// Cache kulcs generálása - appName-mel együtt a privát ikonokhoz
+	const iconType = detectIconType(iconIdentifier);
+	const cacheKey = iconType === ICON_TYPES.PRIVATE_SVG || iconType === ICON_TYPES.PRIVATE_IMAGE
+		? `${appName || ''}:${iconIdentifier}`
+		: iconIdentifier;
+
 	// Cache ellenőrzése
-	if (iconCache.has(iconIdentifier)) {
-		return iconCache.get(iconIdentifier) ?? null;
+	if (iconCache.has(cacheKey)) {
+		return iconCache.get(cacheKey) ?? null;
 	}
 
-	const iconType = detectIconType(iconIdentifier);
 	if (!iconType) {
-		iconCache.set(iconIdentifier, null);
+		iconCache.set(cacheKey, null);
 		return null;
 	}
 
@@ -215,7 +220,7 @@ export async function loadIcon(
 	}
 
 	// Cache-elés
-	iconCache.set(iconIdentifier, result);
+	iconCache.set(cacheKey, result);
 	return result;
 }
 
