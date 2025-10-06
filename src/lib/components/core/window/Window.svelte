@@ -1,14 +1,23 @@
 <!-- src/lib/components/Window.svelte -->
 <script lang="ts">
 	import { getWindowManager, type WindowState } from '$lib/stores/windowStore.svelte';
+	import { setContext } from 'svelte';
+	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/appContext';
 	let { windowState }: { windowState: WindowState } = $props();
 	import WindowControlButton from './WindowControlButton.svelte';
 
 	const windowManager = getWindowManager();
 
+	// Set up app context for child components
+	const appContext: AppContext = {
+		parameters: windowState.parameters || {},
+		windowId: windowState.id
+	};
+	setContext(APP_CONTEXT_KEY, appContext);
+
 	// Minimum ablak méretek
-	const MIN_WINDOW_WIDTH = 300;
-	const MIN_WINDOW_HEIGHT = 200;
+	const MIN_WINDOW_WIDTH = windowState.minSize.width;
+	const MIN_WINDOW_HEIGHT = windowState.minSize.height;
 	const WORKSPACE_PADDING = 10;
 
 	let dragStartX = 0;
@@ -204,6 +213,29 @@
 		windowManager.updatePosition(windowState.id, { x: newLeft, y: newTop });
 	}
 
+	function checkIfMaximized() {
+		// Workspace méretek
+		const workspace = document.getElementById('workspace');
+		if (!workspace) return false;
+
+		const workspaceRect = workspace.getBoundingClientRect();
+		const workspaceWidth = workspaceRect.width;
+		const workspaceHeight = workspaceRect.height;
+
+		// Maximális elérhető méret (padding figyelembevételével)
+		const maxWidth = workspaceWidth - 2 * WORKSPACE_PADDING;
+		const maxHeight = workspaceHeight - 2 * WORKSPACE_PADDING;
+
+		// Ellenőrizzük, hogy az ablak pozíciója és mérete megfelel-e a maximalizált állapotnak
+		const isAtMaxPosition =
+			windowState.position.x <= WORKSPACE_PADDING && windowState.position.y <= WORKSPACE_PADDING;
+		const isAtMaxSize =
+			windowState.size.width >= maxWidth - 5 && // 5px tolerancia
+			windowState.size.height >= maxHeight - 5;
+
+		return isAtMaxPosition && isAtMaxSize;
+	}
+
 	function handleResizeEnd() {
 		isResizing = false;
 		resizeDirection = '';
@@ -214,6 +246,82 @@
 
 		document.removeEventListener('mousemove', handleResizeMove);
 		document.removeEventListener('mouseup', handleResizeEnd);
+
+		// Ellenőrizzük, hogy elérte-e a maximális méretet
+		if (!windowState.isMaximized && checkIfMaximized()) {
+			windowManager.maximizeWindow(windowState.id);
+		}
+	}
+
+	function handleEdgeDoubleClick(e: MouseEvent, direction: string) {
+		if (windowState.isMaximized) return;
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		// Workspace méretek
+		const workspace = document.getElementById('workspace');
+		if (!workspace) return;
+
+		const workspaceRect = workspace.getBoundingClientRect();
+		const workspaceWidth = workspaceRect.width;
+		const workspaceHeight = workspaceRect.height;
+
+		let newWidth = windowState.size.width;
+		let newHeight = windowState.size.height;
+		let newLeft = windowState.position.x;
+		let newTop = windowState.position.y;
+
+		switch (direction) {
+			case 'e': // Jobb él - nyújtás jobbra a workspace jobb széléig
+				newWidth = workspaceWidth - windowState.position.x - WORKSPACE_PADDING;
+				break;
+			case 'w': // Bal él - nyújtás balra a workspace bal széléig
+				newWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+				newLeft = WORKSPACE_PADDING;
+				break;
+			case 's': // Alsó él - nyújtás lefelé a workspace aljáig
+				newHeight = workspaceHeight - windowState.position.y - WORKSPACE_PADDING;
+				break;
+			case 'n': // Felső él - nyújtás felfelé a workspace tetejéig
+				newHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+				newTop = WORKSPACE_PADDING;
+				break;
+			case 'ne': // Jobb felső sarok - nyújtás jobbra és felfelé
+				newWidth = workspaceWidth - windowState.position.x - WORKSPACE_PADDING;
+				newHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+				newTop = WORKSPACE_PADDING;
+				break;
+			case 'nw': // Bal felső sarok - nyújtás balra és felfelé
+				newWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+				newLeft = WORKSPACE_PADDING;
+				newHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+				newTop = WORKSPACE_PADDING;
+				break;
+			case 'se': // Jobb alsó sarok - nyújtás jobbra és lefelé
+				newWidth = workspaceWidth - windowState.position.x - WORKSPACE_PADDING;
+				newHeight = workspaceHeight - windowState.position.y - WORKSPACE_PADDING;
+				break;
+			case 'sw': // Bal alsó sarok - nyújtás balra és lefelé
+				newWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+				newLeft = WORKSPACE_PADDING;
+				newHeight = workspaceHeight - windowState.position.y - WORKSPACE_PADDING;
+				break;
+		}
+
+		// Minimum méretek ellenőrzése
+		newWidth = Math.max(MIN_WINDOW_WIDTH, newWidth);
+		newHeight = Math.max(MIN_WINDOW_HEIGHT, newHeight);
+
+		windowManager.updateSize(windowState.id, { width: newWidth, height: newHeight });
+		windowManager.updatePosition(windowState.id, { x: newLeft, y: newTop });
+
+		// Ellenőrizzük, hogy elérte-e a maximális méretet a dupla kattintás után
+		setTimeout(() => {
+			if (!windowState.isMaximized && checkIfMaximized()) {
+				windowManager.maximizeWindow(windowState.id);
+			}
+		}, 10); // Kis késleltetés, hogy a DOM frissüljön
 	}
 
 	let windowStyle = $derived.by(() => {
@@ -264,14 +372,16 @@
 	</div>
 
 	<div class="window-content">
-		{#if windowState.isLoading}
-			<div class="loading">Betöltés...</div>
-		{:else if windowState.component}
-			{@const Component = windowState.component}
-			<Component />
-		{:else}
-			<div class="error">Nem sikerült betölteni a komponenst</div>
-		{/if}
+		<div>
+			{#if windowState.isLoading}
+				<div class="loading">Betöltés...</div>
+			{:else if windowState.component}
+				{@const Component = windowState.component}
+				<Component />
+			{:else}
+				<div class="error">Nem sikerült betölteni a komponenst</div>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Resize handles -->
@@ -279,6 +389,7 @@
 		<div
 			class="resize-handle resize-n"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'n')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'n')}
 			role="button"
 			tabindex="0"
 			aria-label="Resize window"
@@ -286,42 +397,49 @@
 		<div
 			class="resize-handle resize-s"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 's')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 's')}
 			role="button"
 			tabindex="0"
 		></div>
 		<div
 			class="resize-handle resize-e"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'e')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'e')}
 			role="button"
 			tabindex="0"
 		></div>
 		<div
 			class="resize-handle resize-w"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'w')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'w')}
 			role="button"
 			tabindex="0"
 		></div>
 		<div
 			class="resize-handle resize-ne"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'ne')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'ne')}
 			role="button"
 			tabindex="0"
 		></div>
 		<div
 			class="resize-handle resize-nw"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'nw')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'nw')}
 			role="button"
 			tabindex="0"
 		></div>
 		<div
 			class="resize-handle resize-se"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'se')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'se')}
 			role="button"
 			tabindex="0"
 		></div>
 		<div
 			class="resize-handle resize-sw"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'sw')}
+			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'sw')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -397,7 +515,12 @@
 		border-bottom-left-radius: var(--default-border-radius, 8px);
 		background-color: rgba(255, 255, 255, 0.95);
 		padding: 16px;
-		overflow: auto;
+		overflow: hidden;
+
+		& > div {
+			height: 100%;
+			overflow: auto;
+		}
 	}
 
 	.loading,

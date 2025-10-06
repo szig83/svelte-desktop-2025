@@ -9,7 +9,8 @@
 	let { show = $bindable() } = $props();
 
 	let apps = $state<ReturnType<typeof getApps> | null>(null);
-	let startMenuElement: HTMLDivElement;
+	let startMenuElement = $state<HTMLDivElement>();
+	let clickCount = $state(0); // Kattintás számláló a különböző példányokhoz
 
 	$effect(() => {
 		if (show && !apps) {
@@ -62,7 +63,34 @@
 						{#each apps.current as app}
 							<AppIcon
 								onclick={() => {
-									windowManager.openWindow(app.appName, app.title, app);
+									// Example: Pass parameters to app1 (Beállítások)
+									if (app.appName === 'app1') {
+										clickCount++;
+										// Váltakozva különböző paraméterekkel nyitjuk meg
+										if (clickCount % 2 === 0) {
+											windowManager.openWindow(app.appName, app.title, app, {
+												userId: 'admin456',
+												theme: 'light',
+												initialCount: 10,
+												config: {
+													language: 'en',
+													notifications: false
+												}
+											});
+										} else {
+											windowManager.openWindow(app.appName, app.title, app, {
+												userId: 'user123',
+												theme: 'dark',
+												initialCount: 5,
+												config: {
+													language: 'hu',
+													notifications: true
+												}
+											});
+										}
+									} else {
+										windowManager.openWindow(app.appName, app.title, app);
+									}
 									show = false;
 								}}
 								{app}

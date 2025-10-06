@@ -4,30 +4,34 @@ export interface WindowSize {
 }
 
 export interface AppMetadata {
-	/** Application name */
+	/** Application name. */
 	appName: string;
-	/** Application title */
+	/** Application title. */
 	title: string;
-	/** Default window size */
+	/** Default window size. */
 	defaultSize: WindowSize;
-	/** Icon identifier */
+	/** Icon identifier. */
 	icon?: string;
-	/** Application category */
+	/** Application category. */
 	category?: string;
-	/** Whether multiple instances are allowed */
+	/** Whether multiple instances are allowed. */
 	allowMultiple?: boolean;
-	/** Default window position mode */
+	/** Default window position mode. */
 	defaultPosition?: 'center' | 'cascade' | 'custom';
-	/** Custom default position if mode is 'custom' */
-	//customPosition?: WindowPosition;
-	/** Minimum window size */
+	/** Custom default position if mode is 'custom'. */
+	/** Minimum window size. */
 	minSize?: WindowSize;
-	/** Maximum window size */
+	/** Maximum window size. */
 	maxSize?: WindowSize;
-	/** Whether window is resizable */
+	/** Whether window is resizable. */
 	resizable?: boolean;
-	/** Whether window can be maximized */
+	/** Whether window can be maximized. */
 	maximizable?: boolean;
-	/** Whether window can be minimized */
+	/** Whether window can be minimized. */
 	minimizable?: boolean;
+}
+
+/** Parameters that can be passed to an app when opening. */
+export interface AppParameters {
+	[key: string]: unknown;
 }

@@ -10,6 +10,14 @@ export const getApps = query(async () => {
 		icons.push(`/icons/icon_${i}.svg`);
 	}
 	const apps = [];
+	apps.push({
+		title: 'Beállítások',
+		appName: 'app1',
+		icon: 'Cog',
+		minSize: { width: 400, height: 300 },
+		defaultSize: { width: 600, height: 400 },
+		allowMultiple: true
+	});
 
 	for (let i = 0; i < 17; i++) {
 		const icon = faker.helpers.arrayElement(icons);
@@ -18,6 +26,10 @@ export const getApps = query(async () => {
 			title: faker.word.words({ count: { min: 1, max: 3 } }),
 			appName: appName,
 			icon: icon,
+			minSize: {
+				width: 400,
+				height: 200
+			},
 			defaultSize: {
 				width: faker.number.int({ min: 300, max: 1200 }),
 				height: faker.number.int({ min: 200, max: 800 })

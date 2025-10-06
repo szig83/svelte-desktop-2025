@@ -1,6 +1,6 @@
 // src/lib/stores/windowStore.svelte.ts
 import { getContext, setContext } from 'svelte';
-import { type AppMetadata } from '$lib/types/window';
+import { type AppMetadata, type AppParameters } from '$lib/types/window';
 
 export type WindowState = {
 	id: string;
@@ -13,8 +13,11 @@ export type WindowState = {
 	zIndex: number;
 	position: { x: number; y: number };
 	size: { width: number; height: number };
-	component?: any; // A betöltött komponens példány
+	minSize: { width: number; height: number };
+	component?: unknown; // A betöltött komponens példány
 	isLoading?: boolean;
+	parameters?: AppParameters; // Az appnak átadott paraméterek
+	instanceId?: string; // Példány azonosító több példány esetén
 };
 
 class WindowManager {
@@ -22,30 +25,60 @@ class WindowManager {
 	private nextId = 1;
 	private baseZIndex = 100;
 
-	openWindow(appName: string, title: string, metadata: Partial<AppMetadata> = {}) {
-		const existingWindow = this.windows.find((w) => w.appName === appName);
+	openWindow(
+		appName: string,
+		title: string,
+		metadata: Partial<AppMetadata> = {},
+		parameters: AppParameters = {}
+	) {
+		// Ellenőrizzük, hogy az app támogatja-e a több példányt
+		if (metadata.allowMultiple) {
+			// Több példány esetén paraméterek alapján keresünk egyező ablakot
+			const existingWindow = this.windows.find(
+				(w) => w.appName === appName && this.parametersMatch(w.parameters || {}, parameters)
+			);
 
-		if (existingWindow) {
-			// Ha már nyitva van, akkor aktiváljuk és visszaállítjuk a minimalizálásból
-			existingWindow.isMinimized = false;
-			this.activateWindow(existingWindow.id);
-			return existingWindow.id;
+			if (existingWindow) {
+				// Ha már nyitva van ugyanazokkal a paraméterekkel, aktiváljuk
+				existingWindow.isMinimized = false;
+				this.activateWindow(existingWindow.id);
+				return existingWindow.id;
+			}
+		} else {
+			// Egy példány esetén csak az appName alapján keresünk
+			const existingWindow = this.windows.find((w) => w.appName === appName);
+
+			if (existingWindow) {
+				// Ha már nyitva van, akkor aktiváljuk és visszaállítjuk a minimalizálásból
+				existingWindow.isMinimized = false;
+				return existingWindow.id;
+			}
 		}
 
 		const id = `window-${this.nextId++}`;
+		
+		// Több példány esetén instanceId generálása, de cím marad eredeti
+		let instanceId: string | undefined;
+		if (metadata.allowMultiple && Object.keys(parameters).length > 0) {
+			instanceId = this.generateInstanceId(parameters);
+		}
+
 		const newWindow: WindowState = {
 			id,
 			appName,
 			icon: metadata.icon,
-			title,
+			title, // Eredeti cím marad
 			isActive: true,
 			isMinimized: false,
 			isMaximized: false,
 			zIndex: this.getNextZIndex(),
 			position: this.getNextPosition(),
 			size: metadata.defaultSize || { width: 600, height: 400 },
+			minSize: metadata.minSize || { width: 300, height: 200 },
 			component: null,
-			isLoading: true
+			isLoading: true,
+			parameters,
+			instanceId
 		};
 
 		// Deaktiváljuk az összes többi ablakot
@@ -111,7 +144,7 @@ class WindowManager {
 		// Aktiváljuk az aktuális ablakot
 		window.isActive = true;
 		window.zIndex = this.getNextZIndex();
-		
+
 		// Trigger reactivity
 		this.windows = [...this.windows];
 	}
@@ -125,7 +158,7 @@ class WindowManager {
 				window.isActive = false;
 				// Trigger reactivity azonnal
 				this.windows = [...this.windows];
-				
+
 				// Aktiváljuk a következő nem-minimalizált ablakot
 				const nextWindow = this.windows
 					.filter((w) => w.id !== id && !w.isMinimized)
@@ -177,6 +210,40 @@ class WindowManager {
 		this.windows = [...this.windows];
 	}
 
+	getWindowParameters(id: string): AppParameters | undefined {
+		const window = this.windows.find((w) => w.id === id);
+		return window?.parameters;
+	}
+
+	getWindowById(id: string): WindowState | undefined {
+		return this.windows.find((w) => w.id === id);
+	}
+
+	updateWindowTitle(id: string, newTitle: string) {
+		const window = this.windows.find((w) => w.id === id);
+		if (window) {
+			window.title = newTitle;
+			// Trigger reactivity
+			this.windows = [...this.windows];
+		}
+	}
+
+	private parametersMatch(params1: AppParameters, params2: AppParameters): boolean {
+		// Mély összehasonlítás a paraméterek között
+		return JSON.stringify(params1) === JSON.stringify(params2);
+	}
+
+	private generateInstanceId(parameters: AppParameters): string {
+		// Rövid azonosító generálása a paraméterek alapján
+		const keyValues = Object.entries(parameters)
+			.filter(([, value]) => value !== undefined && value !== null)
+			.map(([key, value]) => `${key}:${String(value)}`)
+			.slice(0, 2) // Csak az első 2 paramétert használjuk
+			.join(',');
+
+		return keyValues || 'default';
+	}
+
 	private getNextZIndex(): number {
 		if (this.windows.length === 0) return this.baseZIndex;
 		const maxZ = Math.max(...this.windows.map((w) => w.zIndex));
@@ -191,14 +258,30 @@ class WindowManager {
 
 const WINDOW_MANAGER_KEY = Symbol('windowManager');
 
+// Global singleton instance
+let globalWindowManager: WindowManager | null = null;
+
 export function createWindowManager() {
-	return new WindowManager();
+	if (!globalWindowManager) {
+		globalWindowManager = new WindowManager();
+	}
+	return globalWindowManager;
 }
 
 export function setWindowManager(manager: WindowManager) {
+	globalWindowManager = manager;
 	setContext(WINDOW_MANAGER_KEY, manager);
 }
 
 export function getWindowManager(): WindowManager {
-	return getContext(WINDOW_MANAGER_KEY);
+	// Try context first (for components), then fallback to global
+	try {
+		return getContext(WINDOW_MANAGER_KEY);
+	} catch {
+		// If context fails (e.g., outside component), use global
+		if (!globalWindowManager) {
+			globalWindowManager = new WindowManager();
+		}
+		return globalWindowManager;
+	}
 }
