@@ -1,10 +1,5 @@
 <script lang="ts">
-	import {
-		getAppParameters,
-		getParameter,
-		getWindowId,
-		updateWindowTitleById
-	} from '$lib/services/appContext';
+	import { getAppParameters, getParameter, getWindowId } from '$lib/services/appContext';
 	import { getWindowManager } from '$lib/stores/windowStore.svelte';
 	const helpId = getParameter<number | undefined>('helpId', undefined);
 	const parameters = getAppParameters();
@@ -29,8 +24,11 @@
 	const help = helps.find((h) => h.id === helpId);
 	if (help) {
 		const windowManager = getWindowManager();
-		const windowData = windowManager.windows.find((w) => w.id === getWindowId());
-		updateWindowTitleById(getWindowId(), windowData?.title + ' - ' + help.title);
+		const windowId = getWindowId();
+		const windowData = windowManager.windows.find((w) => w.id === windowId);
+		if (windowData) {
+			windowManager.updateWindowTitle(windowId, windowData.title + ' - ' + help.title);
+		}
 	}
 </script>
 

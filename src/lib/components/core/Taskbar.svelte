@@ -130,7 +130,7 @@
 		.taskbar-item-title {
 			display: flex;
 			align-items: center;
-			max-width: 100px;
+			max-width: 200px;
 			height: 100%;
 			color: var(--taskbar-item-text-color);
 			font-size: 0.85rem;
@@ -151,6 +151,7 @@
 		box-shadow:
 			var(--shadow),
 			inset -1px -8px 20px 6px rgba(from var(--accent-color) r g b / 0.4);
+		background-color: var(--taskbar-item-bg-color_active);
 	}
 
 	.taskbar-item.minimized {

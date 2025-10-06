@@ -112,7 +112,7 @@
 			title: 'Súgó',
 			appName: 'help',
 			icon: 'icon.svg',
-			minSize: { width: 500, height: 500 },
+			minSize: { width: 300, height: 300 },
 			defaultSize: { width: 500, height: 500, maximized: false },
 			allowMultiple: true
 		};

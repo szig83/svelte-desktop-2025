@@ -24,16 +24,17 @@ export const getApps = query(async () => {
 		title: 'Felhasználók',
 		appName: 'users',
 		//icon: 'icon.svg',
-		minSize: { width: 500, height: 500 },
+		minSize: { width: 250, height: 250 },
 		defaultSize: { width: 500, height: 500, maximized: false },
-		allowMultiple: false
+		allowMultiple: false,
+		helpId: 2
 	});
 
 	apps.push({
 		title: 'Súgó',
 		appName: 'help',
 		//icon: 'icon.svg',
-		minSize: { width: 500, height: 500 },
+		minSize: { width: 300, height: 300 },
 		defaultSize: { width: 500, height: 500, maximized: false },
 		allowMultiple: true
 	});
