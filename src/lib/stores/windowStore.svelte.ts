@@ -1,6 +1,6 @@
-// src/lib/stores/windowStore.svelte.ts
 import { getContext, setContext } from 'svelte';
 import { type AppMetadata, type AppParameters } from '$lib/types/window';
+import type { Component } from 'svelte';
 
 export type WindowState = {
 	id: string;
@@ -14,7 +14,7 @@ export type WindowState = {
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	minSize: { width: number; height: number };
-	component?: unknown; // A betöltött komponens példány
+	component?: Component; // A betöltött komponens példány
 	isLoading?: boolean;
 	parameters?: AppParameters; // Az appnak átadott paraméterek
 	instanceId?: string; // Példány azonosító több példány esetén
@@ -78,7 +78,7 @@ class WindowManager {
 			position: this.getNextPosition(),
 			size: { width: defaultSize.width, height: defaultSize.height },
 			minSize: metadata.minSize || { width: 300, height: 200 },
-			component: null,
+			component: undefined,
 			isLoading: true,
 			parameters,
 			instanceId,
@@ -265,6 +265,10 @@ const WINDOW_MANAGER_KEY = Symbol('windowManager');
 // Global singleton instance
 let globalWindowManager: WindowManager | null = null;
 
+/**
+ * Creates a new window manager instance.
+ * @returns {WindowManager} The window manager instance.
+ */
 export function createWindowManager() {
 	if (!globalWindowManager) {
 		globalWindowManager = new WindowManager();
@@ -272,11 +276,19 @@ export function createWindowManager() {
 	return globalWindowManager;
 }
 
+/**
+ * Set the window manager instance.
+ * @param {WindowManager} manager Instance.
+ */
 export function setWindowManager(manager: WindowManager) {
 	globalWindowManager = manager;
 	setContext(WINDOW_MANAGER_KEY, manager);
 }
 
+/**
+ * Gets the window manager instance.
+ * @returns {WindowManager} The window manager instance.
+ */
 export function getWindowManager(): WindowManager {
 	// Try context first (for components), then fallback to global
 	try {

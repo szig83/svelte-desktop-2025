@@ -1,5 +1,4 @@
 // lib/utils/iconLoader.ts
-import type { ComponentType } from 'svelte';
 
 /**
  * Ikon típusok.
@@ -16,11 +15,25 @@ export const ICON_TYPES = {
 export type IconType = (typeof ICON_TYPES)[keyof typeof ICON_TYPES];
 
 /**
+ * Lucide ikon props típus.
+ */
+export interface LucideIconProps {
+	size?: number | string;
+	color?: string;
+	strokeWidth?: number | string;
+	class?: string;
+	[key: string]: unknown;
+}
+
+/**
  * Ikon adat típus.
+ * A content lehet:
+ * - Lucide komponens (unknown típus, mert a lucide-svelte komponensek dinamikusan betöltöttek).
+ * - string (SVG tartalom vagy URL).
  */
 export interface IconData {
 	type: IconType;
-	content: ComponentType | string;
+	content: unknown;
 }
 
 /**
@@ -30,6 +43,8 @@ const iconCache = new Map<string, IconData | null>();
 
 /**
  * Ikon típus felismerése.
+ * @param {string | null} iconName Ikon neve.
+ * @returns {IconType | null} Ikon típus.
  */
 export function detectIconType(iconName: string | null | undefined): IconType | null {
 	if (!iconName) return null;
@@ -60,9 +75,11 @@ export function detectIconType(iconName: string | null | undefined): IconType | 
 
 /**
  * Lucide ikon betöltése.
- * Lucide ikonok neve PascalCase formátumban (pl. 'LayoutDashboard')
+ * Lucide ikonok neve PascalCase formátumban (pl. 'LayoutDashboard').
+ * @param {string} iconName - Lucide ikon neve.
+ * @returns {Promise<unknown>} Lucide ikon komponens.
  */
-async function loadLucideIcon(iconName: string): Promise<ComponentType | null> {
+async function loadLucideIcon(iconName: string): Promise<unknown> {
 	try {
 		// Lucide-svelte dinamikus import
 		const module = await import('lucide-svelte');
@@ -73,7 +90,9 @@ async function loadLucideIcon(iconName: string): Promise<ComponentType | null> {
 			return null;
 		}
 
-		return IconComponent as ComponentType;
+		// Lucide komponensek dinamikusan betöltöttek, unknown típusként adjuk vissza
+		// A Svelte template-ben használva automatikusan felismeri a komponenst
+		return IconComponent;
 	} catch (error) {
 		console.warn(`Lucide ikon '${iconName}' betöltési hiba:`, error);
 		return null;
@@ -81,20 +100,22 @@ async function loadLucideIcon(iconName: string): Promise<ComponentType | null> {
 }
 
 /**
- * Privát SVG betöltése dinamikus importtal
- * @param {string} iconName - pl. 'facebook.svg'
- * @returns {Promise<string|null>}
+ * Privát SVG betöltése fetch-el.
+ * @param {string} iconName - Pl. 'facebook.svg'.
+ * @param {string | undefined} appName - Alapértelmezett érték: undefined.
+ * @returns {Promise<string|null>} SVG tartalom.
  */
 async function loadPrivateSvg(iconName: string, appName?: string) {
 	console.log(iconName, appName);
 	try {
-		// Vite automatikusan kezeli a ?raw query-t
-		let path = '../assets/icons/';
+		// Fetch használata a dinamikus import helyett - hálózati környezetben is működik
+		let path = '/src/lib/assets/icons/';
 		if (appName !== '') {
-			path = `../apps/${appName}/`;
+			path = `/src/lib/apps/${appName}/`;
 		}
-		const svgModule = await import(`${path}${iconName}?raw`);
-		return svgModule.default;
+		const response = await fetch(`${path}${iconName}`);
+		if (!response.ok) throw new Error(`SVG not found: ${path}${iconName}`);
+		return await response.text();
 	} catch (error) {
 		console.warn(`Privát SVG '${iconName}' nem található:`, error);
 		return null;
@@ -102,20 +123,24 @@ async function loadPrivateSvg(iconName: string, appName?: string) {
 }
 
 /**
- * Privát kép betöltése dinamikus importtal
- * @param {string} iconName - pl. 'facebook.png'
- * @returns {Promise<string|null>}
+ * Privát kép betöltése URL-ként.
+ * @param {string} iconName - Pl. 'facebook.png'.
+ * @param {string | undefined} appName - Alapértelmezett érték: undefined.
+ * @returns {Promise<string|null>} Kép URL.
  */
 async function loadPrivateImage(iconName: string, appName?: string) {
 	console.log('private image:', iconName, appName);
 	try {
-		// Vite automatikusan optimalizálja és hash-eli a képeket
-		let path = '../assets/icons/';
+		// Közvetlen URL használata a dinamikus import helyett
+		let path = '/src/lib/assets/icons/';
 		if (appName !== '') {
-			path = `../apps/${appName}/`;
+			path = `/src/lib/apps/${appName}/`;
 		}
-		const imageModule = await import(`${path}${iconName}`);
-		return imageModule.default; // Ez már egy optimalizált URL lesz
+		// Ellenőrizzük, hogy a kép elérhető-e
+		const imageUrl = `${path}${iconName}`;
+		const response = await fetch(imageUrl, { method: 'HEAD' });
+		if (!response.ok) throw new Error(`Image not found: ${imageUrl}`);
+		return imageUrl;
 	} catch (error) {
 		console.warn(`Privát kép '${iconName}' nem található:`, error);
 		return null;
@@ -124,6 +149,8 @@ async function loadPrivateImage(iconName: string, appName?: string) {
 
 /**
  * Publikus SVG betöltése fetch-el.
+ * @param {string} svgPath - Pl. '/src/lib/assets/icons/facebook.svg'.
+ * @returns {Promise<string|null>} SVG tartalom.
  */
 async function loadPublicSvg(svgPath: string): Promise<string | null> {
 	try {
@@ -138,6 +165,9 @@ async function loadPublicSvg(svgPath: string): Promise<string | null> {
 
 /**
  * Univerzális ikon betöltő.
+ * @param {string | null | undefined} iconIdentifier - Ikon azonosító.
+ * @param {string | undefined} appName - Alapértelmezett érték: undefined.
+ * @returns {Promise<IconData | null>} Ikon adatok.
  */
 export async function loadIcon(
 	iconIdentifier: string | null | undefined,
@@ -149,9 +179,10 @@ export async function loadIcon(
 
 	// Cache kulcs generálása - appName-mel együtt a privát ikonokhoz
 	const iconType = detectIconType(iconIdentifier);
-	const cacheKey = iconType === ICON_TYPES.PRIVATE_SVG || iconType === ICON_TYPES.PRIVATE_IMAGE
-		? `${appName || ''}:${iconIdentifier}`
-		: iconIdentifier;
+	const cacheKey =
+		iconType === ICON_TYPES.PRIVATE_SVG || iconType === ICON_TYPES.PRIVATE_IMAGE
+			? `${appName || ''}:${iconIdentifier}`
+			: iconIdentifier;
 
 	// Cache ellenőrzése
 	if (iconCache.has(cacheKey)) {

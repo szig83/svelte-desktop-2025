@@ -14,10 +14,24 @@
 			windowManager.deactivateAllWindows();
 		}
 	}
+
+	function handleWorkspaceKeydown(e: KeyboardEvent) {
+		// Enter vagy Space billentyűre ugyanaz történik, mint kattintásra
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			windowManager.deactivateAllWindows();
+		}
+	}
 </script>
 
 <div id="desktop">
-	<div id="workspace" onclick={handleWorkspaceClick} role="button" tabindex="-1">
+	<div
+		id="workspace"
+		onclick={handleWorkspaceClick}
+		onkeydown={handleWorkspaceKeydown}
+		role="button"
+		tabindex="-1"
+	>
 		{#if children}
 			{@render children()}
 		{/if}

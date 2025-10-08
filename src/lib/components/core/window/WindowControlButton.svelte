@@ -1,3 +1,8 @@
+<!--
+Ablakok jobb felső sarkábna megjelenő vezértló gombok.
+Minimalizálás, maximalizálás, bezárás.
+Ha tartozik súgó az adott alkalmazáshoz, akkor annak is gombja.
+-->
 <script lang="ts">
 	import { X, Minus, Maximize, Minimize2 } from 'lucide-svelte';
 

@@ -1,14 +1,17 @@
-<!-- src/lib/components/Window.svelte -->
+<!--
+ Ablak komponens.
+ Ez a komponens felel az egyes ablakok felépítésért, műveletekért.
+ -->
 <script lang="ts">
-	import { getWindowManager, type WindowState } from '$lib/stores/windowStore.svelte';
 	import { setContext } from 'svelte';
 	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/appContext';
-	let { windowState }: { windowState: WindowState } = $props();
+	import { getWindowManager, type WindowState } from '$lib/stores/windowStore.svelte';
 	import WindowControlButton from './WindowControlButton.svelte';
 
+	let { windowState }: { windowState: WindowState } = $props();
 	const windowManager = getWindowManager();
 
-	// Set up app context for child components
+	// App kontextus beállítás a gyerek komponensekhez.
 	const appContext: AppContext = {
 		parameters: windowState.parameters || {},
 		windowId: windowState.id
@@ -33,6 +36,10 @@
 	let resizeStartLeft = 0;
 	let resizeStartTop = 0;
 
+	/**
+	 * Ablak mozgatás kezelése (gomb lenyomás)
+	 * @param e Egér esemény
+	 */
 	function handleMouseDown(e: MouseEvent) {
 		if ((e.target as HTMLElement).closest('.window-controls')) return;
 
@@ -42,13 +49,17 @@
 		dragStartX = e.clientX - windowState.position.x;
 		dragStartY = e.clientY - windowState.position.y;
 
-		// Letiltjuk a szövegkijelölést mozgatás közben
+		// Szövegkijeölés tiltása mozgatás közben
 		document.body.style.userSelect = 'none';
 
 		document.addEventListener('mousemove', handleMouseMove);
 		document.addEventListener('mouseup', handleMouseUp);
 	}
 
+	/**
+	 * Ablak mozgás kezelése (mozgatás)
+	 * @param e Egér esemény
+	 */
 	function handleMouseMove(e: MouseEvent) {
 		if (!isDragging || windowState.isMaximized) return;
 
@@ -80,6 +91,9 @@
 		});
 	}
 
+	/**
+	 * Ablak mozgás befejezése (gomb elengedés)
+	 */
 	function handleMouseUp() {
 		isDragging = false;
 
@@ -90,23 +104,40 @@
 		document.removeEventListener('mouseup', handleMouseUp);
 	}
 
+	/**
+	 * Dupla klikkelés az ablak fejlécén
+	 * @param e
+	 */
 	function handleDoubleClick(e: MouseEvent) {
 		if ((e.target as HTMLElement).closest('.window-controls')) return;
 		maximize();
 	}
 
+	/**
+	 * Ablak bezárás gomb esemény
+	 */
 	function close() {
 		windowManager.closeWindow(windowState.id);
 	}
 
+	/**
+	 * Ablak lekicsinyítés gomb esemény
+	 */
 	function minimize() {
 		windowManager.minimizeWindow(windowState.id);
 	}
 
+	/**
+	 * Ablak maximalizálás esemény
+	 */
 	function maximize() {
 		windowManager.maximizeWindow(windowState.id);
 	}
 
+	/**
+	 * Súgó gomb esemény
+	 * @param helpId Súgó azonosító
+	 */
 	function help(helpId: number | undefined) {
 		const helpApp = {
 			title: 'Súgó',
@@ -116,12 +147,17 @@
 			defaultSize: { width: 500, height: 500, maximized: false },
 			allowMultiple: true
 		};
-		console.log(helpId);
+
 		windowManager.openWindow(helpApp.appName, helpApp.title, helpApp, {
 			helpId
 		});
 	}
 
+	/**
+	 * Ablak méretezés kezdet
+	 * @param e Egér esemény
+	 * @param direction Méretezés irány
+	 */
 	function handleResizeStart(e: MouseEvent, direction: string) {
 		if (windowState.isMaximized || isResizing) return;
 
@@ -147,6 +183,10 @@
 		document.addEventListener('mouseup', handleResizeEnd);
 	}
 
+	/**
+	 * Kurzor változása méretezés során
+	 * @param direction Méretezés irány
+	 */
 	function getCursorForDirection(direction: string): string {
 		if (direction === 'n' || direction === 's') return 'ns-resize';
 		if (direction === 'e' || direction === 'w') return 'ew-resize';
@@ -155,6 +195,10 @@
 		return 'default';
 	}
 
+	/**
+	 * Ablak méretezés folyamatban
+	 * @param e Egér esemény
+	 */
 	function handleResizeMove(e: MouseEvent) {
 		if (!isResizing) return;
 
@@ -228,6 +272,10 @@
 		windowManager.updatePosition(windowState.id, { x: newLeft, y: newTop });
 	}
 
+	/**
+	 * Maximális elérhető méret ellenőrzése
+	 * Ha automatikus/manuális méretezés során elérte az ablak a maximalizált állapotot, akkor az állapotát is átállítjuk.
+	 */
 	function checkIfMaximized() {
 		// Workspace méretek
 		const workspace = document.getElementById('workspace');
@@ -251,6 +299,9 @@
 		return isAtMaxPosition && isAtMaxSize;
 	}
 
+	/**
+	 * Ablak méretezés befejezése
+	 */
 	function handleResizeEnd() {
 		isResizing = false;
 		resizeDirection = '';
@@ -268,6 +319,11 @@
 		}
 	}
 
+	/**
+	 * Ablak éleken dupla kattintás
+	 * @param e Egér esemény
+	 * @param direction Éle irány
+	 */
 	function handleEdgeDoubleClick(e: MouseEvent, direction: string) {
 		if (windowState.isMaximized) return;
 
@@ -339,6 +395,34 @@
 		}, 10); // Kis késleltetés, hogy a DOM frissüljön
 	}
 
+	// AKADÁLYMENTES MŰKÖDÉSHEZ SZÜKSÉGES ESEMÉNYEK - START
+	function handleWindowKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			windowManager.activateWindow(windowState.id);
+		}
+	}
+
+	function handleHeaderKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			// Dupla kattintás hatása (maximize)
+			maximize();
+		}
+	}
+
+	function handleResizeKeydown(e: KeyboardEvent, direction: string) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			// Billentyűzetről nem indítunk resize-t, csak aktiváljuk az ablakot
+			windowManager.activateWindow(windowState.id);
+		}
+	}
+	// AKADÁLYMENTES MŰKÖDÉSHEZ SZÜKSÉGES ESEMÉNYEK - STOP
+
+	/**
+	 * Ablak stílus számítása
+	 */
 	let windowStyle = $derived.by(() => {
 		const left = windowState.isMaximized
 			? 'var(--startmenu-margin)'
@@ -365,6 +449,7 @@
 	]}
 	style={windowStyle}
 	onclick={() => windowManager.activateWindow(windowState.id)}
+	onkeydown={handleWindowKeydown}
 	role="button"
 	tabindex="0"
 >
@@ -372,6 +457,7 @@
 		class="window-header"
 		onmousedown={handleMouseDown}
 		ondblclick={handleDoubleClick}
+		onkeydown={handleHeaderKeydown}
 		role="button"
 		tabindex="0"
 	>
@@ -408,6 +494,7 @@
 			class="resize-handle resize-n"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'n')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'n')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'n')}
 			role="button"
 			tabindex="0"
 			aria-label="Resize window"
@@ -416,6 +503,7 @@
 			class="resize-handle resize-s"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 's')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 's')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 's')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -423,6 +511,7 @@
 			class="resize-handle resize-e"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'e')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'e')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'e')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -430,6 +519,7 @@
 			class="resize-handle resize-w"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'w')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'w')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'w')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -437,6 +527,7 @@
 			class="resize-handle resize-ne"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'ne')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'ne')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'ne')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -444,6 +535,7 @@
 			class="resize-handle resize-nw"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'nw')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'nw')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'nw')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -451,6 +543,7 @@
 			class="resize-handle resize-se"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'se')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'se')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'se')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -458,6 +551,7 @@
 			class="resize-handle resize-sw"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'sw')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'sw')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'sw')}
 			role="button"
 			tabindex="0"
 		></div>
@@ -485,10 +579,6 @@
 
 	:global(.window.active) {
 		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-	}
-
-	.window.maximized {
-		/*border-radius: 0;*/
 	}
 
 	.window-header {

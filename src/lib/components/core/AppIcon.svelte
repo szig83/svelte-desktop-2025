@@ -1,3 +1,7 @@
+<!--
+Alkalmazás parancsikonok komponens.
+Start menüben megjelenő ikonokat mutatja.
+-->
 <script lang="ts">
 	import { type AppMetadata } from '$lib/types/window';
 	import UniversalIcon from '../UniversalIcon.svelte';
