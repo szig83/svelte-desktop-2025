@@ -26,6 +26,7 @@
 		ariaLabel="Téma választása"
 		onChange={handleThemeChange}
 		disabled={false}
+		searchable={false}
 	/>
 	<p>Kiválasztott téma: {selectedTheme ?? 'nincs'}</p>
 </div>

@@ -18,6 +18,8 @@
 		ariaLabel?: string;
 		onChange?: (value: string | undefined) => void;
 		disabled?: boolean;
+		searchable?: boolean;
+		type?: 'single' | 'multiple';
 	};
 
 	let {
@@ -27,7 +29,9 @@
 		name = 'combobox',
 		ariaLabel = 'Válassz egy opciót',
 		onChange,
-		disabled = false
+		disabled = false,
+		searchable = true,
+		type = 'single'
 	}: Props = $props();
 
 	let inputValue = $state('');
@@ -43,7 +47,7 @@
 	});
 
 	const filteredItems = $derived(
-		inputValue === ''
+		!searchable || inputValue === ''
 			? items
 			: items.filter((item) => item.label.toLowerCase().includes(inputValue.toLowerCase()))
 	);
@@ -71,7 +75,7 @@
 <Combobox.Root
 	bind:value
 	bind:open={isOpen}
-	type="single"
+	{type}
 	{name}
 	{disabled}
 	onValueChange={handleValueChange}
@@ -82,12 +86,20 @@
 		<Combobox.Input
 			bind:ref={inputElement}
 			oninput={(e) => {
-				inputValue = e.currentTarget.value;
+				if (searchable) {
+					inputValue = e.currentTarget.value;
+				}
 			}}
-			class="combobox-input"
+			onclick={() => {
+				if (!searchable && !disabled) {
+					isOpen = !isOpen;
+				}
+			}}
+			class={`combobox-input${!searchable ? ' non-searchable' : ''}`}
 			{placeholder}
 			aria-label={ariaLabel}
 			{disabled}
+			readonly={!searchable}
 		/>
 		<Combobox.Trigger class="combobox-trigger" {disabled}>
 			<CaretUpDown class="size-5" />
@@ -100,7 +112,12 @@
 			</Combobox.ScrollUpButton>
 			<Combobox.Viewport class="combobox-viewport">
 				{#each filteredItems as item, i (i + item.value)}
-					<Combobox.Item class="combobox-item" value={item.value} label={item.label}>
+					<Combobox.Item
+						class="combobox-item"
+						value={item.value}
+						label={item.label}
+						disabled={type === 'single' && item.value === value}
+					>
 						{#snippet children({ selected })}
 							<span class="combobox-item-label">{item.label}</span>
 							{#if selected}
@@ -153,11 +170,16 @@
 	}
 
 	:global(.combobox-input:disabled) {
-		cursor: not-allowed;
 		opacity: 0.5;
+		cursor: not-allowed;
 		border-color: var(--neutral-900-alpha-10);
 		background-color: var(--neutral-900-alpha-10);
 		color: var(--neutral-500);
+	}
+
+	:global(.combobox-input.non-searchable) {
+		cursor: pointer;
+		user-select: none;
 	}
 
 	:global(.combobox-trigger) {
@@ -181,8 +203,8 @@
 	}
 
 	:global(.combobox-trigger:disabled) {
-		cursor: not-allowed;
 		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	:global(.combobox-content) {
@@ -251,7 +273,7 @@
 		user-select: none;
 	}
 
-	:global(.combobox-item[data-highlighted]) {
+	:global(.combobox-item:hover) {
 		background-color: var(--neutral-900-alpha-10);
 	}
 
@@ -288,46 +310,67 @@
 		}
 	}
 
-	/* Dark mode */
-	:global(.dark .combobox-input) {
+	/* Dark mode - használjuk :root.dark vagy :is(.dark *) szelektort a Portal miatt */
+	:global(:is(.dark *) .combobox-input) {
 		background-color: var(--neutral-800);
 		color: var(--neutral-300);
 	}
 
-	:global(.dark .combobox-input:focus) {
+	:global(:is(.dark *) .combobox-input:focus) {
 		border-color: var(--neutral-50-alpha-10);
 		background-color: var(--neutral-700);
 	}
 
-	:global(.dark .combobox-trigger) {
+	:global(:is(.dark *) .combobox-trigger) {
 		color: var(--neutral-400);
 	}
 
-	:global(.dark .combobox-trigger:hover) {
+	:global(:is(.dark *) .combobox-trigger:hover) {
 		color: var(--neutral-200);
 	}
 
-	:global(.dark .combobox-content) {
+	:global(:is(.dark *) .combobox-content) {
 		border-color: var(--neutral-50-alpha-10);
+		background-color: var(--neutral-800);
 	}
 
-	:global(.dark .combobox-viewport::-webkit-scrollbar-thumb) {
+	:global(:is(.dark *) .combobox-viewport::-webkit-scrollbar-thumb) {
 		background-color: var(--neutral-50-alpha-20);
 	}
 
-	:global(.dark .combobox-viewport::-webkit-scrollbar-thumb:hover) {
+	:global(:is(.dark *) .combobox-viewport::-webkit-scrollbar-thumb:hover) {
 		background-color: var(--neutral-50-alpha-30);
 	}
 
-	:global(.dark .combobox-scroll-button) {
+	:global(:is(.dark *) .combobox-scroll-button) {
 		color: var(--neutral-400);
 	}
 
-	:global(.dark .combobox-scroll-button:hover) {
+	:global(:is(.dark *) .combobox-scroll-button:hover) {
 		color: var(--neutral-200);
 	}
 
-	:global(.dark .combobox-item[data-highlighted]) {
+	:global(:is(.dark *) .combobox-item) {
+		color: var(--neutral-200);
+	}
+
+	:global(:is(.dark *) .combobox-item:hover) {
 		background-color: var(--neutral-50-alpha-10);
+	}
+
+	:global(:is(.dark *) .combobox-item:hover) {
+		background-color: var(--neutral-50-alpha-20);
+	}
+
+	:global(:is(.dark *) .combobox-item[data-selected]) {
+		background-color: var(--primary-500-alpha-30);
+	}
+
+	:global(:is(.dark *) .combobox-item-check) {
+		color: var(--primary-400);
+	}
+
+	:global(:is(.dark *) .combobox-empty) {
+		color: var(--neutral-400);
 	}
 </style>

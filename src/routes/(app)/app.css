@@ -119,6 +119,8 @@ body {
 	--primary-500-alpha-90: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-90));
 	--primary-500-alpha-80: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-80));
 	--primary-500-alpha-50: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-50));
+	--primary-500-alpha-40: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-40));
+	--primary-500-alpha-30: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-30));
 	--primary-500-alpha-20: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-20));
 	--primary-500-alpha-10: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-10));
 	--primary-500-alpha-5: oklch(56% var(--primary-c) var(--primary-h) / var(--alpha-5));
