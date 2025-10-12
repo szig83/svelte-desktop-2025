@@ -13,8 +13,8 @@ export const getApps = query(async () => {
 		title: 'Beállítások',
 		appName: 'settings',
 		//icon: 'icon.svg',
-		minSize: { width: 400, height: 300 },
-		defaultSize: { width: 600, height: 400, maximized: false },
+		minSize: { width: 500, height: 400 },
+		defaultSize: { width: 700, height: 600, maximized: false },
 		allowMultiple: false,
 		helpId: 1
 	});

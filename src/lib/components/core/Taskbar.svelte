@@ -4,6 +4,8 @@
 	import UniversalIcon from '../UniversalIcon.svelte';
 	import StartMenu from './StartMenu.svelte';
 	import Clock from '../Clock.svelte';
+	import { getThemeManager } from '$lib/stores/themeStore.svelte';
+	const themeManager = getThemeManager();
 	const windowManager = getWindowManager();
 	let showStartMenu = $state(false);
 	/**
@@ -14,7 +16,7 @@
 	}
 </script>
 
-<div class="dark">
+<div class={themeManager.cssClassesTaskBarStartMenu}>
 	<StartMenu bind:show={showStartMenu} />
 	<!-- Taskbar a minimalizált ablakok számára -->
 	<div id="taskbar">
@@ -70,7 +72,7 @@
 		justify-content: space-between;
 		backdrop-filter: blur(10px);
 		border-radius: var(--border-radius);
-		background: hsl(from var(--panel-bg-color) h s calc(l - 5));
+		background: var(--panel-bg-color);
 		width: 100%;
 		height: 100%;
 
@@ -96,14 +98,15 @@
 		transition: background-color 0.2s;
 		cursor: pointer;
 
+		border: 0;
 		border-radius: var(--border-radius);
 		aspect-ratio: 1;
 		height: calc(var(--taskbar-height) - var(--startmenu-margin));
 		color: var(--panel-text-color);
 
 		&:hover {
-			background-color: var(--accent-color);
-			color: var(--accent-text-color);
+			background-color: var(--primary-500-alpha-80);
+			color: var(--text-primary);
 		}
 	}
 
@@ -149,8 +152,8 @@
 
 	.taskbar-item.active {
 		box-shadow:
-			var(--shadow),
-			inset -1px -8px 20px 6px rgba(from var(--accent-color) r g b / 0.4);
+			var(--shadow-sm),
+			0px 15px 20px -15px rgba(from var(--primary-400) r g b / 0.8);
 		background-color: var(--taskbar-item-bg-color_active);
 	}
 

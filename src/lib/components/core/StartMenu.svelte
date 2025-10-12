@@ -132,9 +132,12 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
+
 		box-shadow: var(--shadow-card);
+
 		border-radius: var(--border-radius, 0);
 		background-color: var(--startmenu-bg-color);
+
 		width: 100%;
 		overflow: auto;
 	}
@@ -158,7 +161,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 15px 0 10px 0;
+		padding: 15px 0 0 0;
 
 		.search-bar {
 			display: flex;
@@ -167,29 +170,6 @@
 			:global(.search-icon) {
 				color: #7f7f7f;
 			}
-			.search-input {
-				all: unset;
-				transition: border-color 0.2s ease-in-out;
-				outline: none;
-				border: 1px solid transparent;
-				border-radius: 14px;
-				background-color: rgba(0, 0, 0, 0.2);
-				padding: 0 10px;
-				min-width: 200px;
-				max-width: 400px;
-				height: 28px;
-				color: #b7b7b7;
-				font-size: 0.8rem;
-				field-sizing: content;
-
-				&::placeholder {
-					color: #7f7f7f !important;
-				}
-
-				&:focus {
-					border-color: rgba(255, 255, 255, 0.05);
-				}
-			}
 		}
 	}
 
@@ -197,8 +177,9 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		background-color: hsl(from var(--panel-bg-color) h s calc(l - 5));
+		background-color: var(--primary-500-alpha-80);
 		padding: 10px 15px;
+		color: var(--neutral-100);
 		font-size: 0.8rem;
 	}
 

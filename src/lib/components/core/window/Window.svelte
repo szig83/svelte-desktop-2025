@@ -565,8 +565,9 @@
 		flex-direction: column;
 		transition: box-shadow 0.2s;
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-		border-radius: var(--default-border-radius, 8px);
 		/*background: white;*/
+		border: 2px solid var(--glass-border);
+		border-radius: var(--default-border-radius, 8px);
 	}
 
 	.window.minimized {
@@ -587,7 +588,8 @@
 		align-items: center;
 		cursor: move;
 		border-bottom: 1px solid #d0d0d0;
-		border-radius: 8px 8px 0 0;
+		border-radius: calc(var(--default-border-radius, 8px) - 2px)
+			calc(var(--default-border-radius, 8px) - 2px) 0 0;
 		background: #d9d9d9;
 		padding: 8px 12px;
 		user-select: none;
@@ -618,10 +620,15 @@
 
 	.window-content {
 		flex: 1;
-		backdrop-filter: blur(10px); /* Blur effekt mértéke (px-ben) */
-		border-bottom-right-radius: var(--default-border-radius, 8px);
-		border-bottom-left-radius: var(--default-border-radius, 8px);
-		background-color: rgba(255, 255, 255, 0.95);
+		/*backdrop-filter: blur(10px); */
+		backdrop-filter: blur(12px) saturate(180%);
+		box-shadow: var(--shadow-lg);
+
+		border-bottom-right-radius: calc(var(--default-border-radius, 8px) - 2px);
+		border-bottom-left-radius: calc(var(--default-border-radius, 8px) - 2px);
+
+		background: var(--glass-bg);
+		/*background-color: rgba(255, 255, 255, 0.95);*/
 		padding: 16px;
 		overflow: hidden;
 

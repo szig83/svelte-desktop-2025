@@ -62,11 +62,11 @@ Start menüben megjelenő ikonokat mutatja.
 
 		&:hover {
 			.app-icon {
-				background-color: hsl(from var(--panel-bg-color) h s calc(l - 5));
+				background-color: var(--primary-500-alpha-80);
 			}
 			.app-title {
 				& > div {
-					color: hsl(from var(--accent-color) h s calc(l + 5));
+					color: var(--primary-400);
 				}
 			}
 		}

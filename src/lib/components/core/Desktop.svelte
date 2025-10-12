@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { createWindowManager, setWindowManager } from '$lib/stores/windowStore.svelte';
+	import { createThemeManager, setThemeManager } from '$lib/stores/themeStore.svelte';
 	import Window from '$lib/components/core/window/Window.svelte';
 	import Taskbar from '$lib/components/core/Taskbar.svelte';
 
 	const windowManager = createWindowManager();
 	setWindowManager(windowManager);
+
+	const themeManager = createThemeManager();
+	setThemeManager(themeManager);
 
 	let { children } = $props();
 
@@ -22,9 +26,21 @@
 			windowManager.deactivateAllWindows();
 		}
 	}
+
+	// CSS változók és osztályok alkalmazása a document root-ra (html elem)
+	$effect(() => {
+		// CSS változók beállítása
+		const vars = themeManager.cssVariables;
+		Object.entries(vars).forEach(([key, value]) => {
+			document.documentElement.style.setProperty(key, value);
+		});
+
+		// CSS osztályok szinkronizálása (dark/light mód, stb.)
+		document.documentElement.className = themeManager.cssClasses;
+	});
 </script>
 
-<div id="desktop">
+<div id="desktop" class={themeManager.cssClasses}>
 	<div
 		id="workspace"
 		onclick={handleWorkspaceClick}
@@ -52,9 +68,45 @@
 		flex-direction: column;
 		justify-content: space-between;
 
+		/* Téma átmenetek */
+		transition:
+			background-color 0.3s ease,
+			color 0.3s ease;
+		background: url('/bg.jpg') center center / cover no-repeat fixed;
+
+		/* Alapértelmezett világos mód */
+		background-color: #f3f4f6;
+
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
+		color: #1f2937;
+	}
+
+	/* Sötét mód */
+	#desktop.dark {
+		background-color: #1f2937;
+		color: #f9fafb;
+	}
+
+	/* Animációk kikapcsolása */
+	#desktop.no-animations,
+	#desktop.no-animations * {
+		animation: none !important;
+		transition: none !important;
+	}
+
+	/* Betűméret beállítások */
+	#desktop.font-small {
+		font-size: var(--base-font-size, 14px);
+	}
+
+	#desktop.font-medium {
+		font-size: var(--base-font-size, 16px);
+	}
+
+	#desktop.font-large {
+		font-size: var(--base-font-size, 18px);
 	}
 
 	#workspace {
