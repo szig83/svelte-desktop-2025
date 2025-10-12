@@ -116,7 +116,7 @@
 						class="combobox-item"
 						value={item.value}
 						label={item.label}
-						disabled={type === 'single' && item.value === value}
+						disabled={!multiple && item.value === value}
 					>
 						{#snippet children({ selected })}
 							<span class="combobox-item-label">{item.label}</span>
