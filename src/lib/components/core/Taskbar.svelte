@@ -22,7 +22,7 @@
 	<div class="taskbar-left">
 		<Popover.Root>
 			<Popover.Trigger class="btn-startmenu h-full"><Rocket size={24} /></Popover.Trigger>
-			<Popover.Content class="mx-4 my-2 w-96"><StartMenu /></Popover.Content>
+			<Popover.Content class="z-[1000] mx-2 my-1 w-96"><StartMenu /></Popover.Content>
 		</Popover.Root>
 
 		{#each windowManager.windows as window}
@@ -93,7 +93,10 @@
 		background-color: var(--color-primary-alpha-20);
 		aspect-ratio: 1;
 		&:hover {
-			background-color: var(--color-primary);
+			background-color: var(--color-primary-alpha-80);
+		}
+		&[data-state='open'] {
+			background-color: var(--color-primary-alpha-80);
 		}
 	}
 

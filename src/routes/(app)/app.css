@@ -155,6 +155,7 @@
 	--color-popover-foreground: var(--popover-foreground);
 	--color-primary: var(--primary);
 	--color-primary-alpha-90: oklch(from var(--color-primary) l c h / var(--alpha-90));
+	--color-primary-alpha-80: oklch(from var(--color-primary) l c h / var(--alpha-80));
 	--color-primary-alpha-20: oklch(from var(--color-primary) l c h / var(--alpha-20));
 	--color-primary-alpha-10: oklch(from var(--color-primary) l c h / var(--alpha-10));
 	--color-primary-foreground: var(--primary-foreground);
