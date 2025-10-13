@@ -5,6 +5,7 @@
 	import StartMenu from './StartMenu.svelte';
 	import Clock from '../Clock.svelte';
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
+	import * as Popover from '$lib/components/ui/popover';
 	const themeManager = getThemeManager();
 	const windowManager = getWindowManager();
 	let showStartMenu = $state(false);
@@ -16,65 +17,56 @@
 	}
 </script>
 
-<div class={themeManager.cssClassesTaskBarStartMenu}>
-	<StartMenu bind:show={showStartMenu} />
-	<!-- Taskbar a minimalizált ablakok számára -->
-	<div id="taskbar">
-		<div>
-			<div class="taskbar-left">
-				<button class="btn-startmenu btn-click-effect" onclick={toggleStartMenu}
-					><Rocket size={22} /></button
-				>
-				{#each windowManager.windows as window}
-					<button
-						class="taskbar-item"
-						class:active={window.isActive}
-						class:minimized={window.isMinimized}
-						onclick={() => {
-							if (window.isMinimized) {
-								// Ha minimalizált, visszaállítjuk és aktiváljuk
-								windowManager.minimizeWindow(window.id);
-							} else if (window.isActive) {
-								// Ha aktív, minimalizáljuk
-								windowManager.minimizeWindow(window.id);
-							} else {
-								// Ha inaktív (de nem minimalizált), aktiváljuk
-								windowManager.activateWindow(window.id);
-							}
-						}}
-					>
-						<div class="taskbar-item-icon">
-							<UniversalIcon icon={window.icon ?? ''} size={32} appName={window.appName} />
-						</div>
-						<div class="taskbar-item-title">
-							<span>{window.title}</span>
-						</div>
-					</button>
-				{/each}
-			</div>
-			<div class="taskbar-right">
-				<Clock />
-			</div>
-		</div>
+<!-- Taskbar a minimalizált ablakok számára -->
+<div class="taskbar">
+	<div class="taskbar-left">
+		<Popover.Root>
+			<Popover.Trigger class="btn-startmenu h-full"><Rocket size={24} /></Popover.Trigger>
+			<Popover.Content class="mx-4 my-2 w-96"><StartMenu /></Popover.Content>
+		</Popover.Root>
+
+		{#each windowManager.windows as window}
+			<button
+				class="taskbar-item"
+				class:active={window.isActive}
+				class:minimized={window.isMinimized}
+				onclick={() => {
+					if (window.isMinimized) {
+						// Ha minimalizált, visszaállítjuk és aktiváljuk
+						windowManager.minimizeWindow(window.id);
+					} else if (window.isActive) {
+						// Ha aktív, minimalizáljuk
+						windowManager.minimizeWindow(window.id);
+					} else {
+						// Ha inaktív (de nem minimalizált), aktiváljuk
+						windowManager.activateWindow(window.id);
+					}
+				}}
+			>
+				<div class="taskbar-item-icon">
+					<UniversalIcon icon={window.icon ?? ''} size={32} appName={window.appName} />
+				</div>
+				<div class="taskbar-item-title">
+					<span>{window.title}</span>
+				</div>
+			</button>
+		{/each}
+	</div>
+	<div class="taskbar-right">
+		<Clock />
 	</div>
 </div>
 
 <style>
-	#taskbar {
-		z-index: var(--taskbar-z-index);
-
-		padding: 0 var(--startmenu-margin) var(--startmenu-margin) var(--startmenu-margin);
-		height: var(--taskbar-height);
-	}
-
-	#taskbar > div {
+	.taskbar {
 		display: flex;
 		justify-content: space-between;
+		z-index: var(--taskbar-z-index);
 		backdrop-filter: blur(10px);
-		border-radius: var(--border-radius);
-		background: var(--panel-bg-color);
+		border-radius: 0;
+		background-color: var(--color-taskbar-background);
 		width: 100%;
-		height: 100%;
+		color: var(--color-taskbar-foreground);
 
 		.taskbar-left {
 			display: flex;
@@ -91,22 +83,17 @@
 			padding-right: 16px;
 		}
 	}
-	.btn-startmenu {
+
+	:global(.btn-startmenu) {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		transition: background-color 0.2s;
 		cursor: pointer;
-
-		border: 0;
-		border-radius: var(--border-radius);
+		background-color: var(--color-primary-alpha-20);
 		aspect-ratio: 1;
-		height: calc(var(--taskbar-height) - var(--startmenu-margin));
-		color: var(--panel-text-color);
-
 		&:hover {
-			background-color: var(--primary-500-alpha-80);
-			color: var(--text-primary);
+			background-color: var(--color-primary);
 		}
 	}
 
@@ -117,7 +104,7 @@
 		transition: all 0.2s;
 		cursor: pointer;
 		border: 1px solid transparent;
-		border-radius: var(--border-radius);
+		border-radius: 0;
 		background-color: var(--taskbar-item-bg-color);
 		padding: 0 10px;
 

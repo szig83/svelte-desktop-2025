@@ -67,46 +67,13 @@
 		position: relative;
 		flex-direction: column;
 		justify-content: space-between;
-
-		/* Téma átmenetek */
 		transition:
 			background-color 0.3s ease,
 			color 0.3s ease;
 		background: url('/bg.jpg') center center / cover no-repeat fixed;
-
-		/* Alapértelmezett világos mód */
-		background-color: #f3f4f6;
-
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
-		color: #1f2937;
-	}
-
-	/* Sötét mód */
-	#desktop.dark {
-		background-color: #1f2937;
-		color: #f9fafb;
-	}
-
-	/* Animációk kikapcsolása */
-	#desktop.no-animations,
-	#desktop.no-animations * {
-		animation: none !important;
-		transition: none !important;
-	}
-
-	/* Betűméret beállítások */
-	#desktop.font-small {
-		font-size: var(--base-font-size, 14px);
-	}
-
-	#desktop.font-medium {
-		font-size: var(--base-font-size, 16px);
-	}
-
-	#desktop.font-large {
-		font-size: var(--base-font-size, 18px);
 	}
 
 	#workspace {

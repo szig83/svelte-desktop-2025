@@ -13,13 +13,13 @@
 	let clickCount = $state(0); // Kattintás számláló a különböző példányokhoz
 
 	$effect(() => {
-		if (show && !apps) {
+		if (!apps) {
 			apps = getApps();
 		}
 	});
 
 	// Click outside kezelés
-	$effect(() => {
+	/*	$effect(() => {
 		if (!show) return;
 
 		function handleClickOutside(event: MouseEvent) {
@@ -41,93 +41,76 @@
 			clearTimeout(timeoutId);
 			document.removeEventListener('click', handleClickOutside);
 		};
-	});
+	});*/
 </script>
 
-{#if show}
-	<div id="startMenu" bind:this={startMenuElement} transition:fly={{ y: 20, duration: 200 }}>
-		<div class="start-menu-wrapper">
-			<div class="start-menu-header">
-				<div class="search-bar">
-					<UniversalIcon icon="Search" size={18} class="search-icon" />
-					<input class="search-input" type="text" placeholder="Keresés..." />
-				</div>
-			</div>
-			<div class="start-menu-content">
-				{#if apps?.error}
-					<p>oops!</p>
-				{:else if apps?.loading}
-					<p>loading...</p>
-				{:else if apps?.current}
-					<div class="start-menu-apps">
-						{#each apps.current as app}
-							<AppIcon
-								onclick={() => {
-									// Example: Pass parameters to app1 (Beállítások)
-									if (app.appName === 'app1') {
-										clickCount++;
-										// Váltakozva különböző paraméterekkel nyitjuk meg
-										if (clickCount % 2 === 0) {
-											windowManager.openWindow(app.appName, app.title, app, {
-												userId: 'admin456',
-												theme: 'light',
-												initialCount: 10,
-												config: {
-													language: 'en',
-													notifications: false
-												}
-											});
-										} else {
-											windowManager.openWindow(app.appName, app.title, app, {
-												userId: 'user123',
-												theme: 'dark',
-												initialCount: 5,
-												config: {
-													language: 'hu',
-													notifications: true
-												}
-											});
-										}
-									} else {
-										windowManager.openWindow(app.appName, app.title, app);
-									}
-									show = false;
-								}}
-								{app}
-							/>
-						{/each}
-					</div>
-				{/if}
-			</div>
-			<div class="start-menu-footer">
-				<div class="start-menu-footer-left">
-					<div class="avatar"><img src="avatar.png" alt="" /></div>
-					<div>Szigeti Balázs</div>
-				</div>
-				<div class="start-menu-footer-right">
-					<button class="btn-click-effect">
-						<UniversalIcon icon="Power" size={16} class="btn-power" />
-					</button>
-				</div>
-			</div>
+<div class="start-menu-wrapper">
+	<div class="start-menu-header">
+		<div class="search-bar">
+			<UniversalIcon icon="Search" size={18} class="search-icon" />
+			<input class="search-input" type="text" placeholder="Keresés..." />
 		</div>
 	</div>
-{/if}
+	<div class="start-menu-content">
+		{#if apps?.error}
+			<p>oops!</p>
+		{:else if apps?.loading}
+			<p>loading...</p>
+		{:else if apps?.current}
+			<div class="start-menu-apps">
+				{#each apps.current as app}
+					<AppIcon
+						onclick={() => {
+							// Example: Pass parameters to app1 (Beállítások)
+							if (app.appName === 'app1') {
+								clickCount++;
+								// Váltakozva különböző paraméterekkel nyitjuk meg
+								if (clickCount % 2 === 0) {
+									windowManager.openWindow(app.appName, app.title, app, {
+										userId: 'admin456',
+										theme: 'light',
+										initialCount: 10,
+										config: {
+											language: 'en',
+											notifications: false
+										}
+									});
+								} else {
+									windowManager.openWindow(app.appName, app.title, app, {
+										userId: 'user123',
+										theme: 'dark',
+										initialCount: 5,
+										config: {
+											language: 'hu',
+											notifications: true
+										}
+									});
+								}
+							} else {
+								windowManager.openWindow(app.appName, app.title, app);
+							}
+							show = false;
+						}}
+						{app}
+					/>
+				{/each}
+			</div>
+		{/if}
+	</div>
+	<div class="start-menu-footer">
+		<div class="start-menu-footer-left">
+			<div class="avatar"><img src="avatar.png" alt="" /></div>
+			<div>Szigeti Balázs</div>
+		</div>
+		<div class="start-menu-footer-right">
+			<button class="btn-click-effect">
+				<UniversalIcon icon="Power" size={16} class="btn-power" />
+			</button>
+		</div>
+	</div>
+</div>
 
 <style>
-	#startMenu {
-		display: flex;
-		position: fixed;
-		bottom: var(--taskbar-height, 100px);
-		left: var(--startmenu-margin, 16px);
-		z-index: calc(var(--taskbar-z-index) - 1);
-		padding-bottom: var(--startmenu-margin, 16px);
-		width: var(--startmenu-width, 300px);
-		min-height: var(--startmenu-height, 300px);
-		overflow: hidden;
-		color: var(--panel-text-color);
-	}
-
 	.start-menu-wrapper {
 		display: flex;
 		flex-direction: column;
