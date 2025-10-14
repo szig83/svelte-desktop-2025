@@ -18,6 +18,8 @@ export type WindowState = {
 	isLoading?: boolean;
 	parameters?: AppParameters; // Az appnak átadott paraméterek
 	instanceId?: string; // Példány azonosító több példány esetén
+	maximizable?: boolean;
+	resizable?: boolean;
 	helpId?: number;
 };
 
@@ -82,6 +84,8 @@ class WindowManager {
 			isLoading: true,
 			parameters,
 			instanceId,
+			maximizable: metadata.maximizable ?? true,
+			resizable: metadata.resizable ?? true,
 			helpId: metadata.helpId
 		};
 

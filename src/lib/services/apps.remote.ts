@@ -24,8 +24,10 @@ export const getApps = query(async () => {
 		appName: 'users',
 		//icon: 'icon.svg',
 		minSize: { width: 250, height: 250 },
+		maxSize: { width: 600, height: 600 },
 		defaultSize: { width: 500, height: 500, maximized: false },
 		allowMultiple: false,
+		maximizable: false,
 		helpId: 2
 	});
 

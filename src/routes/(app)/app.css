@@ -68,11 +68,12 @@
 
 	--taskbar-background: oklch(92.494% 0.00011 271.152);
 	--taskbar-foreground: oklch(0.145 0 0);
+	--window-background: oklch(92.494% 0.00011 271.152);
 }
 
 .dark {
-	--background: oklch(0.145 0 0);
-	--foreground: oklch(0.985 0 0);
+	--background: oklch(26.448% 0.00003 271.152);
+	--foreground: oklch(83.28% 0.00009 271.152);
 	--card: oklch(0.205 0 0);
 	--card-foreground: oklch(0.985 0 0);
 	--popover: oklch(20.463% 0.00002 271.152 / var(--alpha-80));
@@ -105,6 +106,8 @@
 
 	--taskbar-background: oklch(20.463% 0.00002 271.152);
 	--taskbar-foreground: oklch(82.968% 0.00009 271.152);
+
+	--window-background: oklch(20.463% 0.00002 271.152);
 }
 
 @theme inline {
@@ -121,8 +124,12 @@
 	--color-primary: var(--primary);
 	--color-primary-alpha-90: oklch(from var(--color-primary) l c h / var(--alpha-90));
 	--color-primary-alpha-80: oklch(from var(--color-primary) l c h / var(--alpha-80));
+	--color-primary-alpha-70: oklch(from var(--color-primary) l c h / var(--alpha-70));
+	--color-primary-alpha-60: oklch(from var(--color-primary) l c h / var(--alpha-60));
+	--color-primary-alpha-50: oklch(from var(--color-primary) l c h / var(--alpha-50));
 	--color-primary-alpha-20: oklch(from var(--color-primary) l c h / var(--alpha-20));
 	--color-primary-alpha-10: oklch(from var(--color-primary) l c h / var(--alpha-10));
+	--color-primary-alpha-5: oklch(from var(--color-primary) l c h / var(--alpha-5));
 	--color-primary-foreground: var(--primary-foreground);
 	--color-secondary: var(--secondary);
 	--color-secondary-foreground: var(--secondary-foreground);
@@ -150,6 +157,8 @@
 
 	--color-taskbar-background: --alpha(var(--taskbar-background) / var(--alpha-80));
 	--color-taskbar-foreground: var(--taskbar-foreground);
+	--color-window-background: var(--window-background);
+	--color-window-background-alpha-90: --alpha(var(--window-background) / var(--alpha-90));
 }
 
 @layer base {
@@ -158,5 +167,18 @@
 	}
 	body {
 		@apply bg-background text-foreground;
+	}
+}
+
+/* Globális gomb benyomódás effekt - HeroUI stílusú */
+.btn-click-effect {
+	svg {
+		transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	&:active {
+		svg {
+			transform: scale(0.9);
+		}
 	}
 }

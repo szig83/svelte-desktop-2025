@@ -1,95 +1,42 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
 	import { getApps } from '$lib/services/apps.remote';
 	import { getWindowManager } from '$lib/stores/windowStore.svelte';
 	import AppIcon from './AppIcon.svelte';
-	import UniversalIcon from '../UniversalIcon.svelte';
+	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import * as Avatar from '$lib/components/ui/avatar/index';
 
 	const windowManager = getWindowManager();
-	let { show = $bindable() } = $props();
+	let { open = $bindable() } = $props();
 
 	let apps = $state<ReturnType<typeof getApps> | null>(null);
-	let startMenuElement = $state<HTMLDivElement>();
-	let clickCount = $state(0); // Kattintás számláló a különböző példányokhoz
 
 	$effect(() => {
 		if (!apps) {
 			apps = getApps();
 		}
 	});
-
-	// Click outside kezelés
-	/*	$effect(() => {
-		if (!show) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			if (startMenuElement && !startMenuElement.contains(event.target as Node)) {
-				// Ellenőrizzük, hogy nem a start menu gombra kattintottunk-e
-				const target = event.target as HTMLElement;
-				if (!target.closest('.btn-startmenu')) {
-					show = false;
-				}
-			}
-		}
-
-		// Kis késleltetéssel adjuk hozzá, hogy ne azonnal zárja be
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside);
-		}, 100);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside);
-		};
-	});*/
 </script>
 
-<div class="start-menu-wrapper">
-	<div class="start-menu-header">
+<div class="start-menu">
+	<div class="header">
 		<div class="search-bar">
 			<UniversalIcon icon="Search" size={18} class="search-icon" />
-			<input class="search-input" type="text" placeholder="Keresés..." />
+			<Input name="appSearch" class="rounded-full pl-8" placeholder="Keresés..." />
 		</div>
 	</div>
-	<div class="start-menu-content">
+	<div class="content">
 		{#if apps?.error}
 			<p>oops!</p>
 		{:else if apps?.loading}
 			<p>loading...</p>
 		{:else if apps?.current}
-			<div class="start-menu-apps">
+			<div class="apps">
 				{#each apps.current as app}
 					<AppIcon
 						onclick={() => {
-							// Example: Pass parameters to app1 (Beállítások)
-							if (app.appName === 'app1') {
-								clickCount++;
-								// Váltakozva különböző paraméterekkel nyitjuk meg
-								if (clickCount % 2 === 0) {
-									windowManager.openWindow(app.appName, app.title, app, {
-										userId: 'admin456',
-										theme: 'light',
-										initialCount: 10,
-										config: {
-											language: 'en',
-											notifications: false
-										}
-									});
-								} else {
-									windowManager.openWindow(app.appName, app.title, app, {
-										userId: 'user123',
-										theme: 'dark',
-										initialCount: 5,
-										config: {
-											language: 'hu',
-											notifications: true
-										}
-									});
-								}
-							} else {
-								windowManager.openWindow(app.appName, app.title, app);
-							}
-							show = false;
+							windowManager.openWindow(app.appName, app.title, app);
+							open = false;
 						}}
 						{app}
 					/>
@@ -97,12 +44,12 @@
 			</div>
 		{/if}
 	</div>
-	<div class="start-menu-footer">
-		<div class="start-menu-footer-left">
+	<div class="footer">
+		<div class="footer-left">
 			<div class="avatar"><img src="avatar.png" alt="" /></div>
 			<div>Szigeti Balázs</div>
 		</div>
-		<div class="start-menu-footer-right">
+		<div class="footer-right">
 			<button class="btn-click-effect">
 				<UniversalIcon icon="Power" size={16} class="btn-power" />
 			</button>
@@ -111,65 +58,59 @@
 </div>
 
 <style>
-	.start-menu-wrapper {
+	.start-menu {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 
-		box-shadow: var(--shadow-card);
-
-		border-radius: var(--border-radius, 0);
-		background-color: var(--startmenu-bg-color);
-
-		width: 100%;
-		overflow: auto;
-	}
-
-	.start-menu-content {
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 10px;
-	}
-
-	.start-menu-apps {
-		display: inline-grid;
-		grid-template-columns: repeat(5, 1fr);
-		gap: 10px 15px;
-	}
-
-	.start-menu-header {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 15px 0 0 0;
-
-		.search-bar {
+		.header {
 			display: flex;
+			justify-content: center;
 			align-items: center;
-			gap: 5px;
-			:global(.search-icon) {
-				color: #7f7f7f;
+
+			.search-bar {
+				display: flex;
+				align-items: center;
+				width: 50%;
+				:global(.search-icon) {
+					position: absolute;
+					margin-left: 10px;
+					color: #7f7f7f;
+				}
 			}
 		}
-	}
 
-	.start-menu-footer {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		background-color: var(--primary-500-alpha-80);
-		padding: 10px 15px;
-		color: var(--neutral-100);
-		font-size: 0.8rem;
-	}
+		.content {
+			display: flex;
+			flex-grow: 1;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			padding: 20px 10px;
 
-	.start-menu-footer-left {
-		display: flex;
-		align-items: center;
-		gap: 10px;
+			.apps {
+				display: inline-grid;
+				grid-template-columns: repeat(5, 1fr);
+				gap: 10px 15px;
+			}
+		}
+
+		.footer {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			border-top: 1px solid var(--color-border);
+			background-color: var(--primary-500-alpha-80);
+			padding: 10px 0 0 0;
+			color: var(--neutral-100);
+			font-size: 0.8rem;
+
+			.footer-left {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+		}
 	}
 
 	.avatar {

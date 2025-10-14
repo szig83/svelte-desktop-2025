@@ -40,9 +40,10 @@
 	});
 </script>
 
-<div id="desktop" class={themeManager.cssClasses}>
+<div class={['desktop', themeManager.cssClasses]}>
 	<div
 		id="workspace"
+		class="workspace"
 		onclick={handleWorkspaceClick}
 		onkeydown={handleWorkspaceKeydown}
 		role="button"
@@ -62,7 +63,7 @@
 </div>
 
 <style>
-	#desktop {
+	.desktop {
 		display: flex;
 		position: relative;
 		flex-direction: column;
@@ -76,7 +77,7 @@
 		overflow: hidden;
 	}
 
-	#workspace {
+	.workspace {
 		position: relative;
 		flex-grow: 1;
 		overflow: hidden;

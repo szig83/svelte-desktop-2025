@@ -6,23 +6,27 @@
 	import StartMenu from './StartMenu.svelte';
 	import Clock from '$lib/components/Clock.svelte';
 	import * as Popover from '$lib/components/ui/popover';
+	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 
+	/**
+	 * @TODO ahhoz fog kelleni, hogy a taskbar/startmenü-t külön lehessen dark módba kapcsolni.
+	 */
 	const themeManager = getThemeManager();
 	const windowManager = getWindowManager();
+
+	let startMenuOpen = $state(false);
 </script>
 
-<!-- Taskbar a minimalizált ablakok számára -->
 <div class="taskbar">
 	<div class="taskbar-left">
-		<Popover.Root>
-			<Popover.Trigger class="btn-startmenu"><Rocket size={24} /></Popover.Trigger>
-			<Popover.Content
-				class="z-[1000] mx-3 my-2 min-h-[var(--startmenu-height)] w-[var(--startmenu-width)]"
-				><StartMenu /></Popover.Content
+		<Popover.Root bind:open={startMenuOpen}>
+			<Popover.Trigger class="btn-startmenu btn-click-effect"><Rocket size={24} /></Popover.Trigger>
+			<Popover.Content class="z-[1000] mx-2 my-2 flex w-[var(--startmenu-width)] items-stretch"
+				><StartMenu bind:open={startMenuOpen} /></Popover.Content
 			>
 		</Popover.Root>
 
-		{#each windowManager.windows as window}
+		{#each windowManager.windows as window (window.id)}
 			<button
 				class="taskbar-item"
 				class:active={window.isActive}
@@ -50,6 +54,7 @@
 		{/each}
 	</div>
 	<div class="taskbar-right">
+		<ThemeSwitcher />
 		<Clock />
 	</div>
 </div>
@@ -80,6 +85,7 @@
 			display: flex;
 			justify-content: start;
 			align-items: center;
+			gap: 5px;
 			padding-right: 16px;
 		}
 
@@ -135,21 +141,21 @@
 	}
 
 	:global(.btn-startmenu) {
-		@apply mx-3 my-1 h-full;
+		@apply mx-2 my-1 h-full;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		transition: background-color 0.2s;
 		cursor: pointer;
 		border-radius: var(--radius-sm);
-		background-color: var(--color-primary-alpha-20);
+		background-color: var(--color-primary-alpha-60);
 		aspect-ratio: 1;
 		height: 45px;
+		color: var(--color-neutral-100);
 
 		&:hover,
 		&[data-state='open'] {
 			background-color: var(--color-primary-alpha-80);
-			color: var(--color-accent-foreground);
 		}
 	}
 </style>

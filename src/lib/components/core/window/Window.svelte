@@ -21,7 +21,7 @@
 	// Minimum ablak méretek
 	const MIN_WINDOW_WIDTH = windowState.minSize.width;
 	const MIN_WINDOW_HEIGHT = windowState.minSize.height;
-	const WORKSPACE_PADDING = 10;
+	const WORKSPACE_PADDING = 0;
 
 	let dragStartX = 0;
 	let dragStartY = 0;
@@ -110,6 +110,7 @@
 	 */
 	function handleDoubleClick(e: MouseEvent) {
 		if ((e.target as HTMLElement).closest('.window-controls')) return;
+		if (!windowState.maximizable) return;
 		maximize();
 	}
 
@@ -411,7 +412,7 @@
 		}
 	}
 
-	function handleResizeKeydown(e: KeyboardEvent, direction: string) {
+	function handleResizeKeydown(e: KeyboardEvent) {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
 			// Billentyűzetről nem indítunk resize-t, csak aktiváljuk az ablakot
@@ -467,10 +468,12 @@
 				<WindowControlButton controlType="help" onClick={() => help(windowState.helpId)} />
 			{/if}
 			<WindowControlButton controlType="minimize" onClick={minimize} />
-			<WindowControlButton
-				controlType={windowState.isMaximized ? 'restore' : 'maximize'}
-				onClick={maximize}
-			/>
+			{#if windowState.maximizable}
+				<WindowControlButton
+					controlType={windowState.isMaximized ? 'restore' : 'maximize'}
+					onClick={maximize}
+				/>
+			{/if}
 			<WindowControlButton controlType="close" onClick={close} />
 		</div>
 	</div>
@@ -494,7 +497,7 @@
 			class="resize-handle resize-n"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'n')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'n')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'n')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 			aria-label="Resize window"
@@ -503,7 +506,7 @@
 			class="resize-handle resize-s"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 's')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 's')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 's')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 		></div>
@@ -511,7 +514,7 @@
 			class="resize-handle resize-e"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'e')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'e')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'e')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 		></div>
@@ -519,7 +522,7 @@
 			class="resize-handle resize-w"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'w')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'w')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'w')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 		></div>
@@ -527,7 +530,7 @@
 			class="resize-handle resize-ne"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'ne')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'ne')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'ne')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 		></div>
@@ -535,7 +538,7 @@
 			class="resize-handle resize-nw"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'nw')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'nw')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'nw')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 		></div>
@@ -543,7 +546,7 @@
 			class="resize-handle resize-se"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'se')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'se')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'se')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 		></div>
@@ -551,7 +554,7 @@
 			class="resize-handle resize-sw"
 			onmousedown={(e: MouseEvent) => handleResizeStart(e, 'sw')}
 			ondblclick={(e: MouseEvent) => handleEdgeDoubleClick(e, 'sw')}
-			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e, 'sw')}
+			onkeydown={(e: KeyboardEvent) => handleResizeKeydown(e)}
 			role="button"
 			tabindex="0"
 		></div>
@@ -563,23 +566,29 @@
 		display: flex;
 		position: absolute;
 		flex-direction: column;
-		transition: box-shadow 0.2s;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-		/*background: white;*/
-		border: 2px solid var(--glass-border);
-		border-radius: var(--default-border-radius, 8px);
+		backdrop-filter: blur(12px) saturate(180%);
+		transition:
+			box-shadow 0.2s,
+			border 0.2s;
+		box-shadow: var(--shadow-lg);
+		border-radius: var(--radius-md, 8px);
+		background-color: var(--color-window-background-alpha-90);
 	}
 
 	.window.minimized {
 		display: none;
 	}
 
-	:global(.window:not(.active)) {
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	.window.maximized {
+		border-radius: 0;
 	}
 
 	:global(.window.active) {
-		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+		/*border: 2px solid var(--color-primary-alpha-20);*/
+	}
+
+	:global(.window:not(.active)) {
+		box-shadow: none;
 	}
 
 	.window-header {
@@ -587,12 +596,24 @@
 		justify-content: space-between;
 		align-items: center;
 		cursor: move;
-		border-bottom: 1px solid #d0d0d0;
+		/*border-bottom: 1px solid var(--color-primary-alpha-20);*/
 		border-radius: calc(var(--default-border-radius, 8px) - 2px)
 			calc(var(--default-border-radius, 8px) - 2px) 0 0;
-		background: #d9d9d9;
+		/*background-color: var(--color-primary-alpha-70);*/
+		/*background: var(--color-background);*/
 		padding: 8px 12px;
+		color: var(--color-primary-alpha-90);
 		user-select: none;
+		&:hover {
+		}
+	}
+
+	:global {
+		.dark {
+			.window-header {
+				/*background-color: var(--color-primary-alpha-5);*/
+			}
+		}
 	}
 
 	.window.maximized .window-header {
@@ -600,35 +621,29 @@
 	}
 
 	.window:not(.active) .window-header {
-		background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+		border-bottom-color: var(--color-border);
+		/*background-color: transparent;*/
 	}
 
 	.window-title {
-		color: #333;
 		font-weight: 600;
 		font-size: 14px;
 	}
 
 	.window:not(.active) .window-title {
-		color: #888;
+		color: var(--color-foreground);
 	}
-
 	.window-controls {
 		display: flex;
 		gap: 8px;
 	}
 
+	.window:not(.active) .window-controls {
+		filter: grayscale(1);
+	}
+
 	.window-content {
 		flex: 1;
-		/*backdrop-filter: blur(10px); */
-		backdrop-filter: blur(12px) saturate(180%);
-		box-shadow: var(--shadow-lg);
-
-		border-bottom-right-radius: calc(var(--default-border-radius, 8px) - 2px);
-		border-bottom-left-radius: calc(var(--default-border-radius, 8px) - 2px);
-
-		background: var(--glass-bg);
-		/*background-color: rgba(255, 255, 255, 0.95);*/
 		padding: 16px;
 		overflow: hidden;
 

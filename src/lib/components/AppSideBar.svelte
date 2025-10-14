@@ -9,15 +9,15 @@
 <style>
 	.app-sidebar {
 		flex: 0 0 250px;
-		border-radius: var(--border-radius);
-		background-color: var(--neutral-100);
+		border-radius: var(--radius-md);
+		background-color: var(--color-neutral-200);
 		padding: 1rem;
 	}
 
 	:global {
 		.dark {
 			.app-sidebar {
-				background-color: var(--neutral-900);
+				background-color: var(--color-neutral-900);
 			}
 		}
 	}

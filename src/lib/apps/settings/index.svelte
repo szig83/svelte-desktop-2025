@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
 
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import ThemeToggle from '$lib/components/ThemeSwitcher.svelte';
 	import ColorSchemePicker from '$lib/components/ColorSchemePicker.svelte';
 	import AppSideBar from '$lib/components/AppSideBar.svelte';
 	import ThemeSettings from './components/ThemeSettings.svelte';
 
-	import { Command } from 'bits-ui';
 	const theme = getThemeManager();
 	function scrollToSection(id: string) {
 		const element = document.getElementById(id);
@@ -17,44 +16,7 @@
 </script>
 
 <div class="settings-app">
-	<AppSideBar>
-		<Command.Root class="command-root">
-			<Command.Input placeholder="Keresés..." />
-			<Command.List class="command-list">
-				<Command.Viewport>
-					<Command.Empty
-						class="text-muted-foreground flex w-full items-center justify-center pb-6 pt-8 text-sm"
-					>
-						No results found.
-					</Command.Empty>
-					<Command.Group>
-						<Command.GroupHeading class="command-group-heading">Megjelenés</Command.GroupHeading>
-						<Command.GroupItems>
-							<Command.Item
-								onclick={() => scrollToSection('elso')}
-								class="command-item"
-								keywords={[]}>Első</Command.Item
-							>
-							<Command.Item
-								onclick={() => scrollToSection('info')}
-								class="command-item"
-								keywords={['child', 'custom element', 'snippets']}
-							>
-								Második
-							</Command.Item>
-							<Command.Item
-								class="command-item"
-								keywords={['css', 'theme', 'colors', 'fonts', 'tailwind']}
-							>
-								Harmadik
-							</Command.Item>
-						</Command.GroupItems>
-					</Command.Group>
-					<Command.Separator class="bg-foreground/5 h-px w-full" />
-				</Command.Viewport>
-			</Command.List>
-		</Command.Root>
-	</AppSideBar>
+	<AppSideBar>oldalsó menü</AppSideBar>
 	<div class="settings-content">
 		<ThemeSettings />
 		<ThemeToggle />

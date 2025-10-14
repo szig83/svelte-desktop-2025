@@ -32,13 +32,14 @@ Start menüben megjelenő ikonokat mutatja.
 		cursor: pointer;
 		aspect-ratio: 1;
 		width: var(--btn-size);
+		color: var(--color-foreground);
 
 		.app-icon {
 			display: flex;
 			justify-content: center;
 			align-items: center;
 			transition: background-color 0.35s ease-out;
-			border-radius: var(--border-radius);
+			border-radius: var(--radius-sm);
 			/*background-color: hsl(from var(--panel-bg-color) h s calc(l - 5));*/
 			aspect-ratio: 1;
 			width: 100%;
@@ -62,11 +63,11 @@ Start menüben megjelenő ikonokat mutatja.
 
 		&:hover {
 			.app-icon {
-				background-color: var(--primary-500-alpha-80);
+				background-color: var(--color-primary-alpha-70);
 			}
 			.app-title {
 				& > div {
-					color: var(--primary-400);
+					color: var(--color-primary-alpha-70);
 				}
 			}
 		}
