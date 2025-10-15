@@ -18,9 +18,11 @@
 	};
 	setContext(APP_CONTEXT_KEY, appContext);
 
-	// Minimum ablak méretek
+	// Minimum és maximum ablak méretek
 	const MIN_WINDOW_WIDTH = windowState.minSize.width;
 	const MIN_WINDOW_HEIGHT = windowState.minSize.height;
+	const MAX_WINDOW_WIDTH = windowState.maxSize.width;
+	const MAX_WINDOW_HEIGHT = windowState.maxSize.height;
 	const WORKSPACE_PADDING = 0;
 
 	let dragStartX = 0;
@@ -221,22 +223,32 @@
 
 		// Vízszintes méretezés
 		if (resizeDirection.includes('e')) {
-			// Jobb oldal: ne menjen túl a workspace jobb szélén (padding figyelembevételével)
-			const maxWidth = workspaceWidth - resizeStartLeft - WORKSPACE_PADDING;
+			// Jobb oldal: ne menjen túl a workspace jobb szélén és a max méreten (padding figyelembevételével)
+			const maxWidth = Math.min(
+				workspaceWidth - resizeStartLeft - WORKSPACE_PADDING,
+				MAX_WINDOW_WIDTH
+			);
 			newWidth = Math.max(MIN_WINDOW_WIDTH, Math.min(maxWidth, resizeStartWidth + deltaX));
 		} else if (resizeDirection.includes('w')) {
-			// Bal oldal: ne menjen túl a workspace bal szélén (padding figyelembevételével)
+			// Bal oldal: ne menjen túl a workspace bal szélén és a max méreten (padding figyelembevételével)
 			const potentialWidth = resizeStartWidth - deltaX;
 			const potentialLeft = resizeStartLeft + deltaX;
 
 			if (potentialLeft < WORKSPACE_PADDING) {
-				// Ha túlmenne a bal szélen, állítsuk be a maximális méretet
-				newWidth = resizeStartLeft + resizeStartWidth - WORKSPACE_PADDING;
+				// Ha túlmenne a bal szélen, állítsuk be a maximális méretet (de max méret alatt)
+				newWidth = Math.min(
+					resizeStartLeft + resizeStartWidth - WORKSPACE_PADDING,
+					MAX_WINDOW_WIDTH
+				);
 				newLeft = WORKSPACE_PADDING;
-			} else if (potentialWidth >= MIN_WINDOW_WIDTH) {
-				// Normál méretezés, ha a minimum méret felett vagyunk
+			} else if (potentialWidth >= MIN_WINDOW_WIDTH && potentialWidth <= MAX_WINDOW_WIDTH) {
+				// Normál méretezés, ha a minimum és maximum méret között vagyunk
 				newWidth = potentialWidth;
 				newLeft = potentialLeft;
+			} else if (potentialWidth > MAX_WINDOW_WIDTH) {
+				// Ha túllépnénk a maximum méretet, rögzítsük azt
+				newWidth = MAX_WINDOW_WIDTH;
+				newLeft = resizeStartLeft + resizeStartWidth - MAX_WINDOW_WIDTH;
 			} else {
 				// Ha elérnénk a minimum méretet, rögzítsük azt és a pozíciót
 				newWidth = MIN_WINDOW_WIDTH;
@@ -246,22 +258,32 @@
 
 		// Függőleges méretezés
 		if (resizeDirection.includes('s')) {
-			// Alsó oldal: ne menjen túl a workspace alján (padding figyelembevételével)
-			const maxHeight = workspaceHeight - resizeStartTop - WORKSPACE_PADDING;
+			// Alsó oldal: ne menjen túl a workspace alján és a max méreten (padding figyelembevételével)
+			const maxHeight = Math.min(
+				workspaceHeight - resizeStartTop - WORKSPACE_PADDING,
+				MAX_WINDOW_HEIGHT
+			);
 			newHeight = Math.max(MIN_WINDOW_HEIGHT, Math.min(maxHeight, resizeStartHeight + deltaY));
 		} else if (resizeDirection.includes('n')) {
-			// Felső oldal: ne menjen túl a workspace tetején (padding figyelembevételével)
+			// Felső oldal: ne menjen túl a workspace tetején és a max méreten (padding figyelembevételével)
 			const potentialHeight = resizeStartHeight - deltaY;
 			const potentialTop = resizeStartTop + deltaY;
 
 			if (potentialTop < WORKSPACE_PADDING) {
-				// Ha túlmenne a felső szélen, állítsuk be a maximális méretet
-				newHeight = resizeStartTop + resizeStartHeight - WORKSPACE_PADDING;
+				// Ha túlmenne a felső szélen, állítsuk be a maximális méretet (de max méret alatt)
+				newHeight = Math.min(
+					resizeStartTop + resizeStartHeight - WORKSPACE_PADDING,
+					MAX_WINDOW_HEIGHT
+				);
 				newTop = WORKSPACE_PADDING;
-			} else if (potentialHeight >= MIN_WINDOW_HEIGHT) {
-				// Normál méretezés, ha a minimum méret felett vagyunk
+			} else if (potentialHeight >= MIN_WINDOW_HEIGHT && potentialHeight <= MAX_WINDOW_HEIGHT) {
+				// Normál méretezés, ha a minimum és maximum méret között vagyunk
 				newHeight = potentialHeight;
 				newTop = potentialTop;
+			} else if (potentialHeight > MAX_WINDOW_HEIGHT) {
+				// Ha túllépnénk a maximum méretet, rögzítsük azt
+				newHeight = MAX_WINDOW_HEIGHT;
+				newTop = resizeStartTop + resizeStartHeight - MAX_WINDOW_HEIGHT;
 			} else {
 				// Ha elérnénk a minimum méretet, rögzítsük azt és a pozíciót
 				newHeight = MIN_WINDOW_HEIGHT;
@@ -345,40 +367,105 @@
 		let newTop = windowState.position.y;
 
 		switch (direction) {
-			case 'e': // Jobb él - nyújtás jobbra a workspace jobb széléig
-				newWidth = workspaceWidth - windowState.position.x - WORKSPACE_PADDING;
+			case 'e': // Jobb él - nyújtás jobbra a workspace jobb széléig (max méret alatt)
+				newWidth = Math.min(
+					workspaceWidth - windowState.position.x - WORKSPACE_PADDING,
+					MAX_WINDOW_WIDTH
+				);
 				break;
-			case 'w': // Bal él - nyújtás balra a workspace bal széléig
-				newWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
-				newLeft = WORKSPACE_PADDING;
+			case 'w': // Bal él - nyújtás balra a workspace bal széléig (max méret alatt)
+			{
+				const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+				newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
+				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+				if (newWidth === targetWidth) {
+					newLeft = WORKSPACE_PADDING;
+				} else {
+					// Ha max méret korlátozza, számítsuk ki az új bal pozíciót
+					newLeft = windowState.position.x + windowState.size.width - newWidth;
+				}
+			}
+			break;
+			case 's': // Alsó él - nyújtás lefelé a workspace aljáig (max méret alatt)
+				newHeight = Math.min(
+					workspaceHeight - windowState.position.y - WORKSPACE_PADDING,
+					MAX_WINDOW_HEIGHT
+				);
 				break;
-			case 's': // Alsó él - nyújtás lefelé a workspace aljáig
-				newHeight = workspaceHeight - windowState.position.y - WORKSPACE_PADDING;
+			case 'n': // Felső él - nyújtás felfelé a workspace tetejéig (max méret alatt)
+			{
+				const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+				newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
+				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+				if (newHeight === targetHeight) {
+					newTop = WORKSPACE_PADDING;
+				} else {
+					// Ha max méret korlátozza, számítsuk ki az új felső pozíciót
+					newTop = windowState.position.y + windowState.size.height - newHeight;
+				}
+			}
+			break;
+			case 'ne': // Jobb felső sarok - nyújtás jobbra és felfelé (max méret alatt)
+			{
+				newWidth = Math.min(
+					workspaceWidth - windowState.position.x - WORKSPACE_PADDING,
+					MAX_WINDOW_WIDTH
+				);
+				const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+				newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
+				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+				if (newHeight === targetHeight) {
+					newTop = WORKSPACE_PADDING;
+				} else {
+					newTop = windowState.position.y + windowState.size.height - newHeight;
+				}
+			}
+			break;
+			case 'nw': // Bal felső sarok - nyújtás balra és felfelé (max méret alatt)
+			{
+				const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+				newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
+				const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+				newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
+				// Pozíciókat csak akkor változtatjuk, ha nem a max méret korlátozza
+				if (newWidth === targetWidth) {
+					newLeft = WORKSPACE_PADDING;
+				} else {
+					newLeft = windowState.position.x + windowState.size.width - newWidth;
+				}
+				if (newHeight === targetHeight) {
+					newTop = WORKSPACE_PADDING;
+				} else {
+					newTop = windowState.position.y + windowState.size.height - newHeight;
+				}
+			}
+			break;
+			case 'se': // Jobb alsó sarok - nyújtás jobbra és lefelé (max méret alatt)
+				newWidth = Math.min(
+					workspaceWidth - windowState.position.x - WORKSPACE_PADDING,
+					MAX_WINDOW_WIDTH
+				);
+				newHeight = Math.min(
+					workspaceHeight - windowState.position.y - WORKSPACE_PADDING,
+					MAX_WINDOW_HEIGHT
+				);
 				break;
-			case 'n': // Felső él - nyújtás felfelé a workspace tetejéig
-				newHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
-				newTop = WORKSPACE_PADDING;
-				break;
-			case 'ne': // Jobb felső sarok - nyújtás jobbra és felfelé
-				newWidth = workspaceWidth - windowState.position.x - WORKSPACE_PADDING;
-				newHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
-				newTop = WORKSPACE_PADDING;
-				break;
-			case 'nw': // Bal felső sarok - nyújtás balra és felfelé
-				newWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
-				newLeft = WORKSPACE_PADDING;
-				newHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
-				newTop = WORKSPACE_PADDING;
-				break;
-			case 'se': // Jobb alsó sarok - nyújtás jobbra és lefelé
-				newWidth = workspaceWidth - windowState.position.x - WORKSPACE_PADDING;
-				newHeight = workspaceHeight - windowState.position.y - WORKSPACE_PADDING;
-				break;
-			case 'sw': // Bal alsó sarok - nyújtás balra és lefelé
-				newWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
-				newLeft = WORKSPACE_PADDING;
-				newHeight = workspaceHeight - windowState.position.y - WORKSPACE_PADDING;
-				break;
+			case 'sw': // Bal alsó sarok - nyújtás balra és lefelé (max méret alatt)
+			{
+				const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+				newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
+				newHeight = Math.min(
+					workspaceHeight - windowState.position.y - WORKSPACE_PADDING,
+					MAX_WINDOW_HEIGHT
+				);
+				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+				if (newWidth === targetWidth) {
+					newLeft = WORKSPACE_PADDING;
+				} else {
+					newLeft = windowState.position.x + windowState.size.width - newWidth;
+				}
+			}
+			break;
 		}
 
 		// Minimum méretek ellenőrzése

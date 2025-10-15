@@ -14,6 +14,7 @@ export type WindowState = {
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	minSize: { width: number; height: number };
+	maxSize: { width: number; height: number };
 	component?: Component; // A betöltött komponens példány
 	isLoading?: boolean;
 	parameters?: AppParameters; // Az appnak átadott paraméterek
@@ -80,6 +81,7 @@ class WindowManager {
 			position: this.getNextPosition(),
 			size: { width: defaultSize.width, height: defaultSize.height },
 			minSize: metadata.minSize || { width: 300, height: 200 },
+			maxSize: metadata.maxSize || { width: 5000, height: 5000 },
 			component: undefined,
 			isLoading: true,
 			parameters,
