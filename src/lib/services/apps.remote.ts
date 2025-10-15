@@ -1,6 +1,7 @@
 import { query } from '$app/server';
 import { type AppMetadata } from '$lib/types/window';
 import { faker } from '@faker-js/faker';
+import * as v from 'valibot';
 
 export const getApps = query(async () => {
 	//await new Promise((resolve) => setTimeout(resolve, 4000));
@@ -17,7 +18,10 @@ export const getApps = query(async () => {
 		minSize: { width: 500, height: 400 },
 		defaultSize: { width: 700, height: 600, maximized: false },
 		allowMultiple: false,
-		helpId: 1
+		helpId: 1,
+		parameters: {
+			valami: 1
+		}
 	});
 
 	apps.push({
@@ -98,4 +102,9 @@ export const getApps = query(async () => {
 		}
 	] as AppMetadata[];*/
 	return apps as AppMetadata[];
+});
+
+export const getAppByName = query(v.string(), async (appName: string) => {
+	const apps = await getApps();
+	return apps.find((app) => app.appName === appName);
 });

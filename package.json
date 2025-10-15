@@ -33,31 +33,32 @@
 		"bits-ui": "^2.11.5",
 		"eslint": "^9.37.0",
 		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-jsdoc": "^61.1.2",
+		"eslint-plugin-jsdoc": "^61.1.4",
 		"eslint-plugin-svelte": "^3.12.4",
 		"globals": "^16.4.0",
 		"lucide-svelte": "^0.545.0",
 		"prettier": "~3.6.2",
 		"prettier-plugin-css-order": "^2.1.2",
 		"prettier-plugin-svelte": "^3.4.0",
-		"prettier-plugin-tailwindcss": "^0.6.14",
-		"svelte": "^5.39.12",
+		"prettier-plugin-tailwindcss": "^0.7.0",
+		"svelte": "^5.40.0",
 		"svelte-check": "^4.3.3",
 		"svelte-moveable": "^0.45.0",
 		"tailwindcss": "^4.1.14",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.46.1",
-		"vite": "^7.1.9",
+		"vite": "^7.1.10",
 		"vite-plugin-devtools-json": "^1.0.0"
 	},
 	"dependencies": {
-		"@faker-js/faker": "^10.0.0",
+		"@faker-js/faker": "^10.1.0",
 		"clsx": "^2.1.1",
 		"lz-string": "^1.5.0",
 		"phosphor-svelte": "^3.0.1",
 		"tailwind-merge": "^3.3.1",
 		"tailwind-variants": "^3.1.1",
 		"tailwindcss-animate": "^1.0.7",
-		"tw-animate-css": "^1.4.0"
+		"tw-animate-css": "^1.4.0",
+		"valibot": "^1.1.0"
 	}
 }

@@ -3,9 +3,14 @@
  Ez a komponens felel az egyes ablakok felépítésért, műveletekért.
  -->
 <script lang="ts">
+	import { getAppByName } from '$lib/services/apps.remote';
 	import { setContext } from 'svelte';
 	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/appContext';
-	import { getWindowManager, type WindowState, RESTORE_SIZE_THRESHOLD } from '$lib/stores/windowStore.svelte';
+	import {
+		getWindowManager,
+		type WindowState,
+		RESTORE_SIZE_THRESHOLD
+	} from '$lib/stores/windowStore.svelte';
 	import WindowControlButton from './WindowControlButton.svelte';
 	import LZString from 'lz-string';
 
@@ -235,21 +240,11 @@
 	}
 
 	function link() {
-		//TODO csak allowMultiple ablakot lehessen másolni, megosztani... mégse, mivel ha már nyitva van neki, akkor max aktiválja
-		console.log(windowState.parameters);
-
 		const linkData = {
-			allowMultiple: windowState.allowMultiple,
 			appName: windowState.appName,
-			defaultSize: $state.snapshot(windowState.defaultSize),
-			helpId: windowState.helpId,
-			maxSize: $state.snapshot(windowState.maxSize),
-			maximizable: windowState.maximizable,
-			minSize: $state.snapshot(windowState.minSize),
-			title: windowState.title,
-			resizable: windowState.resizable
+			parameters: $state.snapshot(windowState.parameters)
 		};
-
+		console.log(linkData);
 		const jsonString = JSON.stringify(linkData);
 		const compressed = LZString.compressToEncodedURIComponent(jsonString);
 		navigator.clipboard.writeText(compressed);
@@ -784,7 +779,7 @@
 	}
 
 	:global(.window.active) {
-		box-shadow: 
+		box-shadow:
 			0 0 0 1px var(--color-primary-alpha-10),
 			0 0 20px var(--color-primary-alpha-10),
 			0 0 40px var(--color-primary-alpha-10),

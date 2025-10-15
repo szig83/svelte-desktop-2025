@@ -35,7 +35,7 @@
 				{#each apps.current as app}
 					<AppIcon
 						onclick={() => {
-							windowManager.openWindow(app.appName, app.title, app);
+							windowManager.openWindow(app.appName, app.title, app, app.parameters);
 							open = false;
 							console.log(app);
 						}}

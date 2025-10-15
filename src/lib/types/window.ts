@@ -30,6 +30,7 @@ export interface AppMetadata {
 	minimizable?: boolean;
 	/** Help ID for the application. */
 	helpId?: number;
+	parameters?: AppParameters;
 }
 
 /** Parameters that can be passed to an app when opening. */
