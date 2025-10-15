@@ -3,6 +3,10 @@ import { type AppMetadata, type AppParameters } from '$lib/types/window';
 import type { Component } from 'svelte';
 import type { WindowSize } from '$lib/types/window';
 
+// Restore méret konstansok
+const RESTORE_SIZE_THRESHOLD = 0.99; // Ha az előző méret 95%-on belül van a maximálishoz
+const RESTORE_SIZE_RATIO = 0.8; // Akkor 70%-os méretre álljon vissza
+
 export type WindowState = {
 	id: string;
 	icon: string | null | undefined;
@@ -194,7 +198,34 @@ export class WindowManager {
 	maximizeWindow(id: string) {
 		const window = this.windows.find((w) => w.id === id);
 		if (window) {
+			const wasMaximized = window.isMaximized;
 			window.isMaximized = !window.isMaximized;
+
+			// Ha restore történik (maximalizáltból vissza), ellenőrizzük a célméretet
+			if (wasMaximized && !window.isMaximized) {
+				// Workspace méret lekérése
+				const workspace = document.getElementById('workspace');
+				if (workspace) {
+					const workspaceRect = workspace.getBoundingClientRect();
+					const maxWidth = workspaceRect.width;
+					const maxHeight = workspaceRect.height;
+
+					// Ellenőrizzük, hogy a jelenlegi méret 95%-on belül van-e a maximálishoz
+					const widthRatio = window.size.width / maxWidth;
+					const heightRatio = window.size.height / maxHeight;
+
+					if (widthRatio >= RESTORE_SIZE_THRESHOLD || heightRatio >= RESTORE_SIZE_THRESHOLD) {
+						// Ha igen, állítsuk 70%-ra
+						window.size.width = Math.round(maxWidth * RESTORE_SIZE_RATIO);
+						window.size.height = Math.round(maxHeight * RESTORE_SIZE_RATIO);
+
+						// Pozíció centrálása
+						window.position.x = Math.round((maxWidth - window.size.width) / 2);
+						window.position.y = Math.round((maxHeight - window.size.height) / 2);
+					}
+				}
+			}
+
 			// Trigger reactivity
 			this.windows = [...this.windows];
 		}
