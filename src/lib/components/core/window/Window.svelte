@@ -25,9 +25,18 @@
 	const MAX_WINDOW_HEIGHT = windowState.maxSize.height;
 	const WORKSPACE_PADDING = 0;
 
+	// Teljesítmény vs Vizuális élmény
+	// true: teljesítmény prioritás (tartalom elrejtése mozgatás közben)
+	// false: vizuális élmény prioritás (tartalom látható marad)
+	const PREFER_PERFORMANCE = false;
+
 	let dragStartX = 0;
 	let dragStartY = 0;
+	let mouseStartX = 0; // Kezdő egér pozíció X
+	let mouseStartY = 0; // Kezdő egér pozíció Y
 	let isDragging = $state(false);
+	let isVisuallyDragging = $state(false); // Vizuális effekt csak mozgatás után
+	const DRAG_THRESHOLD = 5; // pixel - ennyi mozgás után aktiválódik a vizuális effekt
 
 	let isResizing = $state(false);
 	let resizeDirection = '';
@@ -50,6 +59,8 @@
 		isDragging = true;
 		dragStartX = e.clientX - windowState.position.x;
 		dragStartY = e.clientY - windowState.position.y;
+		mouseStartX = e.clientX;
+		mouseStartY = e.clientY;
 
 		// Szövegkijeölés tiltása mozgatás közben
 		document.body.style.userSelect = 'none';
@@ -64,6 +75,15 @@
 	 */
 	function handleMouseMove(e: MouseEvent) {
 		if (!isDragging || windowState.isMaximized) return;
+
+		// Ellenőrizzük, hogy elértük-e a küszöbértéket a vizuális effekthez
+		if (!isVisuallyDragging) {
+			const deltaX = Math.abs(e.clientX - mouseStartX);
+			const deltaY = Math.abs(e.clientY - mouseStartY);
+			if (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD) {
+				isVisuallyDragging = true;
+			}
+		}
 
 		// Workspace méretek
 		const workspace = document.getElementById('workspace');
@@ -98,6 +118,7 @@
 	 */
 	function handleMouseUp() {
 		isDragging = false;
+		isVisuallyDragging = false;
 
 		// Visszaállítjuk a szövegkijelölést
 		document.body.style.userSelect = '';
@@ -374,18 +395,18 @@
 				);
 				break;
 			case 'w': // Bal él - nyújtás balra a workspace bal széléig (max méret alatt)
-			{
-				const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
-				newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
-				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
-				if (newWidth === targetWidth) {
-					newLeft = WORKSPACE_PADDING;
-				} else {
-					// Ha max méret korlátozza, számítsuk ki az új bal pozíciót
-					newLeft = windowState.position.x + windowState.size.width - newWidth;
+				{
+					const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+					newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
+					// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+					if (newWidth === targetWidth) {
+						newLeft = WORKSPACE_PADDING;
+					} else {
+						// Ha max méret korlátozza, számítsuk ki az új bal pozíciót
+						newLeft = windowState.position.x + windowState.size.width - newWidth;
+					}
 				}
-			}
-			break;
+				break;
 			case 's': // Alsó él - nyújtás lefelé a workspace aljáig (max méret alatt)
 				newHeight = Math.min(
 					workspaceHeight - windowState.position.y - WORKSPACE_PADDING,
@@ -393,53 +414,53 @@
 				);
 				break;
 			case 'n': // Felső él - nyújtás felfelé a workspace tetejéig (max méret alatt)
-			{
-				const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
-				newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
-				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
-				if (newHeight === targetHeight) {
-					newTop = WORKSPACE_PADDING;
-				} else {
-					// Ha max méret korlátozza, számítsuk ki az új felső pozíciót
-					newTop = windowState.position.y + windowState.size.height - newHeight;
+				{
+					const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+					newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
+					// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+					if (newHeight === targetHeight) {
+						newTop = WORKSPACE_PADDING;
+					} else {
+						// Ha max méret korlátozza, számítsuk ki az új felső pozíciót
+						newTop = windowState.position.y + windowState.size.height - newHeight;
+					}
 				}
-			}
-			break;
+				break;
 			case 'ne': // Jobb felső sarok - nyújtás jobbra és felfelé (max méret alatt)
-			{
-				newWidth = Math.min(
-					workspaceWidth - windowState.position.x - WORKSPACE_PADDING,
-					MAX_WINDOW_WIDTH
-				);
-				const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
-				newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
-				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
-				if (newHeight === targetHeight) {
-					newTop = WORKSPACE_PADDING;
-				} else {
-					newTop = windowState.position.y + windowState.size.height - newHeight;
+				{
+					newWidth = Math.min(
+						workspaceWidth - windowState.position.x - WORKSPACE_PADDING,
+						MAX_WINDOW_WIDTH
+					);
+					const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+					newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
+					// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+					if (newHeight === targetHeight) {
+						newTop = WORKSPACE_PADDING;
+					} else {
+						newTop = windowState.position.y + windowState.size.height - newHeight;
+					}
 				}
-			}
-			break;
+				break;
 			case 'nw': // Bal felső sarok - nyújtás balra és felfelé (max méret alatt)
-			{
-				const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
-				newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
-				const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
-				newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
-				// Pozíciókat csak akkor változtatjuk, ha nem a max méret korlátozza
-				if (newWidth === targetWidth) {
-					newLeft = WORKSPACE_PADDING;
-				} else {
-					newLeft = windowState.position.x + windowState.size.width - newWidth;
+				{
+					const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+					newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
+					const targetHeight = windowState.position.y + windowState.size.height - WORKSPACE_PADDING;
+					newHeight = Math.min(targetHeight, MAX_WINDOW_HEIGHT);
+					// Pozíciókat csak akkor változtatjuk, ha nem a max méret korlátozza
+					if (newWidth === targetWidth) {
+						newLeft = WORKSPACE_PADDING;
+					} else {
+						newLeft = windowState.position.x + windowState.size.width - newWidth;
+					}
+					if (newHeight === targetHeight) {
+						newTop = WORKSPACE_PADDING;
+					} else {
+						newTop = windowState.position.y + windowState.size.height - newHeight;
+					}
 				}
-				if (newHeight === targetHeight) {
-					newTop = WORKSPACE_PADDING;
-				} else {
-					newTop = windowState.position.y + windowState.size.height - newHeight;
-				}
-			}
-			break;
+				break;
 			case 'se': // Jobb alsó sarok - nyújtás jobbra és lefelé (max méret alatt)
 				newWidth = Math.min(
 					workspaceWidth - windowState.position.x - WORKSPACE_PADDING,
@@ -451,21 +472,21 @@
 				);
 				break;
 			case 'sw': // Bal alsó sarok - nyújtás balra és lefelé (max méret alatt)
-			{
-				const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
-				newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
-				newHeight = Math.min(
-					workspaceHeight - windowState.position.y - WORKSPACE_PADDING,
-					MAX_WINDOW_HEIGHT
-				);
-				// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
-				if (newWidth === targetWidth) {
-					newLeft = WORKSPACE_PADDING;
-				} else {
-					newLeft = windowState.position.x + windowState.size.width - newWidth;
+				{
+					const targetWidth = windowState.position.x + windowState.size.width - WORKSPACE_PADDING;
+					newWidth = Math.min(targetWidth, MAX_WINDOW_WIDTH);
+					newHeight = Math.min(
+						workspaceHeight - windowState.position.y - WORKSPACE_PADDING,
+						MAX_WINDOW_HEIGHT
+					);
+					// Pozíciót csak akkor változtatjuk, ha nem a max méret korlátozza
+					if (newWidth === targetWidth) {
+						newLeft = WORKSPACE_PADDING;
+					} else {
+						newLeft = windowState.position.x + windowState.size.width - newWidth;
+					}
 				}
-			}
-			break;
+				break;
 		}
 
 		// Minimum méretek ellenőrzése
@@ -533,7 +554,8 @@
 		windowState.isActive ? 'active' : '',
 		windowState.isMaximized ? 'maximized' : '',
 		windowState.isMinimized ? 'minimized' : '',
-		isResizing ? 'resizing' : ''
+		isResizing ? 'resizing' : '',
+		isVisuallyDragging ? 'dragging' : ''
 	]}
 	style={windowStyle}
 	onclick={() => windowManager.activateWindow(windowState.id)}
@@ -565,7 +587,7 @@
 		</div>
 	</div>
 
-	<div class="window-content">
+	<div class="window-content" class:dragging={PREFER_PERFORMANCE && isVisuallyDragging}>
 		<div>
 			{#if windowState.isLoading}
 				<div class="loading">Betöltés...</div>
@@ -656,10 +678,27 @@
 		backdrop-filter: blur(12px) saturate(180%);
 		transition:
 			box-shadow 0.2s,
-			border 0.2s;
+			border 0.2s,
+			opacity 0.15s,
+			transform 0.15s;
 		box-shadow: var(--shadow-lg);
 		border-radius: var(--radius-md, 8px);
 		background-color: var(--color-window-background-alpha-90);
+	}
+
+	/* Vizuális feedback mozgatás közben */
+	.window.dragging {
+		transform: scale(0.98);
+		opacity: 0.85;
+		box-shadow: var(--shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.3));
+
+		.window-header {
+			opacity: 0.5;
+		}
+
+		.window-content {
+			opacity: 0.4;
+		}
 	}
 
 	.window.minimized {
@@ -738,6 +777,11 @@
 			height: 100%;
 			overflow: auto;
 		}
+	}
+
+	/* Teljesítmény optimalizáció: tartalom elrejtése mozgatás közben */
+	.window-content.dragging {
+		visibility: hidden;
 	}
 
 	.loading,
