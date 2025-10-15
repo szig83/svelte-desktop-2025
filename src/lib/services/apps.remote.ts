@@ -28,7 +28,7 @@ export const getApps = query(async () => {
 		maxSize: { width: 600, height: 600 },
 		defaultSize: { width: 500, height: 500, maximized: false },
 		allowMultiple: false,
-		maximizable: false,
+		maximizable: true,
 		helpId: 2
 	});
 

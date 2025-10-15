@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte';
 import { type AppMetadata, type AppParameters } from '$lib/types/window';
 import type { Component } from 'svelte';
+import type { WindowSize } from '$lib/types/window';
 
 export type WindowState = {
 	id: string;
@@ -12,9 +13,9 @@ export type WindowState = {
 	isMaximized: boolean;
 	zIndex: number;
 	position: { x: number; y: number };
-	size: { width: number; height: number };
-	minSize: { width: number; height: number };
-	maxSize: { width: number; height: number };
+	size: WindowSize;
+	minSize: WindowSize;
+	maxSize: WindowSize;
 	component?: Component; // A betöltött komponens példány
 	isLoading?: boolean;
 	parameters?: AppParameters; // Az appnak átadott paraméterek
@@ -22,6 +23,8 @@ export type WindowState = {
 	maximizable?: boolean;
 	resizable?: boolean;
 	helpId?: number;
+	allowMultiple?: boolean;
+	defaultSize?: WindowSize | { maximized?: boolean };
 };
 
 export class WindowManager {
@@ -88,7 +91,9 @@ export class WindowManager {
 			instanceId,
 			maximizable: metadata.maximizable ?? true,
 			resizable: metadata.resizable ?? true,
-			helpId: metadata.helpId
+			helpId: metadata.helpId,
+			allowMultiple: metadata.allowMultiple ?? false,
+			defaultSize: metadata.defaultSize
 		};
 
 		// Deaktiváljuk az összes többi ablakot

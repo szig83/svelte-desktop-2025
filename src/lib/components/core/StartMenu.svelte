@@ -37,6 +37,7 @@
 						onclick={() => {
 							windowManager.openWindow(app.appName, app.title, app);
 							open = false;
+							console.log(app);
 						}}
 						{app}
 					/>

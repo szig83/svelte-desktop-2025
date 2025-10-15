@@ -4,10 +4,10 @@ Minimalizálás, maximalizálás, bezárás.
 Ha tartozik súgó az adott alkalmazáshoz, akkor annak is gombja.
 -->
 <script lang="ts">
-	import { X, Minus, Maximize, Minimize2 } from 'lucide-svelte';
+	import { X, Minus, Maximize, Minimize2, Link } from 'lucide-svelte';
 
 	interface Props {
-		controlType: 'minimize' | 'maximize' | 'restore' | 'close' | 'help';
+		controlType: 'minimize' | 'maximize' | 'restore' | 'close' | 'help' | 'link';
 		onClick: (e: MouseEvent) => void;
 	}
 
@@ -23,6 +23,8 @@ Ha tartozik súgó az adott alkalmazáshoz, akkor annak is gombja.
 				return Minimize2;
 			case 'close':
 				return X;
+			case 'link':
+				return Link;
 		}
 	});
 </script>
@@ -61,6 +63,13 @@ Ha tartozik súgó az adott alkalmazáshoz, akkor annak is gombja.
 
 	.btn-window-help {
 		--btn-color: 52 144 220; /*rgb(52, 144, 220)*/
+		border-color: rgb(var(--btn-color) / 0.5);
+		background: rgb(var(--btn-color));
+		font-size: 0.7rem;
+	}
+
+	.btn-window-link {
+		--btn-color: 154 189 189; /*rgb(154 189 189)*/
 		border-color: rgb(var(--btn-color) / 0.5);
 		background: rgb(var(--btn-color));
 		font-size: 0.7rem;

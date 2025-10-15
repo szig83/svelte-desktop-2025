@@ -41,6 +41,12 @@
 </script>
 
 <div class={['desktop', themeManager.cssClasses]}>
+	<div class="video-background">
+		<video autoplay muted loop playsinline>
+			<source src="video2.mp4" type="video/mp4" />
+			A böngésződ nem támogatja a videó lejátszást.
+		</video>
+	</div>
 	<div
 		id="workspace"
 		class="workspace"
@@ -71,7 +77,7 @@
 		transition:
 			background-color 0.3s ease,
 			color 0.3s ease;
-		background: url('/bg.jpg') center center / cover no-repeat fixed;
+		/*background: url('/bg.jpg') center center / cover no-repeat fixed;*/
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
@@ -82,5 +88,27 @@
 		flex-grow: 1;
 		order: 1;
 		overflow: hidden;
+	}
+
+	.video-background {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: -1;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.video-background video {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: auto;
+		min-width: 100%;
+		height: auto;
+		min-height: 100%;
+		object-fit: cover;
 	}
 </style>

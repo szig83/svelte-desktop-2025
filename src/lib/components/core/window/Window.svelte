@@ -7,6 +7,7 @@
 	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/appContext';
 	import { getWindowManager, type WindowState } from '$lib/stores/windowStore.svelte';
 	import WindowControlButton from './WindowControlButton.svelte';
+	import LZString from 'lz-string';
 
 	let { windowState }: { windowState: WindowState } = $props();
 	const windowManager = getWindowManager();
@@ -106,7 +107,7 @@
 		if (shakeDetectionActive) {
 			const currentTime = Date.now();
 			const elapsedTime = currentTime - shakeStartTime;
-			
+
 			// Ellenőrizzük, hogy nem túlléptük-e az időkorlátot
 			if (elapsedTime > SHAKE_TIME_LIMIT) {
 				// Túl lassú volt, újraindítjuk a detektálást
@@ -116,13 +117,13 @@
 				lastShakeX = e.clientX;
 			} else {
 				const deltaX = e.clientX - lastShakeX;
-				
+
 				if (Math.abs(deltaX) > SHAKE_THRESHOLD) {
 					const currentDirection = deltaX > 0 ? 1 : -1;
-					
+
 					if (lastShakeDirection !== 0 && currentDirection !== lastShakeDirection) {
 						shakeDirectionChanges++;
-						
+
 						if (shakeDirectionChanges >= SHAKE_COUNT) {
 							// Rázás detektálva! Minimalizáljuk a többi ablakot
 							windowManager.windows.forEach((w) => {
@@ -133,7 +134,7 @@
 							shakeDetectionActive = false; // Csak egyszer hajtsa végre
 						}
 					}
-					
+
 					lastShakeDirection = currentDirection;
 					lastShakeX = e.clientX;
 				}
@@ -231,6 +232,29 @@
 		windowManager.openWindow(helpApp.appName, helpApp.title, helpApp, {
 			helpId
 		});
+	}
+
+	function link() {
+		//TODO csak allowMultiple ablakot lehessen másolni, megosztani... mégse, mivel ha már nyitva van neki, akkor max aktiválja
+		console.log(windowState.parameters);
+
+		const linkData = {
+			allowMultiple: windowState.allowMultiple,
+			appName: windowState.appName,
+			defaultSize: $state.snapshot(windowState.defaultSize),
+			helpId: windowState.helpId,
+			maxSize: $state.snapshot(windowState.maxSize),
+			maximizable: windowState.maximizable,
+			minSize: $state.snapshot(windowState.minSize),
+			title: windowState.title,
+			resizable: windowState.resizable
+		};
+
+		const jsonString = JSON.stringify(linkData);
+		const compressed = LZString.compressToEncodedURIComponent(jsonString);
+		navigator.clipboard.writeText(compressed);
+		console.log(compressed);
+		return compressed;
 	}
 
 	/**
@@ -632,6 +656,7 @@
 			{#if windowState.helpId}
 				<WindowControlButton controlType="help" onClick={() => help(windowState.helpId)} />
 			{/if}
+			<WindowControlButton controlType="link" onClick={link} />
 			<WindowControlButton controlType="minimize" onClick={minimize} />
 			{#if windowState.maximizable}
 				<WindowControlButton
@@ -808,8 +833,8 @@
 	}
 
 	.window-title {
-		font-weight: 600;
-		font-size: 14px;
+		display: flex;
+		justify-content: center;
 	}
 
 	.window:not(.active) .window-title {

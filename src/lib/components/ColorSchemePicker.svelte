@@ -8,7 +8,7 @@
 		{ label: 'Kék', color: '225' },
 		{ label: 'Zöld', color: '185' },
 		{ label: 'Lila', color: '290' },
-		{ label: 'Narancs', color: '60' },
+		{ label: 'Narancs', color: '45' },
 		{ label: 'Piros', color: '30' }
 	];
 </script>
