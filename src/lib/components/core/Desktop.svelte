@@ -59,7 +59,7 @@
 		{/each}
 	</div>
 
-	<Taskbar />
+	<Taskbar {windowManager} />
 </div>
 
 <style>

@@ -38,6 +38,16 @@
 	let isVisuallyDragging = $state(false); // Vizuális effekt csak mozgatás után
 	const DRAG_THRESHOLD = 5; // pixel - ennyi mozgás után aktiválódik a vizuális effekt
 
+	// Window Shake funkció (rázás detektálása)
+	let shakeDetectionActive = false;
+	let shakeDirectionChanges = 0;
+	let lastShakeDirection = 0; // -1: balra, 1: jobbra, 0: nincs
+	let lastShakeX = 0;
+	let shakeStartTime = 0; // Rázás kezdési időpont
+	const SHAKE_THRESHOLD = 20; // pixel - ennyi mozgás szükséges irányváltáshoz
+	const SHAKE_COUNT = 3; // hány irányváltás kell a rázáshoz
+	const SHAKE_TIME_LIMIT = 1000; // milliszekundum - ennyi időn belül kell elvégezni a rázást
+
 	let isResizing = $state(false);
 	let resizeDirection = '';
 	let resizeStartX = 0;
@@ -62,6 +72,13 @@
 		mouseStartX = e.clientX;
 		mouseStartY = e.clientY;
 
+		// Shake detektálás inicializálása
+		shakeDetectionActive = true;
+		shakeDirectionChanges = 0;
+		lastShakeDirection = 0;
+		lastShakeX = e.clientX;
+		shakeStartTime = Date.now();
+
 		// Szövegkijeölés tiltása mozgatás közben
 		document.body.style.userSelect = 'none';
 
@@ -82,6 +99,44 @@
 			const deltaY = Math.abs(e.clientY - mouseStartY);
 			if (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD) {
 				isVisuallyDragging = true;
+			}
+		}
+
+		// Shake detektálás (rázás)
+		if (shakeDetectionActive) {
+			const currentTime = Date.now();
+			const elapsedTime = currentTime - shakeStartTime;
+			
+			// Ellenőrizzük, hogy nem túlléptük-e az időkorlátot
+			if (elapsedTime > SHAKE_TIME_LIMIT) {
+				// Túl lassú volt, újraindítjuk a detektálást
+				shakeDirectionChanges = 0;
+				lastShakeDirection = 0;
+				shakeStartTime = currentTime;
+				lastShakeX = e.clientX;
+			} else {
+				const deltaX = e.clientX - lastShakeX;
+				
+				if (Math.abs(deltaX) > SHAKE_THRESHOLD) {
+					const currentDirection = deltaX > 0 ? 1 : -1;
+					
+					if (lastShakeDirection !== 0 && currentDirection !== lastShakeDirection) {
+						shakeDirectionChanges++;
+						
+						if (shakeDirectionChanges >= SHAKE_COUNT) {
+							// Rázás detektálva! Minimalizáljuk a többi ablakot
+							windowManager.windows.forEach((w) => {
+								if (w.id !== windowState.id && !w.isMinimized) {
+									windowManager.minimizeWindow(w.id);
+								}
+							});
+							shakeDetectionActive = false; // Csak egyszer hajtsa végre
+						}
+					}
+					
+					lastShakeDirection = currentDirection;
+					lastShakeX = e.clientX;
+				}
 			}
 		}
 
@@ -119,6 +174,7 @@
 	function handleMouseUp() {
 		isDragging = false;
 		isVisuallyDragging = false;
+		shakeDetectionActive = false;
 
 		// Visszaállítjuk a szövegkijelölést
 		document.body.style.userSelect = '';

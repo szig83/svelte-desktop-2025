@@ -24,7 +24,7 @@ export type WindowState = {
 	helpId?: number;
 };
 
-class WindowManager {
+export class WindowManager {
 	windows = $state<WindowState[]>([]);
 	private nextId = 1;
 	private baseZIndex = 100;
