@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Rocket } from 'lucide-svelte';
+	import { Rocket, Menu } from 'lucide-svelte';
 	import { getWindowManager } from '$lib/stores/windowStore.svelte';
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
 	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
@@ -20,7 +20,7 @@
 <div class="taskbar">
 	<div class="taskbar-left">
 		<Popover.Root bind:open={startMenuOpen}>
-			<Popover.Trigger class="btn-startmenu btn-click-effect"><Rocket size={24} /></Popover.Trigger>
+			<Popover.Trigger class="btn-startmenu btn-click-effect"><Menu size={24} /></Popover.Trigger>
 			<Popover.Content class="z-[1000] mx-2 my-2 flex w-[var(--startmenu-width)] items-stretch"
 				><StartMenu bind:open={startMenuOpen} /></Popover.Content
 			>
@@ -66,6 +66,7 @@
 	.taskbar {
 		display: flex;
 		justify-content: space-between;
+		order: 1;
 		z-index: var(--taskbar-z-index);
 		backdrop-filter: blur(10px);
 		border-radius: 0;
@@ -85,7 +86,7 @@
 			display: flex;
 			justify-content: start;
 			align-items: center;
-			gap: 5px;
+			gap: 10px;
 			padding-right: 16px;
 		}
 
@@ -148,14 +149,17 @@
 		transition: background-color 0.2s;
 		cursor: pointer;
 		border-radius: var(--radius-sm);
-		background-color: var(--color-primary-alpha-60);
+		/*background-color: var(--color-primary-alpha-60);*/
+		background-color: var(--color-secondary);
 		aspect-ratio: 1;
 		height: 45px;
-		color: var(--color-neutral-100);
+		/*color: var(--color-neutral-100);*/
+		color: var(--color-taskbar-foreground);
 
 		&:hover,
 		&[data-state='open'] {
 			background-color: var(--color-primary-alpha-80);
+			color: var(--color-neutral-100);
 		}
 	}
 </style>

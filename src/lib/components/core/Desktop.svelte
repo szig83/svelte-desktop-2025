@@ -80,6 +80,7 @@
 	.workspace {
 		position: relative;
 		flex-grow: 1;
+		order: 1;
 		overflow: hidden;
 	}
 </style>
