@@ -784,7 +784,11 @@
 	}
 
 	:global(.window.active) {
-		/*border: 2px solid var(--color-primary-alpha-20);*/
+		box-shadow: 
+			0 0 0 1px var(--color-primary-alpha-10),
+			0 0 20px var(--color-primary-alpha-10),
+			0 0 40px var(--color-primary-alpha-10),
+			0 0 60px var(--color-primary-alpha-5);
 	}
 
 	:global(.window:not(.active)) {
