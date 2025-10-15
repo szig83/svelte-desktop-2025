@@ -5,7 +5,7 @@
 <script lang="ts">
 	import { setContext } from 'svelte';
 	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/appContext';
-	import { getWindowManager, type WindowState } from '$lib/stores/windowStore.svelte';
+	import { getWindowManager, type WindowState, RESTORE_SIZE_THRESHOLD } from '$lib/stores/windowStore.svelte';
 	import WindowControlButton from './WindowControlButton.svelte';
 	import LZString from 'lz-string';
 
@@ -409,18 +409,11 @@
 		const workspaceWidth = workspaceRect.width;
 		const workspaceHeight = workspaceRect.height;
 
-		// Maximális elérhető méret (padding figyelembevételével)
-		const maxWidth = workspaceWidth - 2 * WORKSPACE_PADDING;
-		const maxHeight = workspaceHeight - 2 * WORKSPACE_PADDING;
+		// Ellenőrizzük, hogy az ablak mérete eléri-e a RESTORE_SIZE_THRESHOLD küszöböt
+		const widthRatio = windowState.size.width / workspaceWidth;
+		const heightRatio = windowState.size.height / workspaceHeight;
 
-		// Ellenőrizzük, hogy az ablak pozíciója és mérete megfelel-e a maximalizált állapotnak
-		const isAtMaxPosition =
-			windowState.position.x <= WORKSPACE_PADDING && windowState.position.y <= WORKSPACE_PADDING;
-		const isAtMaxSize =
-			windowState.size.width >= maxWidth - 5 && // 5px tolerancia
-			windowState.size.height >= maxHeight - 5;
-
-		return isAtMaxPosition && isAtMaxSize;
+		return widthRatio >= RESTORE_SIZE_THRESHOLD && heightRatio >= RESTORE_SIZE_THRESHOLD;
 	}
 
 	/**

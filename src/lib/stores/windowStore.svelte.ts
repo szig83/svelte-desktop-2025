@@ -4,8 +4,8 @@ import type { Component } from 'svelte';
 import type { WindowSize } from '$lib/types/window';
 
 // Restore méret konstansok
-const RESTORE_SIZE_THRESHOLD = 0.99; // Ha az előző méret 95%-on belül van a maximálishoz
-const RESTORE_SIZE_RATIO = 0.8; // Akkor 70%-os méretre álljon vissza
+export const RESTORE_SIZE_THRESHOLD = 0.99; // Ha az előző méret 95%-on belül van a maximálishoz
+export const RESTORE_SIZE_RATIO = 0.8; // Akkor 70%-os méretre álljon vissza
 
 export type WindowState = {
 	id: string;
