@@ -74,6 +74,40 @@
 	let resizeStartTop = 0;
 
 	let windowElement: HTMLDivElement | null = $state(null);
+	let lastActiveState = $state(windowState.isActive);
+
+	// Screenshot készítés amikor ablak inaktívvá válik
+	$effect(() => {
+		const currentActive = windowState.isActive;
+
+		// Ellenőrizzük, hogy aktívból inaktívvá vált-e
+		if (
+			lastActiveState &&
+			!currentActive &&
+			!windowState.isMinimized &&
+			settings.windowPreview &&
+			!settings.preferPerformance
+		) {
+			console.log('Window became inactive, scheduling screenshot for:', windowState.id);
+			const timeout = setTimeout(() => {
+				if (!windowState.isActive) {
+					// Screenshot készítés (felülírja a régit ha van)
+					takeScreenshot();
+					console.log('Screenshot taken for window:', windowState.id);
+				}
+			}, 3000);
+
+			return () => {
+				console.log('Cleanup timeout for:', windowState.id);
+				clearTimeout(timeout);
+			};
+		}
+
+		// Cleanup függvény - frissítjük a lastActiveState-et
+		return () => {
+			lastActiveState = currentActive;
+		};
+	});
 
 	/**
 	 * Ablak mozgatás kezelése (gomb lenyomás)

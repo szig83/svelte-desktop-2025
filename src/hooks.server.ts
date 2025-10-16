@@ -4,7 +4,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.settings = {
 		windowPreview: true,
 		screenshotThumbnailHeight: 100,
-		preferPerformance: true,
+		preferPerformance: false,
 		background: {
 			type: 'video',
 			value: 'bg-video.mp4'
