@@ -798,6 +798,9 @@
 </div>
 
 <style>
+	:root {
+		--window-border-width: 4px;
+	}
 	.window {
 		display: flex;
 		position: absolute;
@@ -809,6 +812,7 @@
 			opacity 0.15s,
 			transform 0.15s;
 		box-shadow: var(--shadow-lg);
+		border: var(--window-border-width) solid var(--color-border);
 		border-radius: var(--radius-md, 8px);
 		background-color: var(--color-window-background-alpha-90);
 	}
@@ -941,31 +945,31 @@
 	.resize-se,
 	.resize-sw {
 		z-index: 12;
-		width: 16px;
-		height: 16px;
+		width: 15px;
+		height: 15px;
 	}
 
 	.resize-ne {
-		top: 0;
-		right: 0;
+		top: calc(var(--window-border-width) * -1.5);
+		right: calc(var(--window-border-width) * -1.5);
 		cursor: nesw-resize;
 	}
 
 	.resize-nw {
-		top: 0;
-		left: 0;
+		top: calc(var(--window-border-width) * -1.5);
+		left: calc(var(--window-border-width) * -1.5);
 		cursor: nwse-resize;
 	}
 
 	.resize-se {
-		right: 0;
-		bottom: 0;
+		right: calc(var(--window-border-width) * -1.5);
+		bottom: calc(var(--window-border-width) * -1.5);
 		cursor: nwse-resize;
 	}
 
 	.resize-sw {
-		bottom: 0;
-		left: 0;
+		bottom: calc(var(--window-border-width) * -1.5);
+		left: calc(var(--window-border-width) * -1.5);
 		cursor: nesw-resize;
 	}
 
@@ -976,15 +980,15 @@
 		left: 16px;
 		z-index: 11;
 		cursor: ns-resize;
-		height: 6px;
+		height: 8px;
 	}
 
 	.resize-n {
-		top: 0;
+		top: calc(var(--window-border-width) * -1.5);
 	}
 
 	.resize-s {
-		bottom: 0;
+		bottom: calc(var(--window-border-width) * -1.5);
 	}
 
 	.resize-e,
@@ -993,14 +997,14 @@
 		bottom: 16px;
 		z-index: 11;
 		cursor: ew-resize;
-		width: 6px;
+		width: 8px;
 	}
 
 	.resize-e {
-		right: 0;
+		right: calc(var(--window-border-width) * -1.5);
 	}
 
 	.resize-w {
-		left: 0;
+		left: calc(var(--window-border-width) * -1.5);
 	}
 </style>
