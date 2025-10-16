@@ -23,6 +23,15 @@ const config = {
 		experimental: {
 			async: true
 		}
+	},
+
+	// CSS warningok szűrése
+	onwarn: (warning, handler) => {
+		// Tailwind @apply direktíva warningok figyelmen kívül hagyása
+		if (warning.message && warning.message.includes('@apply')) return;
+
+		// Minden más warningot továbbít
+		handler(warning);
 	}
 };
 

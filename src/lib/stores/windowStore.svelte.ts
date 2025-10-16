@@ -170,9 +170,14 @@ export class WindowManager {
 		this.windows = [...this.windows];
 	}
 
-	minimizeWindow(id: string) {
+	async minimizeWindow(id: string, beforeMinimize?: () => Promise<void>) {
 		const window = this.windows.find((w) => w.id === id);
 		if (window) {
+			// Ha minimalizálunk (nem visszaállítunk) és van callback, hívjuk meg
+			if (!window.isMinimized && beforeMinimize) {
+				await beforeMinimize();
+			}
+
 			window.isMinimized = !window.isMinimized;
 			if (window.isMinimized) {
 				// Minimalizálás: deaktiváljuk az ablakot

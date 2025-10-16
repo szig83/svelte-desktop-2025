@@ -9,10 +9,14 @@
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 	import WindowLink from '$lib/components/WindowLink.svelte';
 	import { getContext } from 'svelte';
+	import { takeWindowScreenshot } from '$lib/utils/screenshot';
 
 	let { windowManager }: { windowManager: WindowManager } = $props();
 
-	const settings = getContext<{ screenshotThumbnailHeight: number }>('settings');
+	const settings = getContext<{
+		screenshotThumbnailHeight: number;
+		windowPreview: boolean;
+	}>('settings');
 	/**
 	 * @TODO ahhoz fog kelleni, hogy a taskbar/startmenü-t külön lehessen dark módba kapcsolni.
 	 */
@@ -36,13 +40,21 @@
 					class="taskbar-item"
 					class:active={window.isActive}
 					class:minimized={window.isMinimized}
-					onclick={() => {
+					onclick={async () => {
 						if (window.isMinimized) {
 							// Ha minimalizált, visszaállítjuk és aktiváljuk
-							windowManager.minimizeWindow(window.id);
+							await windowManager.minimizeWindow(window.id);
 						} else if (window.isActive) {
-							// Ha aktív, minimalizáljuk
-							windowManager.minimizeWindow(window.id);
+							// Ha aktív, minimalizáljuk (screenshot-tal)
+							await windowManager.minimizeWindow(window.id, async () => {
+								if (settings.windowPreview) {
+									await takeWindowScreenshot(
+										window.id,
+										windowManager,
+										settings.screenshotThumbnailHeight
+									);
+								}
+							});
 						} else {
 							// Ha inaktív (de nem minimalizált), aktiváljuk
 							windowManager.activateWindow(window.id);

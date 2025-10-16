@@ -14,7 +14,7 @@
 	import WindowControlButton from './WindowControlButton.svelte';
 	import LZString from 'lz-string';
 	import { toast } from 'svelte-sonner';
-	import * as htmlToImage from 'html-to-image';
+	import { takeWindowScreenshot } from '$lib/utils/screenshot';
 
 	let { windowState }: { windowState: WindowState } = $props();
 	const windowManager = getWindowManager();
@@ -256,10 +256,11 @@
 	 * Ablak lekicsinyítés gomb esemény
 	 */
 	async function minimize() {
-		if (settings.windowPreview) {
-			await takeScreenshot();
-		}
-		windowManager.minimizeWindow(windowState.id);
+		await windowManager.minimizeWindow(windowState.id, async () => {
+			if (settings.windowPreview) {
+				await takeScreenshot();
+			}
+		});
 	}
 
 	/**
@@ -653,46 +654,11 @@
 	}
 	// AKADÁLYMENTES MŰKÖDÉSHEZ SZÜKSÉGES ESEMÉNYEK - STOP
 
+	/**
+	 * Screenshot készítése az ablakról
+	 */
 	async function takeScreenshot() {
-		if (!windowElement) return;
-
-		try {
-			// Klónozzuk az ablakot egy off-screen konténerbe
-			const clone = windowElement.cloneNode(true) as HTMLElement;
-
-			// Off-screen konténer létrehozása
-			const offscreenContainer = document.createElement('div');
-			offscreenContainer.style.position = 'fixed';
-			offscreenContainer.style.left = '-9999px';
-			offscreenContainer.style.top = '0';
-			offscreenContainer.style.zIndex = '-1';
-			document.body.appendChild(offscreenContainer);
-
-			// Klón pozícionálása a konténerben
-			clone.style.position = 'relative';
-			clone.style.left = '0';
-			clone.style.top = '0';
-			clone.style.transform = 'none';
-			offscreenContainer.appendChild(clone);
-
-			// Ablak méretarányának kiszámítása
-			const aspectRatio = windowState.size.width / windowState.size.height;
-			const thumbnailWidth = Math.round(SCREENSHOT_THUMBNAIL_HEIGHT * aspectRatio);
-
-			// Screenshot készítése a klónról
-			const screenshotData = await htmlToImage.toPng(clone, {
-				canvasHeight: SCREENSHOT_THUMBNAIL_HEIGHT,
-				canvasWidth: thumbnailWidth
-			});
-
-			// Takarítás
-			document.body.removeChild(offscreenContainer);
-
-			// Screenshot mentése az ablak adataiba
-			windowManager.updateWindowScreenshot(windowState.id, screenshotData);
-		} catch (error) {
-			console.error('Screenshot készítés sikertelen!', error);
-		}
+		await takeWindowScreenshot(windowState.id, windowManager, SCREENSHOT_THUMBNAIL_HEIGHT);
 	}
 
 	/**
@@ -724,6 +690,7 @@
 		isVisuallyDragging ? 'dragging' : ''
 	]}
 	style={windowStyle}
+	data-window-id={windowState.id}
 	onclick={() => windowManager.activateWindow(windowState.id)}
 	onkeydown={handleWindowKeydown}
 	role="button"
@@ -907,14 +874,6 @@
 		color: var(--color-primary-alpha-90);
 		user-select: none;
 		&:hover {
-		}
-	}
-
-	:global {
-		.dark {
-			.window-header {
-				/*background-color: var(--color-primary-alpha-5);*/
-			}
 		}
 	}
 
