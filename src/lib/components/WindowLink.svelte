@@ -52,27 +52,41 @@
 	}
 </script>
 
-<Popover.Root bind:open={popoverOpen}>
-	<Popover.Trigger class="btn-click-effect items-stretch" title="Alkalmazás megnyitása guid hivatkozás alapján"
-		><CopyPlus size={20} /></Popover.Trigger
-	>
-	<Popover.Content class="z-[1000] mx-2 my-2 w-[600px] ">
-		<p class="prose-sm flex items-center gap-2 pb-2 leading-7">
-			<span>Alkalmazás megnyitása guid hivatkozás alapján</span>
+<Tooltip.Provider>
+	<Popover.Root bind:open={popoverOpen}>
+		<Tooltip.Root ignoreNonKeyboardFocus>
+			<Tooltip.Trigger>
+				{#snippet child({ props })}
+					<Popover.Trigger {...props} class="btn-click-effect items-stretch"
+						><CopyPlus size={20} />
+					</Popover.Trigger>
+				{/snippet}
+			</Tooltip.Trigger>
+			<Popover.Content class="z-[1000] mx-2 my-2 w-[600px] ">
+				<p class="prose-sm flex items-center gap-2 pb-2 leading-7">
+					<span>Alkalmazás megnyitása guid hivatkozás alapján</span>
 
-			<button onclick={help}><MessageCircleQuestionMark size={16} class="text-primary" /></button>
-		</p>
-		<div class="flex items-center gap-2">
-			<Tooltip.Provider>
-				<Tooltip.Root>
-					<Tooltip.Trigger>
-						<Button variant="outline" onclick={async () => paste()}><ClipboardPaste /></Button>
-					</Tooltip.Trigger>
-					<Tooltip.Content class="z-[1001]">Beillesztés</Tooltip.Content>
-				</Tooltip.Root>
-			</Tooltip.Provider>
-			<Input placeholder="Alkalmazás guid hivatkozás" bind:value={appGuid} class="text-xs" />
-			<Button variant="outline" onclick={open} disabled={appGuid.length === 0}>Megnyitás</Button>
-		</div>
-	</Popover.Content>
-</Popover.Root>
+					<button onclick={help}
+						><MessageCircleQuestionMark size={16} class="text-primary" /></button
+					>
+				</p>
+				<div class="flex items-center gap-2">
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<Button variant="outline" onclick={async () => paste()}><ClipboardPaste /></Button>
+							</Tooltip.Trigger>
+							<Tooltip.Content class="z-[1001]">Beillesztés</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
+					<Input placeholder="Alkalmazás guid hivatkozás" bind:value={appGuid} class="text-xs" />
+					<Button variant="outline" onclick={open} disabled={appGuid.length === 0}>Megnyitás</Button
+					>
+				</div>
+			</Popover.Content>
+			<Tooltip.Content interactOutsideBehavior="defer-otherwise-close"
+				>Alkalmazás megnyitása guid hivatkozás alapján</Tooltip.Content
+			>
+		</Tooltip.Root>
+	</Popover.Root>
+</Tooltip.Provider>
