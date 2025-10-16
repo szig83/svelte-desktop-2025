@@ -32,6 +32,7 @@
 	const MAX_WINDOW_WIDTH = windowState.maxSize.width;
 	const MAX_WINDOW_HEIGHT = windowState.maxSize.height;
 	const WORKSPACE_PADDING = 0;
+	const SCREENSHOT_THUMBNAIL_HEIGHT = 200; // Screenshot thumbnail fix magassága pixelben
 
 	// Teljesítmény vs Vizuális élmény
 	// true: teljesítmény prioritás (tartalom elrejtése mozgatás közben)
@@ -615,7 +616,7 @@
 		try {
 			// Klónozzuk az ablakot egy off-screen konténerbe
 			const clone = windowElement.cloneNode(true) as HTMLElement;
-			
+
 			// Off-screen konténer létrehozása
 			const offscreenContainer = document.createElement('div');
 			offscreenContainer.style.position = 'fixed';
@@ -623,26 +624,27 @@
 			offscreenContainer.style.top = '0';
 			offscreenContainer.style.zIndex = '-1';
 			document.body.appendChild(offscreenContainer);
-			
+
 			// Klón pozícionálása a konténerben
 			clone.style.position = 'relative';
 			clone.style.left = '0';
 			clone.style.top = '0';
 			clone.style.transform = 'none';
 			offscreenContainer.appendChild(clone);
-			
-			// Kis késleltetés, hogy a DOM renderelődjön
-			await new Promise(resolve => setTimeout(resolve, 50));
-			
+
+			// Ablak méretarányának kiszámítása
+			const aspectRatio = windowState.size.width / windowState.size.height;
+			const thumbnailWidth = Math.round(SCREENSHOT_THUMBNAIL_HEIGHT * aspectRatio);
+
 			// Screenshot készítése a klónról
-			const screenshotData = await htmlToImage.toJpeg(clone, {
-				quality: 0.8,
-				pixelRatio: 1
+			const screenshotData = await htmlToImage.toPng(clone, {
+				canvasHeight: SCREENSHOT_THUMBNAIL_HEIGHT,
+				canvasWidth: thumbnailWidth
 			});
-			
+
 			// Takarítás
 			document.body.removeChild(offscreenContainer);
-			
+
 			console.log('Screenshot készült!', screenshotData);
 		} catch (error) {
 			console.error('Screenshot készítés sikertelen!', error);
