@@ -8,9 +8,11 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 	import WindowLink from '$lib/components/WindowLink.svelte';
+	import { getContext } from 'svelte';
 
 	let { windowManager }: { windowManager: WindowManager } = $props();
 
+	const settings = getContext<{ screenshotThumbnailHeight: number }>('settings');
 	/**
 	 * @TODO ahhoz fog kelleni, hogy a taskbar/startmenü-t külön lehessen dark módba kapcsolni.
 	 */
@@ -56,7 +58,11 @@
 				</button>
 				{#if window.screenshot}
 					<div class="screenshot-preview">
-						<img src={window.screenshot} alt="{window.title} preview" />
+						<img
+							style:height="{settings.screenshotThumbnailHeight}px"
+							src={window.screenshot}
+							alt="{window.title} preview"
+						/>
 					</div>
 				{/if}
 			</div>
@@ -187,7 +193,7 @@
 				display: block;
 				border-radius: var(--radius-sm);
 				max-width: none;
-				height: 200px;
+				/*height: 200px;*/
 				object-fit: contain;
 			}
 		}

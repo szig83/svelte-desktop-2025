@@ -3,7 +3,17 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			settings: {
+				windowPreview: boolean;
+				screenshotThumbnailHeight: number;
+				preferPerformance: boolean;
+				background: {
+					type: 'color' | 'image' | 'video';
+					value: string;
+				};
+			};
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}

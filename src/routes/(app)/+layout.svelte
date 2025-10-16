@@ -4,7 +4,12 @@
 	import Desktop from '$lib/components/core/Desktop.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { browser } from '$app/environment';
-	let { children } = $props();
+	import { setContext } from 'svelte';
+	
+	let { children, data } = $props();
+	
+	// Settings kontextus beállítása, hogy a gyerek komponensek elérjék
+	setContext('settings', data.settings);
 </script>
 
 {#if browser}

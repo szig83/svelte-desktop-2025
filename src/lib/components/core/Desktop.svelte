@@ -1,8 +1,16 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
 	import { createWindowManager, setWindowManager } from '$lib/stores/windowStore.svelte';
 	import { createThemeManager, setThemeManager } from '$lib/stores/themeStore.svelte';
 	import Window from '$lib/components/core/window/Window.svelte';
 	import Taskbar from '$lib/components/core/Taskbar.svelte';
+
+	const settings = getContext<{
+		background: {
+			type: 'color' | 'image' | 'video';
+			value: string;
+		};
+	}>('settings');
 
 	const windowManager = createWindowManager();
 	setWindowManager(windowManager);
@@ -40,13 +48,27 @@
 	});
 </script>
 
-<div class={['desktop', themeManager.cssClasses]}>
-	<div class="video-background">
-		<video autoplay muted loop playsinline>
-			<source src="bg-video.mp4" type="video/mp4" />
-			A böngésződ nem támogatja a videó lejátszást.
-		</video>
-	</div>
+<div
+	class={['desktop', themeManager.cssClasses]}
+	style:background-color={settings.background.type === 'color' &&
+	settings.background.value &&
+	settings.background.value.length > 0
+		? settings.background.value
+		: ''}
+	style:background={settings.background.type === 'image' &&
+	settings.background.value &&
+	settings.background.value.length > 0
+		? `url(${settings.background.value}) center center / cover no-repeat fixed`
+		: ''}
+>
+	{#if settings.background.type === 'video' && settings.background.value && settings.background.value.length > 0}
+		<div class="video-background">
+			<video autoplay muted loop playsinline>
+				<source src={settings.background.value} type="video/mp4" />
+				A böngésződ nem támogatja a videó lejátszást.
+			</video>
+		</div>
+	{/if}
 	<div
 		id="workspace"
 		class="workspace"

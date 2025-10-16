@@ -4,7 +4,7 @@
  -->
 <script lang="ts">
 	import { getAppByName } from '$lib/services/apps.remote';
-	import { setContext } from 'svelte';
+	import { setContext, getContext } from 'svelte';
 	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/appContext';
 	import {
 		getWindowManager,
@@ -19,6 +19,13 @@
 	let { windowState }: { windowState: WindowState } = $props();
 	const windowManager = getWindowManager();
 
+	// Settings elérése a kontextusból
+	const settings = getContext<{
+		windowPreview: boolean;
+		screenshotThumbnailHeight: number;
+		preferPerformance: boolean;
+	}>('settings');
+
 	// App kontextus beállítás a gyerek komponensekhez.
 	const appContext: AppContext = {
 		parameters: windowState.parameters || {},
@@ -32,12 +39,12 @@
 	const MAX_WINDOW_WIDTH = windowState.maxSize.width;
 	const MAX_WINDOW_HEIGHT = windowState.maxSize.height;
 	const WORKSPACE_PADDING = 0;
-	const SCREENSHOT_THUMBNAIL_HEIGHT = 200; // Screenshot thumbnail fix magassága pixelben
+	const SCREENSHOT_THUMBNAIL_HEIGHT = settings.screenshotThumbnailHeight; // Screenshot thumbnail fix magassága pixelben
 
 	// Teljesítmény vs Vizuális élmény
 	// true: teljesítmény prioritás (tartalom elrejtése mozgatás közben)
 	// false: vizuális élmény prioritás (tartalom látható marad)
-	const PREFER_PERFORMANCE = false;
+	const PREFER_PERFORMANCE = settings.preferPerformance;
 
 	let dragStartX = 0;
 	let dragStartY = 0;
@@ -215,7 +222,9 @@
 	 * Ablak lekicsinyítés gomb esemény
 	 */
 	async function minimize() {
-		await takeScreenshot();
+		if (settings.windowPreview) {
+			await takeScreenshot();
+		}
 		windowManager.minimizeWindow(windowState.id);
 	}
 
@@ -647,8 +656,6 @@
 
 			// Screenshot mentése az ablak adataiba
 			windowManager.updateWindowScreenshot(windowState.id, screenshotData);
-
-			console.log('Screenshot készült és mentve!', screenshotData);
 		} catch (error) {
 			console.error('Screenshot készítés sikertelen!', error);
 		}
