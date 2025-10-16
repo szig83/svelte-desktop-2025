@@ -14,6 +14,12 @@
 
 	const windowManager = getWindowManager();
 
+	$effect(() => {
+		if (!popoverOpen) {
+			appGuid = '';
+		}
+	});
+
 	async function paste() {
 		const linkData = await navigator.clipboard.readText();
 		appGuid = linkData;
@@ -63,7 +69,9 @@
 				{/snippet}
 			</Tooltip.Trigger>
 			<Popover.Content class="z-[1000] mx-2 my-2 w-[600px] ">
-				<p class="prose-sm flex items-center gap-2 pb-2 leading-7">
+				<p
+					class="prose-sm flex items-center gap-2 pb-2 leading-7 text-[var(--color-muted-foreground)]"
+				>
 					<span>Alkalmazás megnyitása guid hivatkozás alapján</span>
 
 					<button onclick={help}
@@ -79,12 +87,18 @@
 							<Tooltip.Content class="z-[1001]">Beillesztés</Tooltip.Content>
 						</Tooltip.Root>
 					</Tooltip.Provider>
-					<Input placeholder="Alkalmazás guid hivatkozás" bind:value={appGuid} class="text-xs" />
+					<Input
+						name="appGuidInput"
+						placeholder="Alkalmazás guid hivatkozás"
+						bind:value={appGuid}
+						class="text-xs"
+						autocomplete="off"
+					/>
 					<Button variant="outline" onclick={open} disabled={appGuid.length === 0}>Megnyitás</Button
 					>
 				</div>
 			</Popover.Content>
-			<Tooltip.Content interactOutsideBehavior="defer-otherwise-close"
+			<Tooltip.Content class="z-[1001]" interactOutsideBehavior="defer-otherwise-close"
 				>Alkalmazás megnyitása guid hivatkozás alapján</Tooltip.Content
 			>
 		</Tooltip.Root>
