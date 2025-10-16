@@ -62,6 +62,7 @@ export class WindowManager {
 			if (existingWindow) {
 				// Ha már nyitva van, akkor aktiváljuk és visszaállítjuk a minimalizálásból
 				existingWindow.isMinimized = false;
+				this.activateWindow(existingWindow.id);
 				return existingWindow.id;
 			}
 		}
