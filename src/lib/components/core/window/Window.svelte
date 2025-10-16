@@ -14,6 +14,7 @@
 	import WindowControlButton from './WindowControlButton.svelte';
 	import LZString from 'lz-string';
 	import { toast } from 'svelte-sonner';
+	import * as htmlToImage from 'html-to-image';
 
 	let { windowState }: { windowState: WindowState } = $props();
 	const windowManager = getWindowManager();
@@ -63,6 +64,8 @@
 	let resizeStartHeight = 0;
 	let resizeStartLeft = 0;
 	let resizeStartTop = 0;
+
+	let windowElement: HTMLDivElement | null = $state(null);
 
 	/**
 	 * Ablak mozgatás kezelése (gomb lenyomás)
@@ -210,7 +213,8 @@
 	/**
 	 * Ablak lekicsinyítés gomb esemény
 	 */
-	function minimize() {
+	async function minimize() {
+		await takeScreenshot();
 		windowManager.minimizeWindow(windowState.id);
 	}
 
@@ -605,6 +609,46 @@
 	}
 	// AKADÁLYMENTES MŰKÖDÉSHEZ SZÜKSÉGES ESEMÉNYEK - STOP
 
+	async function takeScreenshot() {
+		if (!windowElement) return;
+
+		try {
+			// Klónozzuk az ablakot egy off-screen konténerbe
+			const clone = windowElement.cloneNode(true) as HTMLElement;
+			
+			// Off-screen konténer létrehozása
+			const offscreenContainer = document.createElement('div');
+			offscreenContainer.style.position = 'fixed';
+			offscreenContainer.style.left = '-9999px';
+			offscreenContainer.style.top = '0';
+			offscreenContainer.style.zIndex = '-1';
+			document.body.appendChild(offscreenContainer);
+			
+			// Klón pozícionálása a konténerben
+			clone.style.position = 'relative';
+			clone.style.left = '0';
+			clone.style.top = '0';
+			clone.style.transform = 'none';
+			offscreenContainer.appendChild(clone);
+			
+			// Kis késleltetés, hogy a DOM renderelődjön
+			await new Promise(resolve => setTimeout(resolve, 50));
+			
+			// Screenshot készítése a klónról
+			const screenshotData = await htmlToImage.toJpeg(clone, {
+				quality: 0.8,
+				pixelRatio: 1
+			});
+			
+			// Takarítás
+			document.body.removeChild(offscreenContainer);
+			
+			console.log('Screenshot készült!', screenshotData);
+		} catch (error) {
+			console.error('Screenshot készítés sikertelen!', error);
+		}
+	}
+
 	/**
 	 * Ablak stílus számítása
 	 */
@@ -638,6 +682,7 @@
 	onkeydown={handleWindowKeydown}
 	role="button"
 	tabindex="0"
+	bind:this={windowElement}
 >
 	<div
 		class="window-header"
@@ -653,7 +698,7 @@
 				<WindowControlButton controlType="help" onClick={() => help(windowState.helpId)} />
 			{/if}
 			<WindowControlButton controlType="link" onClick={async () => link()} />
-			<WindowControlButton controlType="minimize" onClick={minimize} />
+			<WindowControlButton controlType="minimize" onClick={async () => minimize()} />
 			{#if windowState.maximizable}
 				<WindowControlButton
 					controlType={windowState.isMaximized ? 'restore' : 'maximize'}
