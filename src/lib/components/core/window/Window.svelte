@@ -13,6 +13,7 @@
 	} from '$lib/stores/windowStore.svelte';
 	import WindowControlButton from './WindowControlButton.svelte';
 	import LZString from 'lz-string';
+	import { toast } from 'svelte-sonner';
 
 	let { windowState }: { windowState: WindowState } = $props();
 	const windowManager = getWindowManager();
@@ -224,31 +225,38 @@
 	 * Súgó gomb esemény
 	 * @param helpId Súgó azonosító
 	 */
-	function help(helpId: number | undefined) {
-		const helpApp = {
+	async function help(helpId: number | undefined) {
+		/*const helpApp = {
 			title: 'Súgó',
 			appName: 'help',
 			icon: 'icon.svg',
 			minSize: { width: 300, height: 300 },
 			defaultSize: { width: 500, height: 500, maximized: false },
 			allowMultiple: true
-		};
-
-		windowManager.openWindow(helpApp.appName, helpApp.title, helpApp, {
-			helpId
-		});
+		};*/
+		const helpApp = await getAppByName('help');
+		if (helpApp) {
+			windowManager.openWindow(helpApp.appName, helpApp.title, helpApp, {
+				helpId
+			});
+		}
 	}
 
-	function link() {
+	async function link(): Promise<boolean | string> {
 		const linkData = {
 			appName: windowState.appName,
 			parameters: $state.snapshot(windowState.parameters)
 		};
-		console.log(linkData);
 		const jsonString = JSON.stringify(linkData);
 		const compressed = LZString.compressToEncodedURIComponent(jsonString);
-		navigator.clipboard.writeText(compressed);
-		console.log(compressed);
+		try {
+			await navigator.clipboard.writeText(compressed);
+			toast.success('Sikeres vágólapra helyezés!');
+			return true;
+		} catch (err) {
+			toast.error('Sikertelen vágólapra helyezés!');
+			return false;
+		}
 		return compressed;
 	}
 
@@ -644,7 +652,7 @@
 			{#if windowState.helpId}
 				<WindowControlButton controlType="help" onClick={() => help(windowState.helpId)} />
 			{/if}
-			<WindowControlButton controlType="link" onClick={link} />
+			<WindowControlButton controlType="link" onClick={async () => link()} />
 			<WindowControlButton controlType="minimize" onClick={minimize} />
 			{#if windowState.maximizable}
 				<WindowControlButton

@@ -1,0 +1,78 @@
+<script lang="ts">
+	import { CopyPlus, ClipboardPaste, MessageCircleQuestionMark } from 'lucide-svelte';
+	import * as Popover from '$lib/components/ui/popover';
+	import { Input } from '$lib/components/ui/input';
+	import { Button } from '$lib/components/ui/button';
+	import LZString from 'lz-string';
+	import { getAppByName } from '$lib/services/apps.remote';
+	import { getWindowManager } from '$lib/stores/windowStore.svelte';
+	import { toast } from 'svelte-sonner';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+
+	let appGuid = $state('');
+	let popoverOpen = $state(false);
+
+	const windowManager = getWindowManager();
+
+	async function paste() {
+		const linkData = await navigator.clipboard.readText();
+		appGuid = linkData;
+		open();
+	}
+
+	async function open() {
+		try {
+			const jsonString = LZString.decompressFromEncodedURIComponent(appGuid);
+			const appData = JSON.parse(jsonString);
+			if (appData) {
+				const app = await getAppByName(appData.appName);
+				if (app) {
+					windowManager.openWindow(app.appName, app.title, app, appData.parameters);
+					appGuid = '';
+					popoverOpen = false;
+				}
+			} else {
+				appGuid = '';
+				toast.error('Hibás alkalmazás guid hivatkotás');
+			}
+		} catch (error) {
+			toast.error('Hibás formátum');
+			appGuid = '';
+			return null;
+		}
+	}
+
+	async function help() {
+		const helpApp = await getAppByName('help');
+		if (helpApp) {
+			windowManager.openWindow(helpApp.appName, helpApp.title, helpApp, {
+				helpId: 1000
+			});
+		}
+	}
+</script>
+
+<Popover.Root bind:open={popoverOpen}>
+	<Popover.Trigger class="btn-click-effect items-stretch" title="Alkalmazás megnyitása guid hivatkozás alapján"
+		><CopyPlus size={20} /></Popover.Trigger
+	>
+	<Popover.Content class="z-[1000] mx-2 my-2 w-[600px] ">
+		<p class="prose-sm flex items-center gap-2 pb-2 leading-7">
+			<span>Alkalmazás megnyitása guid hivatkozás alapján</span>
+
+			<button onclick={help}><MessageCircleQuestionMark size={16} class="text-primary" /></button>
+		</p>
+		<div class="flex items-center gap-2">
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<Button variant="outline" onclick={async () => paste()}><ClipboardPaste /></Button>
+					</Tooltip.Trigger>
+					<Tooltip.Content class="z-[1001]">Beillesztés</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+			<Input placeholder="Alkalmazás guid hivatkozás" bind:value={appGuid} class="text-xs" />
+			<Button variant="outline" onclick={open} disabled={appGuid.length === 0}>Megnyitás</Button>
+		</div>
+	</Popover.Content>
+</Popover.Root>

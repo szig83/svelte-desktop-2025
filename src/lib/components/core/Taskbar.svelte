@@ -7,6 +7,7 @@
 	import Clock from '$lib/components/Clock.svelte';
 	import * as Popover from '$lib/components/ui/popover';
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
+	import WindowLink from '$lib/components/WindowLink.svelte';
 
 	let { windowManager }: { windowManager: WindowManager } = $props();
 
@@ -55,6 +56,7 @@
 		{/each}
 	</div>
 	<div class="taskbar-right">
+		<WindowLink />
 		<ThemeSwitcher />
 		<Clock />
 	</div>
@@ -86,7 +88,7 @@
 		.taskbar-right {
 			display: flex;
 			justify-content: start;
-			align-items: center;
+			align-items: stretch;
 			gap: 10px;
 			padding-right: 16px;
 		}

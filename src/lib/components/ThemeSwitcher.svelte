@@ -2,6 +2,7 @@
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
 	import { Sun } from 'lucide-svelte';
 	import { Moon } from 'lucide-svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	const theme = getThemeManager();
 	function toggleTheme() {
@@ -9,24 +10,31 @@
 	}
 </script>
 
-<label for="toggle">
-	<div class={['toggle', theme.isDark ? 'enabled' : 'disabled']}>
-		<span class="hidden">
-			{theme.isDark ? 'Enable Light Mode' : 'Enable Dark Mode'}
-		</span>
-		<div class="icons">
-			<Sun />
-			<Moon />
-		</div>
-		<input
-			id="toggle"
-			name="toggle"
-			type="checkbox"
-			checked={!theme.isDark}
-			onclick={toggleTheme}
-		/>
-	</div>
-</label>
+<Tooltip.Provider>
+	<Tooltip.Root>
+		<Tooltip.Trigger>
+			<label for="toggle" class="self-center">
+				<div class={['toggle', theme.isDark ? 'enabled' : 'disabled']}>
+					<span class="hidden">
+						{theme.isDark ? 'Enable Light Mode' : 'Enable Dark Mode'}
+					</span>
+					<div class="icons">
+						<Sun />
+						<Moon />
+					</div>
+					<input
+						id="toggle"
+						name="toggle"
+						type="checkbox"
+						checked={!theme.isDark}
+						onclick={toggleTheme}
+					/>
+				</div>
+			</label></Tooltip.Trigger
+		>
+		<Tooltip.Content>Váltás {theme.isDark ? 'világos' : 'sötét'} módra</Tooltip.Content>
+	</Tooltip.Root>
+</Tooltip.Provider>
 
 <style>
 	:root {
@@ -34,6 +42,7 @@
 	}
 	.toggle {
 		position: relative;
+
 		transition: background var(--transition);
 		cursor: pointer;
 		border-radius: 10px;

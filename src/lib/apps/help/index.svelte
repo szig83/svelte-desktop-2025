@@ -18,6 +18,11 @@
 			id: 3,
 			title: 'Súgó',
 			content: 'Súgó súgó tartalom lesz ez.'
+		},
+		{
+			id: 1000,
+			title: 'Alkalmazás megnyitás guid alapján',
+			content: 'Súgó tartalom lesz ez.'
 		}
 	];
 

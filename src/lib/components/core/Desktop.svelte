@@ -43,7 +43,7 @@
 <div class={['desktop', themeManager.cssClasses]}>
 	<div class="video-background">
 		<video autoplay muted loop playsinline>
-			<source src="video2.mp4" type="video/mp4" />
+			<source src="bg-video.mp4" type="video/mp4" />
 			A böngésződ nem támogatja a videó lejátszást.
 		</video>
 	</div>

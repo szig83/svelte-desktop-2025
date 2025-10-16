@@ -34,7 +34,7 @@ Ha tartozik súgó az adott alkalmazáshoz, akkor annak is gombja.
 		e.stopPropagation();
 		onClick(e);
 	}}
-	class="btn-window-control btn-window-{controlType}"
+	class="btn-window-control btn-window-{controlType} btn-click-effect"
 	aria-label="{controlType} window"
 >
 	{#if controlType === 'help'}
