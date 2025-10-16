@@ -976,8 +976,8 @@
 	/* Élek - kisebb z-index, hogy a sarkok felülírják őket */
 	.resize-n,
 	.resize-s {
-		right: 16px;
-		left: 16px;
+		right: 0;
+		left: 0;
 		z-index: 11;
 		cursor: ns-resize;
 		height: 8px;
@@ -993,8 +993,8 @@
 
 	.resize-e,
 	.resize-w {
-		top: 16px;
-		bottom: 16px;
+		top: 0;
+		bottom: 0;
 		z-index: 11;
 		cursor: ew-resize;
 		width: 8px;
