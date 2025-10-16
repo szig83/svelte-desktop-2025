@@ -29,6 +29,7 @@ export type WindowState = {
 	helpId?: number;
 	allowMultiple?: boolean;
 	defaultSize?: WindowSize | { maximized?: boolean };
+	screenshot?: string; // Screenshot data URL (base64)
 };
 
 export class WindowManager {
@@ -270,6 +271,15 @@ export class WindowManager {
 		const window = this.windows.find((w) => w.id === id);
 		if (window) {
 			window.title = newTitle;
+			// Trigger reactivity
+			this.windows = [...this.windows];
+		}
+	}
+
+	updateWindowScreenshot(id: string, screenshotData: string) {
+		const window = this.windows.find((w) => w.id === id);
+		if (window) {
+			window.screenshot = screenshotData;
 			// Trigger reactivity
 			this.windows = [...this.windows];
 		}

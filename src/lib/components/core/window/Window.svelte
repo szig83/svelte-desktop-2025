@@ -645,7 +645,10 @@
 			// Takarítás
 			document.body.removeChild(offscreenContainer);
 
-			console.log('Screenshot készült!', screenshotData);
+			// Screenshot mentése az ablak adataiba
+			windowManager.updateWindowScreenshot(windowState.id, screenshotData);
+
+			console.log('Screenshot készült és mentve!', screenshotData);
 		} catch (error) {
 			console.error('Screenshot készítés sikertelen!', error);
 		}
