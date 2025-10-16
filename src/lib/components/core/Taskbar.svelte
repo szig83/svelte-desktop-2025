@@ -29,30 +29,37 @@
 		</Popover.Root>
 
 		{#each windowManager.windows as window (window.id)}
-			<button
-				class="taskbar-item"
-				class:active={window.isActive}
-				class:minimized={window.isMinimized}
-				onclick={() => {
-					if (window.isMinimized) {
-						// Ha minimalizált, visszaállítjuk és aktiváljuk
-						windowManager.minimizeWindow(window.id);
-					} else if (window.isActive) {
-						// Ha aktív, minimalizáljuk
-						windowManager.minimizeWindow(window.id);
-					} else {
-						// Ha inaktív (de nem minimalizált), aktiváljuk
-						windowManager.activateWindow(window.id);
-					}
-				}}
-			>
-				<div class="taskbar-item-icon">
-					<UniversalIcon icon={window.icon ?? ''} size={24} appName={window.appName} />
-				</div>
-				<div class="taskbar-item-title">
-					<span>{window.title}</span>
-				</div>
-			</button>
+			<div class="taskbar-item-wrapper">
+				<button
+					class="taskbar-item"
+					class:active={window.isActive}
+					class:minimized={window.isMinimized}
+					onclick={() => {
+						if (window.isMinimized) {
+							// Ha minimalizált, visszaállítjuk és aktiváljuk
+							windowManager.minimizeWindow(window.id);
+						} else if (window.isActive) {
+							// Ha aktív, minimalizáljuk
+							windowManager.minimizeWindow(window.id);
+						} else {
+							// Ha inaktív (de nem minimalizált), aktiváljuk
+							windowManager.activateWindow(window.id);
+						}
+					}}
+				>
+					<div class="taskbar-item-icon">
+						<UniversalIcon icon={window.icon ?? ''} size={24} appName={window.appName} />
+					</div>
+					<div class="taskbar-item-title">
+						<span>{window.title}</span>
+					</div>
+				</button>
+				{#if window.screenshot}
+					<div class="screenshot-preview">
+						<img src={window.screenshot} alt="{window.title} preview" />
+					</div>
+				{/if}
+			</div>
 		{/each}
 	</div>
 	<div class="taskbar-right">
@@ -91,6 +98,18 @@
 			align-items: stretch;
 			gap: 10px;
 			padding-right: 16px;
+		}
+
+		.taskbar-item-wrapper {
+			display: flex;
+			position: relative;
+			align-items: stretch;
+
+			&:hover .screenshot-preview {
+				transform: translateY(-8px);
+				visibility: visible;
+				opacity: 1;
+			}
 		}
 
 		.taskbar-item {
@@ -140,6 +159,36 @@
 				.taskbar-item-icon {
 					filter: grayscale(1);
 				}
+			}
+		}
+
+		.screenshot-preview {
+			position: absolute;
+			bottom: 100%;
+			left: 0;
+			/*transform: translateX(-50%) translateY(0);*/
+			visibility: hidden;
+			opacity: 0;
+			z-index: 1000;
+			backdrop-filter: blur(12px);
+			transition:
+				opacity 0.2s,
+				visibility 0.2s,
+				transform 0.2s;
+			margin-bottom: 8px;
+			box-shadow: var(--shadow-lg);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background-color: var(--color-popover);
+			padding: 8px;
+			pointer-events: none;
+
+			img {
+				display: block;
+				border-radius: var(--radius-sm);
+				max-width: none;
+				height: 200px;
+				object-fit: contain;
 			}
 		}
 	}
