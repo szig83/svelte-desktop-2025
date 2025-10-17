@@ -257,7 +257,7 @@
 	 */
 	async function minimize() {
 		await windowManager.minimizeWindow(windowState.id, async () => {
-			if (settings.windowPreview) {
+			if (settings.windowPreview && !settings.preferPerformance) {
 				await takeScreenshot();
 			}
 		});

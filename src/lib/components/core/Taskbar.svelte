@@ -16,6 +16,7 @@
 	const settings = getContext<{
 		screenshotThumbnailHeight: number;
 		windowPreview: boolean;
+		preferPerformance: boolean;
 	}>('settings');
 	/**
 	 * @TODO ahhoz fog kelleni, hogy a taskbar/startmenü-t külön lehessen dark módba kapcsolni.
@@ -47,7 +48,7 @@
 						} else if (window.isActive) {
 							// Ha aktív, minimalizáljuk (screenshot-tal)
 							await windowManager.minimizeWindow(window.id, async () => {
-								if (settings.windowPreview) {
+								if (settings.windowPreview && !settings.preferPerformance) {
 									await takeWindowScreenshot(
 										window.id,
 										windowManager,

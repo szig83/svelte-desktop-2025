@@ -3,12 +3,13 @@ import type { Handle } from '@sveltejs/kit';
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.settings = {
 		windowPreview: true,
-		screenshotThumbnailHeight: 100,
-		preferPerformance: false,
+		screenshotThumbnailHeight: 200,
+		preferPerformance: true,
 		background: {
-			type: 'video',
-			value: 'bg-video.mp4'
+			type: 'color',
+			value: '#666666'
 		},
+		taskbarPosition: 'bottom',
 		theme: {
 			mode: 'light',
 			modeTaskbarStartMenu: 'light',

@@ -12,6 +12,7 @@ declare global {
 					type: 'color' | 'image' | 'video';
 					value: string;
 				};
+				taskbarPosition: 'top' | 'bottom';
 				theme: ThemeSettings;
 			};
 		}
