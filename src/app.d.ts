@@ -12,6 +12,7 @@ declare global {
 					type: 'color' | 'image' | 'video';
 					value: string;
 				};
+				theme: ThemeSettings;
 			};
 		}
 		// interface PageData {}

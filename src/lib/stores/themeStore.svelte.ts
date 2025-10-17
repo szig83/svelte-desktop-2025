@@ -19,7 +19,8 @@ class ThemeManager {
 	}
 
 	/**
-	 * Téma mód beállítása (light, dark, auto)
+	 * Téma mód beállítása (light, dark, auto).
+	 * @param {ThemeMode} mode - Téma mód.
 	 */
 	setMode(mode: ThemeMode) {
 		this.settings.mode = mode;
@@ -27,7 +28,8 @@ class ThemeManager {
 	}
 
 	/**
-	 * Téma mód beállítása (light, dark, auto)
+	 * Start menu / Taskbar téma mód beállítása (light, dark, auto).
+	 * @param {ThemeMode} mode - Téma mód.
 	 */
 	setModeTaskbarStartMenu(mode: ThemeMode) {
 		this.settings.modeTaskbarStartMenu = mode;
@@ -35,15 +37,17 @@ class ThemeManager {
 	}
 
 	/**
-	 * Színséma beállítása
+	 * Színséma beállítása.
+	 * @param {string} color - Színséma.
 	 */
 	setColor(color: string) {
-		this.settings.color = color;
+		this.settings.colorPrimaryHue = color;
 		this.saveSettings();
 	}
 
 	/**
-	 * Betűméret beállítása
+	 * Betűméret beállítása.
+	 * @param {"small" | "medium" | "large"} size - Betűméret.
 	 */
 	setFontSize(size: 'small' | 'medium' | 'large') {
 		this.settings.fontSize = size;
@@ -51,15 +55,8 @@ class ThemeManager {
 	}
 
 	/**
-	 * Animációk be/kikapcsolása
-	 */
-	setAnimations(enabled: boolean) {
-		this.settings.animations = enabled;
-		this.saveSettings();
-	}
-
-	/**
-	 * Teljes beállítások frissítése
+	 * Teljes beállítások frissítése.
+	 * @param {Partial<ThemeSettings>} newSettings - Új beállítások.
 	 */
 	updateSettings(newSettings: Partial<ThemeSettings>) {
 		this.settings = { ...this.settings, ...newSettings };
@@ -77,35 +74,40 @@ class ThemeManager {
 	}
 
 	/**
-	 * Aktuális effektív téma mód (auto esetén a rendszer beállítás alapján)
+	 * Aktuális effektív téma mód (auto esetén a rendszer beállítás alapján).
+	 * @returns {"light" | "dark"} Aktuális effektív téma mód.
 	 */
 	get effectiveMode(): 'light' | 'dark' {
 		return this.effectiveModeBase('mode');
 	}
 
 	/**
-	 * Aktuális effektív téma mód (auto esetén a rendszer beállítás alapján)
+	 * Aktuális effektív téma mód (auto esetén a rendszer beállítás alapján).
+	 * @returns {"light" | "dark"} Aktuális effektív téma mód.
 	 */
 	get effectiveModeTaskBarStartMenu(): 'light' | 'dark' {
 		return this.effectiveModeBase('modeTaskbarStartMenu');
 	}
 
 	/**
-	 * Sötét mód aktív-e
+	 * Sötét mód aktív-e.
+	 * @returns {boolean} Sötét mód aktív-e.
 	 */
 	get isDark(): boolean {
 		return this.effectiveMode === 'dark';
 	}
 
 	/**
-	 * Világos mód aktív-e
+	 * Világos mód aktív-e.
+	 * @returns {boolean} Világos mód aktív-e.
 	 */
 	get isLight(): boolean {
 		return this.effectiveMode === 'light';
 	}
 
 	/**
-	 * CSS osztályok generálása a layout számára
+	 * CSS osztályok generálása a layout számára.
+	 * @returns {string} CSS osztályok.
 	 */
 	get cssClasses(): string {
 		const classes: string[] = [];
@@ -116,11 +118,6 @@ class ThemeManager {
 		// Betűméret
 		if (this.settings.fontSize) {
 			classes.push(`font-${this.settings.fontSize}`);
-		}
-
-		// Animációk
-		if (this.settings.animations === false) {
-			classes.push('no-animations');
 		}
 
 		return classes.join(' ');
@@ -137,27 +134,17 @@ class ThemeManager {
 			classes.push(`font-${this.settings.fontSize}`);
 		}
 
-		// Animációk
-		if (this.settings.animations === false) {
-			classes.push('no-animations');
-		}
-
 		return classes.join(' ');
 	}
 
 	/**
-	 * CSS változók objektum generálása
+	 * CSS változók objektum generálása.
+	 * @returns {Record<string, string>} CSS változók objektum.
 	 */
 	get cssVariables(): Record<string, string> {
 		const vars: Record<string, string> = {};
 
-		// Színséma alapú változók
-		/*const schemeColors = this.getSchemeColors(this.settings.colorScheme);
-		Object.entries(schemeColors).forEach(([key, value]) => {
-			vars[`--color-${key}`] = value;
-			vars[`--${key}-color`] = value;
-		});*/
-		vars['--primary-h'] = this.settings.color;
+		vars['--primary-h'] = this.settings.colorPrimaryHue;
 
 		// Betűméret változók
 		if (this.settings.fontSize === 'small') {
@@ -172,7 +159,7 @@ class ThemeManager {
 	}
 
 	/**
-	 * Beállítások mentése localStorage-ba
+	 * Beállítások mentése localStorage-ba.
 	 */
 	private saveSettings() {
 		if (typeof window !== 'undefined') {
@@ -185,7 +172,7 @@ class ThemeManager {
 	}
 
 	/**
-	 * Beállítások betöltése localStorage-ból
+	 * Beállítások betöltése localStorage-ból.
 	 */
 	private loadSettings() {
 		if (typeof window !== 'undefined') {
@@ -202,7 +189,7 @@ class ThemeManager {
 	}
 
 	/**
-	 * Rendszer téma változás kezelése
+	 * Rendszer téma változás kezelése.
 	 */
 	private handleSystemThemeChange() {
 		if (this.settings.mode === 'auto') {
@@ -212,47 +199,7 @@ class ThemeManager {
 	}
 
 	/**
-	 * Színséma színek lekérése
-	 */
-	/*private getSchemeColors(scheme: ColorScheme): Record<string, string> {
-		const schemes: Record<ColorScheme, Record<string, string>> = {
-			blue: {
-				primary: '#3b82f6',
-				'primary-hover': '#2563eb',
-				'primary-light': '#dbeafe',
-				accent: '#60a5fa'
-			},
-			green: {
-				primary: '#10b981',
-				'primary-hover': '#059669',
-				'primary-light': '#d1fae5',
-				accent: '#34d399'
-			},
-			purple: {
-				primary: '#8b5cf6',
-				'primary-hover': '#7c3aed',
-				'primary-light': '#ede9fe',
-				accent: '#a78bfa'
-			},
-			orange: {
-				primary: '#f97316',
-				'primary-hover': '#ea580c',
-				'primary-light': '#ffedd5',
-				accent: '#fb923c'
-			},
-			red: {
-				primary: '#ef4444',
-				'primary-hover': '#dc2626',
-				'primary-light': '#fee2e2',
-				accent: '#f87171'
-			}
-		};
-
-		return schemes[scheme];
-	}
-*/
-	/**
-	 * Cleanup
+	 * Cleanup.
 	 */
 	destroy() {
 		if (this.mediaQuery) {

@@ -8,6 +8,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		background: {
 			type: 'video',
 			value: 'bg-video.mp4'
+		},
+		theme: {
+			mode: 'light',
+			modeTaskbarStartMenu: 'light',
+			colorPrimaryHue: '225',
+			fontSize: 'medium'
 		}
 	};
 
