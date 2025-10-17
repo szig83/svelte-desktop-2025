@@ -15,6 +15,7 @@
 	import LZString from 'lz-string';
 	import { toast } from 'svelte-sonner';
 	import { takeWindowScreenshot } from '$lib/utils/screenshot';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	let { windowState }: { windowState: WindowState } = $props();
 	const windowManager = getWindowManager();
@@ -300,10 +301,10 @@
 		const compressed = LZString.compressToEncodedURIComponent(jsonString);
 		try {
 			await navigator.clipboard.writeText(compressed);
-			toast.success('Sikeres vágólapra helyezés!');
+			toast.success('Guid link sikeres vágólapra helyezése!');
 			return true;
 		} catch (err) {
-			toast.error('Sikertelen vágólapra helyezés!');
+			toast.error('Guid link sikertelen vágólapra helyezése!');
 			return false;
 		}
 		return compressed;
@@ -710,7 +711,14 @@
 			{#if windowState.helpId}
 				<WindowControlButton controlType="help" onClick={() => help(windowState.helpId)} />
 			{/if}
-			<WindowControlButton controlType="link" onClick={async () => link()} />
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<WindowControlButton controlType="link" onClick={async () => link()} />
+					</Tooltip.Trigger>
+					<Tooltip.Content class="z-[1001]">Guid generálás az ablak megosztáshoz</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 			<WindowControlButton controlType="minimize" onClick={async () => minimize()} />
 			{#if windowState.maximizable}
 				<WindowControlButton

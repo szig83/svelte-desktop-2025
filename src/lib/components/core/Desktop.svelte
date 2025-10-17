@@ -4,10 +4,11 @@
 	import { createThemeManager, setThemeManager } from '$lib/stores/themeStore.svelte';
 	import Window from '$lib/components/core/window/Window.svelte';
 	import Taskbar from '$lib/components/core/Taskbar.svelte';
+	import type { BackgroundType } from '$lib/types/desktopEnviroment.ts';
 
 	const settings = getContext<{
 		background: {
-			type: 'color' | 'image' | 'video';
+			type: BackgroundType;
 			value: string;
 		};
 	}>('settings');
@@ -108,7 +109,7 @@
 	.workspace {
 		position: relative;
 		flex-grow: 1;
-		order: 1;
+		order: 2;
 		overflow: hidden;
 	}
 

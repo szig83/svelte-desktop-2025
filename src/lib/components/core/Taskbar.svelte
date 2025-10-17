@@ -10,13 +10,14 @@
 	import WindowLink from '$lib/components/WindowLink.svelte';
 	import { getContext } from 'svelte';
 	import { takeWindowScreenshot } from '$lib/utils/screenshot';
-
+	import type { TaskbarPosition } from '$lib/types/desktopEnviroment.ts';
 	let { windowManager }: { windowManager: WindowManager } = $props();
 
 	const settings = getContext<{
 		screenshotThumbnailHeight: number;
 		windowPreview: boolean;
 		preferPerformance: boolean;
+		taskbarPosition: TaskbarPosition;
 	}>('settings');
 	/**
 	 * @TODO ahhoz fog kelleni, hogy a taskbar/startmenü-t külön lehessen dark módba kapcsolni.
@@ -26,7 +27,7 @@
 	let startMenuOpen = $state(false);
 </script>
 
-<div class="taskbar">
+<div class={['taskbar', settings.taskbarPosition === 'top' ? 'order-1' : 'order-3']}>
 	<div class="taskbar-left">
 		<Popover.Root bind:open={startMenuOpen}>
 			<Popover.Trigger class="btn-startmenu btn-click-effect"><Menu size={24} /></Popover.Trigger>
@@ -95,7 +96,6 @@
 	.taskbar {
 		display: flex;
 		justify-content: space-between;
-		order: 1;
 		z-index: var(--taskbar-z-index);
 		backdrop-filter: blur(10px);
 		border-radius: 0;

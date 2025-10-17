@@ -9,10 +9,10 @@ declare global {
 				screenshotThumbnailHeight: number;
 				preferPerformance: boolean;
 				background: {
-					type: 'color' | 'image' | 'video';
+					type: BackgroundType;
 					value: string;
 				};
-				taskbarPosition: 'top' | 'bottom';
+				taskbarPosition: TaskbarPosition;
 				theme: ThemeSettings;
 			};
 		}

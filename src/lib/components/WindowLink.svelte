@@ -84,7 +84,9 @@
 							<Tooltip.Trigger>
 								<Button variant="outline" onclick={async () => paste()}><ClipboardPaste /></Button>
 							</Tooltip.Trigger>
-							<Tooltip.Content class="z-[1001]">Beillesztés</Tooltip.Content>
+							<Tooltip.Content class="z-[1001]"
+								>Guid beillesztés és alkalmazás megnyitása</Tooltip.Content
+							>
 						</Tooltip.Root>
 					</Tooltip.Provider>
 					<Input

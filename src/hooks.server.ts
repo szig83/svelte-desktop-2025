@@ -4,7 +4,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.settings = {
 		windowPreview: true,
 		screenshotThumbnailHeight: 200,
-		preferPerformance: true,
+		preferPerformance: false,
 		background: {
 			type: 'color',
 			value: '#666666'

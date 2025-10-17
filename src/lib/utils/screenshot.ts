@@ -44,8 +44,13 @@ export async function takeWindowScreenshot(
 			return;
 		}
 
-		// Ablak méretarányának kiszámítása
-		const aspectRatio = window.size.width / window.size.height;
+		// Ablak tényleges méretének lekérése a DOM-ból
+		// (maximalizált ablak esetén a windowState.size nem frissül, csak a CSS)
+		const actualWidth = windowElement.offsetWidth;
+		const actualHeight = windowElement.offsetHeight;
+
+		// Ablak méretarányának kiszámítása a tényleges méret alapján
+		const aspectRatio = actualWidth / actualHeight;
 		const thumbnailWidth = Math.round(screenshotThumbnailHeight * aspectRatio);
 
 		// Screenshot készítése a klónról
