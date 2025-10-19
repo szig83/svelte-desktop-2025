@@ -1,6 +1,11 @@
+import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
+import { auth } from '$lib/auth';
+import { svelteKitHandler } from 'better-auth/svelte-kit';
+import { building } from '$app/environment';
 
-export const handle: Handle = async ({ event, resolve }) => {
+// Settings middleware
+const settingsHandle: Handle = async ({ event, resolve }) => {
 	event.locals.settings = {
 		windowPreview: true,
 		screenshotThumbnailHeight: 200,
@@ -18,15 +23,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	};
 
+	return resolve(event);
+};
+
+// Custom headers middleware
+const headersHandle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
-
-	// Note that modifying response headers isn't always safe.
-	// Response objects can have immutable headers
-	// (e.g. Response.redirect() returned from an endpoint).
-	// Modifying immutable headers throws a TypeError.
-	// In that case, clone the response or avoid creating a
-	// response object with immutable headers.
-	//response.headers.set('x-custom-header', 'potato');
-
+	response.headers.set('x-custom-header', 'potato');
 	return response;
 };
+
+// Better-auth middleware
+const authHandle: Handle = (input) => {
+	return svelteKitHandler({ ...input, auth, building });
+};
+
+// Chain all middlewares in order
+export const handle = sequence(settingsHandle, authHandle, headersHandle);
