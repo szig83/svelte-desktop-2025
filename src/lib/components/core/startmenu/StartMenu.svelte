@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getApps } from '$lib/services/apps.remote';
 	import { getWindowManager } from '$lib/stores/windowStore.svelte';
-	import AppIcon from '../AppIcon.svelte';
+	import AppIcon from './AppIcon.svelte';
 	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import StartMenuFooter from './StartMenuFooter.svelte';

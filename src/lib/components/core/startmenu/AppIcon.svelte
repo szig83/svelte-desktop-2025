@@ -4,7 +4,7 @@ Start menüben megjelenő ikonokat mutatja.
 -->
 <script lang="ts">
 	import { type AppMetadata } from '$lib/types/window';
-	import UniversalIcon from '../UniversalIcon.svelte';
+	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
 	interface Props {
 		app: AppMetadata;
 		onclick: () => void;

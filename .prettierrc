@@ -12,5 +12,5 @@
 			}
 		}
 	],
-	"tailwindStylesheet": "./src/routes/admin/(protected)/appAdmin.css"
+	"tailwindStylesheet": "./src/routes/admin/appAdmin.css"
 }

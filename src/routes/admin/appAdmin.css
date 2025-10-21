@@ -5,12 +5,6 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-	--taskbar-height: 58px;
-	--taskbar-z-index: 1000;
-	--startmenu-width: 500px;
-	--startmenu-height: 300px;
-
-	--startmenu-margin: 0px;
 	--primary-h: 260;
 
 	/* ============================================
@@ -174,7 +168,6 @@
 	}
 }
 
-/* Globális gomb benyomódás effekt - HeroUI stílusú */
 .btn-click-effect {
 	svg {
 		transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
