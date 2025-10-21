@@ -16,7 +16,8 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter(),
 		alias: {
-			$routes: './src/routes/*'
+			$routes: './src/routes/*',
+			$root: './'
 		}
 	},
 	compilerOptions: {

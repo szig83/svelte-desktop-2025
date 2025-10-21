@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { getApps } from '$lib/services/apps.remote';
 	import { getWindowManager } from '$lib/stores/windowStore.svelte';
-	import AppIcon from './AppIcon.svelte';
+	import AppIcon from '../AppIcon.svelte';
 	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import * as Avatar from '$lib/components/ui/avatar/index';
-
+	import StartMenuFooter from './StartMenuFooter.svelte';
 	const windowManager = getWindowManager();
 	let { open = $bindable() } = $props();
 
@@ -45,17 +44,7 @@
 			</div>
 		{/if}
 	</div>
-	<div class="footer">
-		<div class="footer-left">
-			<div class="avatar"><img src="avatar.png" alt="" /></div>
-			<div>Szigeti Balázs</div>
-		</div>
-		<div class="footer-right">
-			<button class="btn-click-effect">
-				<UniversalIcon icon="Power" size={16} class="btn-power" />
-			</button>
-		</div>
-	</div>
+	<StartMenuFooter />
 </div>
 
 <style>
@@ -93,45 +82,6 @@
 				display: inline-grid;
 				grid-template-columns: repeat(5, 1fr);
 				gap: 10px 15px;
-			}
-		}
-
-		.footer {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			border-top: 1px solid var(--color-border);
-			background-color: var(--primary-500-alpha-80);
-			padding: 10px 0 0 0;
-			color: var(--neutral-100);
-			font-size: 0.8rem;
-
-			.footer-left {
-				display: flex;
-				align-items: center;
-				gap: 10px;
-			}
-		}
-	}
-
-	.avatar {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		border-radius: 50%;
-		aspect-ratio: 1;
-		width: 32px;
-		overflow: hidden;
-	}
-
-	:global {
-		.btn-power {
-			transition: color 0.2s ease-in-out;
-			cursor: pointer;
-			color: rgba(187, 53, 53, 0.8);
-
-			&:hover {
-				color: rgba(187, 53, 53, 1);
 			}
 		}
 	}

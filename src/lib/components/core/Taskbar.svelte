@@ -3,7 +3,7 @@
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
 	import type { WindowManager } from '$lib/stores/windowStore.svelte';
 	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
-	import StartMenu from './StartMenu.svelte';
+	import StartMenu from './startmenu/StartMenu.svelte';
 	import Clock from '$lib/components/Clock.svelte';
 	import * as Popover from '$lib/components/ui/popover';
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';

@@ -15,6 +15,8 @@ declare global {
 				taskbarPosition: TaskbarPosition;
 				theme: ThemeSettings;
 			};
+			session?: Session;
+			user?: User;
 		}
 		// interface PageData {}
 		// interface PageState {}
