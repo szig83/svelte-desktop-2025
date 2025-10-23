@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { env as envDynamic } from '$env/dynamic/private';
+
 const envSchema = v.object({
 	NODE_ENV: v.picklist(['development', 'production']),
 	DB_HOST: v.string(),
@@ -31,18 +31,18 @@ type Env = v.InferOutput<typeof envSchema>;
 function validateEnv(): Env {
 	try {
 		return v.parse(envSchema, {
-			NODE_ENV: envDynamic.NODE_ENV,
-			DB_HOST: envDynamic.DB_HOST,
-			DB_USER: envDynamic.DB_USER,
-			DB_PASSWORD: envDynamic.DB_PASSWORD,
-			DB_NAME: envDynamic.DB_NAME,
-			DB_PORT: envDynamic.DB_PORT,
-			DATABASE_URL: envDynamic.DATABASE_URL,
-			DB_MIGRATING: envDynamic.DB_MIGRATING,
-			GOOGLE_CLIENT_ID: envDynamic.GOOGLE_CLIENT_ID,
-			GOOGLE_CLIENT_SECRET: envDynamic.GOOGLE_CLIENT_SECRET,
-			BETTER_AUTH_SECRET: envDynamic.BETTER_AUTH_SECRET,
-			BETTER_AUTH_URL: envDynamic.BETTER_AUTH_URL
+			NODE_ENV: process.env.NODE_ENV,
+			DB_HOST: process.env.DB_HOST,
+			DB_USER: process.env.DB_USER,
+			DB_PASSWORD: process.env.DB_PASSWORD,
+			DB_NAME: process.env.DB_NAME,
+			DB_PORT: process.env.DB_PORT,
+			DATABASE_URL: process.env.DATABASE_URL,
+			DB_MIGRATING: process.env.DB_MIGRATING,
+			GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+			GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+			BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+			BETTER_AUTH_URL: process.env.BETTER_AUTH_URL
 		});
 	} catch (error) {
 		if (v.isValiError(error)) {

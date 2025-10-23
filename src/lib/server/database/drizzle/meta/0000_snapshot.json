@@ -1,5 +1,5 @@
 {
-  "id": "c09fc95d-edb5-46c1-b867-11b4f30900e9",
+  "id": "8150b5d1-8c4b-4852-9d99-686e18e14fe7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -855,6 +855,66 @@
           ]
         }
       },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "platform.user_settings": {
+      "name": "user_settings",
+      "schema": "platform",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "settings": {
+          "name": "settings",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_settings_user_id_users_id_fk": {
+          "name": "user_settings_user_id_users_id_fk",
+          "tableFrom": "user_settings",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

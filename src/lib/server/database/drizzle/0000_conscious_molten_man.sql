@@ -115,6 +115,14 @@ CREATE TABLE "auth"."user_roles" (
 	CONSTRAINT "user_roles_user_id_role_id_pk" PRIMARY KEY("user_id","role_id")
 );
 --> statement-breakpoint
+CREATE TABLE "platform"."user_settings" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"settings" jsonb NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "auth"."users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"full_name" varchar(100) NOT NULL,
@@ -149,4 +157,5 @@ ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FORE
 ALTER TABLE "auth"."user_groups" ADD CONSTRAINT "user_groups_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "auth"."user_groups" ADD CONSTRAINT "user_groups_group_id_groups_id_fk" FOREIGN KEY ("group_id") REFERENCES "auth"."groups"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "auth"."user_roles" ADD CONSTRAINT "user_roles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "auth"."user_roles" ADD CONSTRAINT "user_roles_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "auth"."roles"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "auth"."user_roles" ADD CONSTRAINT "user_roles_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "auth"."roles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "platform"."user_settings" ADD CONSTRAINT "user_settings_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;

@@ -5,7 +5,7 @@ import { authSchema as schema } from '../schema';
 
 import { createInsertSchema } from 'drizzle-valibot';
 import * as v from 'valibot';
-import { localizedTextSchema, type LocalizedText } from '$lib/utils/utils';
+import { localizedTextSchema, type LocalizedText } from '../../../../../utils/utils';
 
 const groups = schema.table('groups', {
 	id: serial('id').primaryKey(),
@@ -21,10 +21,12 @@ const relations = drizzleRelations(groups, ({ many }) => ({
 
 const groupSchema = createInsertSchema(groups, {
 	name: localizedTextSchema,
-	description: v.optional(v.object({
-		hu: v.optional(v.pipe(v.string(), v.minLength(1))),
-		en: v.optional(v.pipe(v.string(), v.minLength(1)))
-	}))
+	description: v.optional(
+		v.object({
+			hu: v.optional(v.pipe(v.string(), v.minLength(1))),
+			en: v.optional(v.pipe(v.string(), v.minLength(1)))
+		})
+	)
 });
 
 export { groups, relations as groupsRelations, groupSchema };

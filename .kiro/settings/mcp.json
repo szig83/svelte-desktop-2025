@@ -1,0 +1,14 @@
+{
+    "mcpServers": {
+        "svelte-remote-mcp": {
+            "command": "npx",
+            "args": [
+                "mcp-remote",
+                "https://mcp.svelte.dev/mcp",
+                "--transport",
+                "sse"
+            ],
+            "disabled": false
+        }
+    }
+}
