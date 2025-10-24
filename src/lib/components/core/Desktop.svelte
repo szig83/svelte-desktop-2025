@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { createWindowManager, setWindowManager } from '$lib/stores/windowStore.svelte';
-	import { createThemeManager, setThemeManager } from '$lib/stores/themeStore.svelte';
+	import {
+		createWindowManager,
+		setWindowManager,
+		createThemeManager,
+		setThemeManager
+	} from '$lib/stores';
 	import Window from '$lib/components/core/window/Window.svelte';
 	import Taskbar from '$lib/components/core/Taskbar.svelte';
 	import type { BackgroundType } from '$lib/types/desktopEnviroment.ts';

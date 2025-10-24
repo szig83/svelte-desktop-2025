@@ -3,18 +3,14 @@
  Ez a komponens felel az egyes ablakok felépítésért, műveletekért.
  -->
 <script lang="ts">
-	import { getAppByName } from '$lib/services/apps.remote';
+	import { getAppByName } from '$lib/services/client/appRegistry';
 	import { setContext, getContext } from 'svelte';
-	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/appContext';
-	import {
-		getWindowManager,
-		type WindowState,
-		RESTORE_SIZE_THRESHOLD
-	} from '$lib/stores/windowStore.svelte';
+	import { type AppContext, APP_CONTEXT_KEY } from '$lib/services/client/appContext';
+	import { getWindowManager, type WindowState, RESTORE_SIZE_THRESHOLD } from '$lib/stores';
 	import WindowControlButton from './WindowControlButton.svelte';
 	import LZString from 'lz-string';
 	import { toast } from 'svelte-sonner';
-	import { takeWindowScreenshot } from '$lib/utils/screenshot';
+	import { takeWindowScreenshot } from '$lib/services/client/screenshot';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	let { windowState }: { windowState: WindowState } = $props();

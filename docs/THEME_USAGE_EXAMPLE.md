@@ -5,7 +5,7 @@
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const theme = getThemeManager();
 </script>
 
@@ -19,14 +19,14 @@
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const theme = getThemeManager();
 	const colors = ['blue', 'green', 'purple', 'orange', 'red'] as const;
 </script>
 
 <div class="color-picker">
 	{#each colors as color}
-		<button 
+		<button
 			class:active={theme.settings.colorScheme === color}
 			onclick={() => theme.setColorScheme(color)}
 		>
@@ -41,7 +41,7 @@
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const theme = getThemeManager();
 </script>
 
@@ -52,18 +52,18 @@
 
 <style>
 	.card {
-		padding: 20px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		border-radius: 8px;
 		background: white;
+		padding: 20px;
 		color: #1f2937;
-		box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 	}
-	
+
 	/* Dark mode */
 	:global(#desktop.dark) .card {
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 		background: #374151;
 		color: #f9fafb;
-		box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 	}
 </style>
 ```
@@ -71,21 +71,19 @@
 ## 4. CSS változók használata
 
 ```svelte
-<button class="primary-button">
-	Kattints ide
-</button>
+<button class="primary-button"> Kattints ide </button>
 
 <style>
 	.primary-button {
-		background: var(--color-primary);
-		color: white;
-		padding: 10px 20px;
+		transition: background 0.2s;
+		cursor: pointer;
 		border: none;
 		border-radius: 6px;
-		cursor: pointer;
-		transition: background 0.2s;
+		background: var(--color-primary);
+		padding: 10px 20px;
+		color: white;
 	}
-	
+
 	.primary-button:hover {
 		background: var(--color-primary-hover);
 	}
@@ -108,9 +106,9 @@
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const theme = getThemeManager();
-	
+
 	// Automatikusan frissül amikor a téma változik
 	$: bgColor = theme.isDark ? '#1f2937' : '#ffffff';
 	$: textColor = theme.isDark ? '#f9fafb' : '#1f2937';
@@ -126,12 +124,12 @@
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const theme = getThemeManager();
-	
+
 	// A beállítások automatikusan mentődnek localStorage-ba
 	// Nem kell manuálisan kezelni!
-	
+
 	function applyCustomTheme() {
 		theme.updateSettings({
 			mode: 'dark',
@@ -142,9 +140,7 @@
 	}
 </script>
 
-<button onclick={applyCustomTheme}>
-	Egyedi téma alkalmazása
-</button>
+<button onclick={applyCustomTheme}> Egyedi téma alkalmazása </button>
 ```
 
 ## 8. Feltételes renderelés téma alapján
@@ -152,7 +148,7 @@
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const theme = getThemeManager();
 </script>
 
@@ -168,23 +164,21 @@
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const theme = getThemeManager();
 </script>
 
-<div class="animated-box">
-	Animált tartalom
-</div>
+<div class="animated-box">Animált tartalom</div>
 
 <style>
 	.animated-box {
 		transition: transform 0.3s ease;
 	}
-	
+
 	.animated-box:hover {
 		transform: scale(1.05);
 	}
-	
+
 	/* Ha az animációk ki vannak kapcsolva, ez automatikusan érvényesül */
 	:global(#desktop.no-animations) .animated-box {
 		transition: none;
@@ -195,25 +189,23 @@
 ## 10. Színséma specifikus stílusok
 
 ```svelte
-<div class="themed-element">
-	Színséma alapú elem
-</div>
+<div class="themed-element">Színséma alapú elem</div>
 
 <style>
 	.themed-element {
 		border: 2px solid var(--color-primary);
 		padding: 10px;
 	}
-	
+
 	/* Specifikus színsémák */
 	:global(#desktop.scheme-blue) .themed-element {
 		background: #dbeafe;
 	}
-	
+
 	:global(#desktop.scheme-green) .themed-element {
 		background: #d1fae5;
 	}
-	
+
 	:global(#desktop.scheme-purple) .themed-element {
 		background: #ede9fe;
 	}

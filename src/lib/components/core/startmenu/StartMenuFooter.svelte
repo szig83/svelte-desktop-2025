@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth/client';
 	const session = authClient.useSession();
-	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
+	import { UniversalIcon } from '$lib/components/shared';
 	import * as Avatar from '$lib/components/ui/avatar/index';
 	import { Button } from '$lib/components/ui/button';
 
@@ -9,7 +9,10 @@
 		if ($session.data) {
 			const firstName = $session.data.user.name.split(' ')[0];
 			const lastName = $session.data.user.name.split(' ')[1];
-			return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+			return (
+				firstName.charAt(0).toUpperCase() +
+				(lastName && lastName.length > 0 ? lastName.charAt(0).toUpperCase() : '')
+			);
 		}
 		return '';
 	});

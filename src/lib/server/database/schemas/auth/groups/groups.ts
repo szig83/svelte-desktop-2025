@@ -5,7 +5,7 @@ import { authSchema as schema } from '../schema';
 
 import { createInsertSchema } from 'drizzle-valibot';
 import * as v from 'valibot';
-import { localizedTextSchema, type LocalizedText } from '../../../../../utils/utils';
+import { localizedTextSchema, type LocalizedText } from '../../../../utils/index.js';
 
 const groups = schema.table('groups', {
 	id: serial('id').primaryKey(),

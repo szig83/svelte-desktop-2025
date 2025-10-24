@@ -39,19 +39,15 @@ A központi témakezelő osztály, amely Svelte 5 runes-t használ a reaktivitá
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const themeManager = getThemeManager();
 </script>
 
 <!-- Téma mód váltása -->
-<button onclick={() => themeManager.setMode('dark')}>
-	Sötét mód
-</button>
+<button onclick={() => themeManager.setMode('dark')}> Sötét mód </button>
 
 <!-- Színséma váltása -->
-<button onclick={() => themeManager.setColorScheme('purple')}>
-	Lila színséma
-</button>
+<button onclick={() => themeManager.setColorScheme('purple')}> Lila színséma </button>
 
 <!-- Aktuális beállítások olvasása -->
 <div>
@@ -84,7 +80,7 @@ Használat komponensben:
 		color: white;
 		font-size: var(--base-font-size);
 	}
-	
+
 	.my-button:hover {
 		background: var(--color-primary-hover);
 	}
@@ -101,7 +97,7 @@ A Desktop komponens automatikusan alkalmazza a `.dark` osztályt sötét módban
 		background: white;
 		color: black;
 	}
-	
+
 	/* Sötét mód stílusok */
 	:global(#desktop.dark) .my-component {
 		background: #1f2937;
@@ -118,7 +114,7 @@ A Desktop komponens automatikusan alkalmazza a `.dark` osztályt sötét módban
 	:global(#desktop.scheme-blue) .my-element {
 		border-color: #3b82f6;
 	}
-	
+
 	/* Zöld színséma */
 	:global(#desktop.scheme-green) .my-element {
 		border-color: #10b981;
@@ -141,16 +137,19 @@ Az alkalmazás tartalmaz egy kész `ThemeSettings` komponenst, amely teljes UI-t
 ## Típusok
 
 ### ThemeMode
+
 ```typescript
 type ThemeMode = 'light' | 'dark' | 'auto';
 ```
 
 ### ColorScheme
+
 ```typescript
 type ColorScheme = 'blue' | 'green' | 'purple' | 'orange' | 'red';
 ```
 
 ### ThemeSettings
+
 ```typescript
 interface ThemeSettings {
 	mode: ThemeMode;
@@ -190,9 +189,9 @@ interface ThemeSettings {
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const themeManager = getThemeManager();
-	
+
 	function toggleTheme() {
 		const newMode = themeManager.isDark ? 'light' : 'dark';
 		themeManager.setMode(newMode);
@@ -210,7 +209,7 @@ interface ThemeSettings {
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
 	import ThemeSettings from '$lib/components/ThemeSettings.svelte';
-	
+
 	const themeManager = getThemeManager();
 </script>
 
@@ -225,14 +224,12 @@ interface ThemeSettings {
 ```svelte
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	
+
 	const themeManager = getThemeManager();
-	
+
 	// A komponens automatikusan újrarenderelődik amikor a téma változik
 	$: backgroundColor = themeManager.isDark ? '#1f2937' : '#ffffff';
 </script>
 
-<div style="background-color: {backgroundColor}">
-	Tartalom
-</div>
+<div style="background-color: {backgroundColor}">Tartalom</div>
 ```

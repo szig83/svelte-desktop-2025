@@ -3,6 +3,7 @@
 ## 🎉 Elkészült Funkciók
 
 ### 1. **Központi ThemeManager Store**
+
 - ✅ `src/lib/stores/themeStore.svelte.ts`
 - ✅ Svelte 5 runes alapú reaktivitás
 - ✅ LocalStorage perzisztencia
@@ -10,12 +11,14 @@
 - ✅ Singleton + Context hibrid megoldás
 
 ### 2. **Típusok**
+
 - ✅ `src/lib/types/theme.ts`
 - ✅ `ThemeMode`: 'light' | 'dark' | 'auto'
 - ✅ `ColorScheme`: 'blue' | 'green' | 'purple' | 'orange' | 'red'
 - ✅ `ThemeSettings`: teljes konfiguráció interface
 
 ### 3. **Desktop Integráció**
+
 - ✅ `src/lib/components/core/Desktop.svelte` frissítve
 - ✅ ThemeManager automatikus létrehozás és kontextus beállítás
 - ✅ CSS osztályok automatikus alkalmazása
@@ -23,11 +26,13 @@
 - ✅ Dark mode támogatás
 
 ### 4. **UI Komponensek**
+
 - ✅ `ThemeSettings.svelte` - Teljes beállítások panel
 - ✅ `ThemeToggle.svelte` - Egyszerű téma váltó gomb
 - ✅ `ColorSchemePicker.svelte` - Színséma választó
 
 ### 5. **Settings App**
+
 - ✅ `src/lib/apps/settings/index.svelte` teljesen újraírva
 - ✅ Gyors téma váltó a fejlécben
 - ✅ Színséma választó szekció
@@ -37,12 +42,14 @@
 - ✅ Szép scrollbar stílusok
 
 ### 6. **Exportok**
+
 - ✅ `src/lib/index.ts` - Központi export fájl
 - ✅ Store funkciók exportálva
 - ✅ Típusok exportálva
 - ✅ Komponensek exportálva
 
 ### 7. **Dokumentáció**
+
 - ✅ `README_THEME.md` - Gyors áttekintés
 - ✅ `THEME_SYSTEM.md` - Részletes technikai dokumentáció
 - ✅ `THEME_USAGE_EXAMPLE.md` - 10+ használati példa
@@ -82,7 +89,7 @@ Az alkalmazásban nyisd meg a **"Beállítások"** ablakot, ahol:
 	.my-button {
 		background: var(--color-primary);
 	}
-	
+
 	:global(#desktop.dark) .my-element {
 		background: #1f2937;
 	}
@@ -92,6 +99,7 @@ Az alkalmazásban nyisd meg a **"Beállítások"** ablakot, ahol:
 ## 📦 Létrehozott Fájlok
 
 ### Új fájlok:
+
 ```
 src/lib/
 ├── types/
@@ -115,6 +123,7 @@ Dokumentáció:
 ```
 
 ### Módosított fájlok:
+
 ```
 src/lib/components/core/Desktop.svelte    ← ThemeManager integráció
 src/lib/services/apps.remote.ts           ← Settings app méret frissítés
@@ -127,19 +136,19 @@ src/lib/index.ts                          ← Export frissítések
 
 ```typescript
 // Beállítások módosítása
-theme.setMode('dark' | 'light' | 'auto')
-theme.setColorScheme('blue' | 'green' | 'purple' | 'orange' | 'red')
-theme.setFontSize('small' | 'medium' | 'large')
-theme.setAnimations(true | false)
-theme.updateSettings({ mode: 'dark', colorScheme: 'purple' })
+theme.setMode('dark' | 'light' | 'auto');
+theme.setColorScheme('blue' | 'green' | 'purple' | 'orange' | 'red');
+theme.setFontSize('small' | 'medium' | 'large');
+theme.setAnimations(true | false);
+theme.updateSettings({ mode: 'dark', colorScheme: 'purple' });
 
 // Állapot lekérdezés
-theme.settings          // Aktuális beállítások
-theme.effectiveMode     // 'light' vagy 'dark'
-theme.isDark            // boolean
-theme.isLight           // boolean
-theme.cssClasses        // "dark scheme-blue font-medium"
-theme.cssVariables      // { '--color-primary': '#3b82f6', ... }
+theme.settings; // Aktuális beállítások
+theme.effectiveMode; // 'light' vagy 'dark'
+theme.isDark; // boolean
+theme.isLight; // boolean
+theme.cssClasses; // "dark scheme-blue font-medium"
+theme.cssVariables; // { '--color-primary': '#3b82f6', ... }
 ```
 
 ### CSS Változók
@@ -164,6 +173,7 @@ theme.cssVariables      // { '--color-primary': '#3b82f6', ... }
 ## 🎯 Tesztelés
 
 1. **Indítsd el az alkalmazást**
+
    ```bash
    npm run dev
    ```

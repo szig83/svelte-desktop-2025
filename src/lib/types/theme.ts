@@ -1,16 +1,13 @@
-export type ThemeMode = 'light' | 'dark' | 'auto';
+import type { ThemeMode, FontSize } from '../constants.js';
+import { DEFAULTS } from '../constants.js';
+
+export type { ThemeMode, FontSize };
 
 export interface ThemeSettings {
 	mode: ThemeMode;
 	modeTaskbarStartMenu: ThemeMode;
 	colorPrimaryHue: string;
-	// További beállítások később bővíthetők
-	fontSize?: 'small' | 'medium' | 'large';
+	fontSize?: FontSize;
 }
 
-export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
-	mode: 'light',
-	modeTaskbarStartMenu: 'light',
-	colorPrimaryHue: '225',
-	fontSize: 'medium'
-};
+export const DEFAULT_THEME_SETTINGS: ThemeSettings = DEFAULTS.THEME;

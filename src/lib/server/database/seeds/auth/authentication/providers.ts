@@ -1,6 +1,6 @@
-import { type DB } from '@/database'
-import { providers } from '@/database/schemas'
-import { providers as providersSeedConfig } from '@/database/seedConfig'
+import { type DB } from '$lib/server/database';
+import { providers } from '$lib/server/database/schemas';
+import { providers as providersSeedConfig } from '$lib/server/database/seedConfig';
 
 /**
  * Konvertálja a seedConfig szolgáltató adatokat a séma formátumára.
@@ -10,8 +10,8 @@ import { providers as providersSeedConfig } from '@/database/seedConfig'
 const initData = Object.values(providersSeedConfig).map((provider) => ({
 	name: provider.name,
 	enabled: provider.enabled,
-	config: provider.config,
-}))
+	config: provider.config
+}));
 
 /**
  * Inicializálja a szolgáltatók táblát a seedConfig-ban megadott adatokkal.
@@ -19,5 +19,5 @@ const initData = Object.values(providersSeedConfig).map((provider) => ({
  * @param db Az adatbázis példány.
  */
 export async function seed(db: DB) {
-	await db.insert(providers).values(initData)
+	await db.insert(providers).values(initData);
 }

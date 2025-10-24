@@ -65,7 +65,7 @@ A témakezelő rendszer **teljesen működőképes** és azonnal használható a
 		background: white;
 		color: black;
 	}
-	
+
 	:global(#desktop.dark) .my-element {
 		background: #1f2937;
 		color: white;
@@ -81,7 +81,7 @@ A témakezelő rendszer **teljesen működőképes** és azonnal használható a
 		background: var(--color-primary);
 		color: white;
 	}
-	
+
 	.button:hover {
 		background: var(--color-primary-hover);
 	}
@@ -93,22 +93,22 @@ A témakezelő rendszer **teljesen működőképes** és azonnal használható a
 ### ThemeManager Metódusok
 
 ```typescript
-theme.setMode('dark' | 'light' | 'auto')
-theme.setColorScheme('blue' | 'green' | 'purple' | 'orange' | 'red')
-theme.setFontSize('small' | 'medium' | 'large')
-theme.setAnimations(true | false)
-theme.updateSettings({ mode: 'dark', colorScheme: 'purple' })
+theme.setMode('dark' | 'light' | 'auto');
+theme.setColorScheme('blue' | 'green' | 'purple' | 'orange' | 'red');
+theme.setFontSize('small' | 'medium' | 'large');
+theme.setAnimations(true | false);
+theme.updateSettings({ mode: 'dark', colorScheme: 'purple' });
 ```
 
 ### ThemeManager Tulajdonságok
 
 ```typescript
-theme.settings          // Aktuális beállítások
-theme.effectiveMode     // 'light' vagy 'dark' (auto esetén a rendszer alapján)
-theme.isDark            // boolean
-theme.isLight           // boolean
-theme.cssClasses        // "dark scheme-blue font-medium"
-theme.cssVariables      // { '--color-primary': '#3b82f6', ... }
+theme.settings; // Aktuális beállítások
+theme.effectiveMode; // 'light' vagy 'dark' (auto esetén a rendszer alapján)
+theme.isDark; // boolean
+theme.isLight; // boolean
+theme.cssClasses; // "dark scheme-blue font-medium"
+theme.cssVariables; // { '--color-primary': '#3b82f6', ... }
 ```
 
 ### CSS Változók
@@ -148,10 +148,12 @@ theme.cssVariables      // { '--color-primary': '#3b82f6', ... }
 ### Azonnal használható:
 
 1. **Taskbar-ba téma váltó gomb**
+
    ```svelte
    <script>
    	import { ThemeToggle } from '$lib';
    </script>
+
    <ThemeToggle />
    ```
 
@@ -208,7 +210,7 @@ theme.cssVariables      // { '--color-primary': '#3b82f6', ... }
 	.settings-app {
 		padding: 20px;
 	}
-	
+
 	:global(#desktop.dark) .settings-app {
 		color: white;
 	}

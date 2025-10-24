@@ -1,6 +1,6 @@
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
-    import '../appAdmin.css';
+	import '../appAdmin.css';
 	import './protected.css';
 	import Desktop from '$lib/components/core/Desktop.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';

@@ -1,12 +1,12 @@
-import { type Auth } from '@/lib/auth'
-import { type DB } from '@/database'
-import { type UserSchema, users, userGroups } from '@/database/schemas'
-import { seedConfig } from '@/database/seedConfig'
-import { eq } from 'drizzle-orm'
+import { auth } from '$lib/auth';
+import { type DB } from '$lib/server/database';
+import { type UserSchema, users, userGroups } from '$lib/server/database/schemas';
+import { seedConfig } from '$lib/server/database/seedConfig';
+import { eq } from 'drizzle-orm';
 
-import { faker } from '@faker-js/faker'
+import { faker } from '@faker-js/faker';
 
-type mockUser = Omit<Extract<UserSchema, { mode: 'signUp' }>, 'mode'>
+type mockUser = Omit<Extract<UserSchema, { mode: 'signUp' }>, 'mode'>;
 
 /**
  * Véletlenszerű nevekkel, jelszavakkal és e-mail címekkel rendelkező mock felhasználók listáját generálja.
@@ -14,18 +14,19 @@ type mockUser = Omit<Extract<UserSchema, { mode: 'signUp' }>, 'mode'>
  * @returns {mockUser[]} Mock felhasználói objektumok tömbje.
  */
 const mock = (): mockUser[] => {
-	const data: mockUser[] = []
+	const data: mockUser[] = [];
 
-	for (let i = 0; i < seedConfig.users.count; i++) {
+	for (let i = 0; i < 10; i++) {
+		// Default to 10 mock users
 		data.push({
 			name: faker.person.fullName(),
 			password: faker.internet.password({ memorable: true, length: 10 }),
-			email: faker.internet.email(),
-		})
+			email: faker.internet.email()
+		});
 	}
 
-	return data
-}
+	return data;
+};
 
 /**
  * Ellenőrzötté tesz egy felhasználót és hozzárendeli egy csoporthoz.
@@ -35,12 +36,12 @@ const mock = (): mockUser[] => {
  * @param groupId - A csoport azonosítója, amelyhez a felhasználót hozzá kell rendelni.
  */
 const updateUserAndAssignGroup = async (db: DB, userId: number, groupId: number) => {
-	await db.update(users).set({ emailVerified: true }).where(eq(users.id, userId))
+	await db.update(users).set({ emailVerified: true }).where(eq(users.id, userId));
 	await db.insert(userGroups).values({
 		userId,
-		groupId,
-	})
-}
+		groupId
+	});
+};
 
 /**
  * Létrehoz egy rendszergazda felhasználót és hozzárendeli a rendszergazda csoporthoz.
@@ -48,23 +49,26 @@ const updateUserAndAssignGroup = async (db: DB, userId: number, groupId: number)
  * @param auth - Az auth példány.
  * @param db - Az adatbázis példány.
  *
- * @returns {Promise<{ user?: { id: number } }>} A signUpEmail hívás eredménye.
+ * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
  */
-const addSysAdmin = async (auth: Auth, db: DB): Promise<{ user?: { id: number } }> => {
+const addSysAdmin = async (
+	authInstance: typeof auth,
+	db: DB
+): Promise<{ user?: { id: string } }> => {
 	const { user } = await auth.api.signUpEmail({
 		body: {
 			name: seedConfig.users.sysadmin.name,
 			email: seedConfig.users.sysadmin.email,
-			password: seedConfig.users.sysadmin.password,
-		},
-	})
+			password: seedConfig.users.sysadmin.password
+		}
+	});
 
 	if (user) {
-		await updateUserAndAssignGroup(db, user.id, seedConfig.users.sysadmin.groupId)
+		await updateUserAndAssignGroup(db, parseInt(user.id), seedConfig.users.sysadmin.groupId);
 	}
 
-	return { user }
-}
+	return { user };
+};
 
 /**
  * Létrehoz egy admin felhasználót és hozzárendeli az admin csoporthoz.
@@ -72,23 +76,23 @@ const addSysAdmin = async (auth: Auth, db: DB): Promise<{ user?: { id: number } 
  * @param auth - Az auth példány.
  * @param db - Az adatbázis példány.
  *
- * @returns {Promise<{ user?: { id: number } }>} A signUpEmail hívás eredménye.
+ * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
  */
-const addAdmin = async (auth: Auth, db: DB): Promise<{ user?: { id: number } }> => {
-	const { user } = await auth.api.signUpEmail({
+const addAdmin = async (authInstance: typeof auth, db: DB): Promise<{ user?: { id: string } }> => {
+	const { user } = await authInstance.api.signUpEmail({
 		body: {
 			name: seedConfig.users.admin.name,
 			email: seedConfig.users.admin.email,
-			password: seedConfig.users.admin.password,
-		},
-	})
+			password: seedConfig.users.admin.password
+		}
+	});
 
 	if (user) {
-		await updateUserAndAssignGroup(db, user.id, seedConfig.users.admin.groupId)
+		await updateUserAndAssignGroup(db, parseInt(user.id), seedConfig.users.admin.groupId);
 	}
 
-	return { user }
-}
+	return { user };
+};
 
 /**
  * Létrehoz egy tartalomszerkesztő felhasználót és hozzárendeli a tartalomszerkesztő csoporthoz.
@@ -96,23 +100,26 @@ const addAdmin = async (auth: Auth, db: DB): Promise<{ user?: { id: number } }> 
  * @param auth - Az auth példány.
  * @param db - Az adatbázis példány.
  *
- * @returns {Promise<{ user?: { id: number } }>} A signUpEmail hívás eredménye.
+ * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
  */
-const addContentEditor = async (auth: Auth, db: DB): Promise<{ user?: { id: number } }> => {
-	const { user } = await auth.api.signUpEmail({
+const addContentEditor = async (
+	authInstance: typeof auth,
+	db: DB
+): Promise<{ user?: { id: string } }> => {
+	const { user } = await authInstance.api.signUpEmail({
 		body: {
 			name: seedConfig.users.content_editor.name,
 			email: seedConfig.users.content_editor.email,
-			password: seedConfig.users.content_editor.password,
-		},
-	})
+			password: seedConfig.users.content_editor.password
+		}
+	});
 
 	if (user) {
-		await updateUserAndAssignGroup(db, parseInt(user.id), seedConfig.users.content_editor.groupId)
+		await updateUserAndAssignGroup(db, parseInt(user.id), seedConfig.users.content_editor.groupId);
 	}
 
-	return { user }
-}
+	return { user };
+};
 
 /**
  * Létrehoz egy nyilvános felhasználót és hozzárendeli a nyilvános felhasználói csoporthoz.
@@ -121,23 +128,23 @@ const addContentEditor = async (auth: Auth, db: DB): Promise<{ user?: { id: numb
  * @param db - Az adatbázis példány.
  * @param user - A létrehozandó mock felhasználó.
  *
- * @returns {Promise<{ user?: { id: number } }>} A signUpEmail hívás eredménye.
+ * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
  */
 const addPublicUser = async (
-	auth: Auth,
+	authInstance: typeof auth,
 	db: DB,
-	mockUser: mockUser,
-): Promise<{ user?: { id: number } }> => {
-	const { user } = await auth.api.signUpEmail({
-		body: mockUser,
-	})
+	mockUser: mockUser
+): Promise<{ user?: { id: string } }> => {
+	const { user } = await authInstance.api.signUpEmail({
+		body: mockUser
+	});
 
 	if (user) {
-		await updateUserAndAssignGroup(db, user.id, seedConfig.users.public_user.groupId)
+		await updateUserAndAssignGroup(db, parseInt(user.id), seedConfig.users.public_user.groupId);
 	}
 
-	return { user }
-}
+	return { user };
+};
 
 /**
  * Feltölti az adatbázist felhasználókkal.
@@ -152,17 +159,17 @@ const addPublicUser = async (
  * @param db - Az adatbázis példány.
  * @param publicUserCount - A létrehozandó nyilvános felhasználók száma.
  */
-export async function seed(auth: Auth, db: DB, publicUserCount: number = 0) {
-	const sysAdminUser = await addSysAdmin(auth, db)
+export async function seed(authInstance: typeof auth, db: DB, publicUserCount: number = 0) {
+	const sysAdminUser = await addSysAdmin(authInstance, db);
 
 	if (sysAdminUser.user) {
-		await addAdmin(auth, db)
-		await addContentEditor(auth, db)
+		await addAdmin(authInstance, db);
+		await addContentEditor(authInstance, db);
 
 		if (publicUserCount > 0) {
-			const mockUsers = mock()
+			const mockUsers = mock();
 			for (const user of mockUsers) {
-				await addPublicUser(auth, db, user)
+				await addPublicUser(authInstance, db, user);
 			}
 		}
 	}

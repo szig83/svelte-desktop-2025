@@ -3,7 +3,7 @@ import { type ThemeSettings, type ThemeMode, DEFAULT_THEME_SETTINGS } from '$lib
 
 const THEME_STORAGE_KEY = 'desktop-theme-settings';
 
-class ThemeManager {
+export class ThemeManager {
 	settings = $state<ThemeSettings>({ ...DEFAULT_THEME_SETTINGS });
 	private mediaQuery: MediaQueryList | null = null;
 

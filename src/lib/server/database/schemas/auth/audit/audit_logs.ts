@@ -1,7 +1,7 @@
-import { serial, integer, varchar, text, timestamp, jsonb, inet } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations } from 'drizzle-orm'
-import { users } from '../users/users'
-import { authSchema as schema } from '../schema'
+import { serial, integer, varchar, text, timestamp, jsonb, inet } from 'drizzle-orm/pg-core';
+import { relations as drizzleRelations } from 'drizzle-orm';
+import { users } from '../users/users';
+import { authSchema as schema } from '../schema';
 
 const auditLogs = schema.table('audit_logs', {
 	id: serial('id').primaryKey(),
@@ -13,14 +13,14 @@ const auditLogs = schema.table('audit_logs', {
 	newValues: jsonb('new_values'),
 	ipAddress: inet('ip_address'),
 	userAgent: text('user_agent'),
-	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-})
+	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow()
+});
 
 const relations = drizzleRelations(auditLogs, ({ one }) => ({
 	user: one(users, {
 		fields: [auditLogs.userId],
-		references: [users.id],
-	}),
-}))
+		references: [users.id]
+	})
+}));
 
-export { auditLogs, relations }
+export { auditLogs, relations };

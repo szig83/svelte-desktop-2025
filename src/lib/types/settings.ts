@@ -1,7 +1,9 @@
-import type { ThemeSettings } from './theme';
+import type { ThemeSettings } from './theme.js';
+import type { BackgroundType, TaskbarPosition } from '../constants.js';
+import { APP_CONSTANTS, DEFAULTS } from '../constants.js';
 
 export interface BackgroundSettings {
-	type: 'video' | 'image' | 'color';
+	type: BackgroundType;
 	value: string;
 }
 
@@ -10,23 +12,15 @@ export interface UserSettings {
 	screenshotThumbnailHeight: number;
 	preferPerformance: boolean;
 	background: BackgroundSettings;
-	taskbarPosition: 'top' | 'bottom' | 'left' | 'right';
+	taskbarPosition: TaskbarPosition;
 	theme: ThemeSettings;
 }
 
 export const DEFAULT_USER_SETTINGS: UserSettings = {
 	windowPreview: true,
-	screenshotThumbnailHeight: 200,
+	screenshotThumbnailHeight: APP_CONSTANTS.DEFAULT_SCREENSHOT_HEIGHT,
 	preferPerformance: false,
-	background: {
-		type: 'video',
-		value: 'bg-video.mp4'
-	},
-	taskbarPosition: 'bottom',
-	theme: {
-		mode: 'dark',
-		modeTaskbarStartMenu: 'dark',
-		colorPrimaryHue: '225',
-		fontSize: 'medium'
-	}
+	background: DEFAULTS.BACKGROUND,
+	taskbarPosition: DEFAULTS.TASKBAR.position,
+	theme: DEFAULTS.THEME
 };
