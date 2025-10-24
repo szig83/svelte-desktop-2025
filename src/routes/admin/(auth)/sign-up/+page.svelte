@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth/client';
+	import { sendWelcomeEmail } from '$lib/auth/email.remote';
 	import { writable, derived } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
@@ -201,9 +202,20 @@
 					callbackURL: '/admin'
 				},
 				{
-					onSuccess() {
-						// Registration successful - user will be redirected via callbackURL
-						console.log('Registration successful');
+					async onSuccess() {
+						// Registration successful - send welcome email
+						console.log('Registration successful, sending welcome email...');
+
+						try {
+							await sendWelcomeEmail({
+								name: $name,
+								email: $email
+							});
+							console.log('Welcome email sent successfully');
+						} catch (emailError) {
+							// Don't fail the registration if email fails
+							console.error('Failed to send welcome email:', emailError);
+						}
 					},
 					onError(context) {
 						// Handle registration errors with comprehensive error mapping
@@ -493,7 +505,17 @@
 				{$isLoading ? 'Creating Account...' : 'Create Account'}
 			</Button>
 
-			<Button variant="outline" class="w-full" disabled={$isLoading} onclick={handleGoogleSignUp}>
+			<Button
+				variant="outline"
+				class="w-full"
+				disabled={$isLoading}
+				onclick={async () => {
+					await authClient.signIn.social({
+						provider: 'google',
+						callbackURL: '/admin'
+					});
+				}}
+			>
 				Sign up with Google
 			</Button>
 		</div>

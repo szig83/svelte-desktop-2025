@@ -32,7 +32,7 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		requireEmailVerification: false,
-		disableSignUp: true
+		disableSignUp: false
 	},
 	socialProviders: {
 		google: {
