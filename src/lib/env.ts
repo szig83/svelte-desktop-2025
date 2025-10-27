@@ -49,7 +49,56 @@ const envSchema = v.object({
 			v.transform((s) => s === 'true')
 		)
 	),
-	EMAIL_LOG_LEVEL: v.optional(v.picklist(['debug', 'info', 'warn', 'error']))
+	EMAIL_LOG_LEVEL: v.optional(v.picklist(['debug', 'info', 'warn', 'error'])),
+
+	// Email Verification Configuration
+	REQUIRE_EMAIL_VERIFICATION: v.optional(
+		v.pipe(
+			v.string(),
+			v.transform((s) => s === 'true')
+		),
+		() => 'true'
+	),
+	EMAIL_VERIFICATION_EXPIRES_IN: v.optional(
+		v.pipe(
+			v.string(),
+			v.transform(Number),
+			v.check((n) => n > 0 && n <= 604800) // Max 7 days
+		),
+		() => '86400' // 24 hours default
+	),
+	AUTO_SIGNIN_AFTER_VERIFICATION: v.optional(
+		v.pipe(
+			v.string(),
+			v.transform((s) => s === 'true')
+		),
+		() => 'false'
+	),
+
+	// Feature Flags
+	VERIFICATION_FEATURE_ENABLED: v.optional(
+		v.pipe(
+			v.string(),
+			v.transform((s) => s === 'true')
+		),
+		() => 'true'
+	),
+	VERIFICATION_NEW_USERS_ONLY: v.optional(
+		v.pipe(
+			v.string(),
+			v.transform((s) => s === 'true')
+		),
+		() => 'false'
+	),
+	VERIFICATION_ROLLOUT_PERCENTAGE: v.optional(
+		v.pipe(
+			v.string(),
+			v.transform(Number),
+			v.check((n) => n >= 0 && n <= 100)
+		),
+		() => '100'
+	),
+	VERIFICATION_ROLLOUT_START_DATE: v.optional(v.string())
 });
 
 // Típus generálása a schemából
@@ -173,7 +222,14 @@ function validateEnv(): Env {
 			AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
 			AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
 			EMAIL_TEST_MODE: process.env.EMAIL_TEST_MODE,
-			EMAIL_LOG_LEVEL: process.env.EMAIL_LOG_LEVEL
+			EMAIL_LOG_LEVEL: process.env.EMAIL_LOG_LEVEL,
+			REQUIRE_EMAIL_VERIFICATION: process.env.REQUIRE_EMAIL_VERIFICATION,
+			EMAIL_VERIFICATION_EXPIRES_IN: process.env.EMAIL_VERIFICATION_EXPIRES_IN,
+			AUTO_SIGNIN_AFTER_VERIFICATION: process.env.AUTO_SIGNIN_AFTER_VERIFICATION,
+			VERIFICATION_FEATURE_ENABLED: process.env.VERIFICATION_FEATURE_ENABLED,
+			VERIFICATION_NEW_USERS_ONLY: process.env.VERIFICATION_NEW_USERS_ONLY,
+			VERIFICATION_ROLLOUT_PERCENTAGE: process.env.VERIFICATION_ROLLOUT_PERCENTAGE,
+			VERIFICATION_ROLLOUT_START_DATE: process.env.VERIFICATION_ROLLOUT_START_DATE
 		});
 
 		// Provider-specifikus validáció

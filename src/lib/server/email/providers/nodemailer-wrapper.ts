@@ -23,19 +23,19 @@ export async function getNodemailer() {
 				keys: Object.keys(nm)
 			});
 
-			if (nm.default?.createTransport) {
+			if (nm.default && typeof nm.default.createTransport === 'function') {
 				nodemailerInstance = nm.default;
 				console.log('✅ Using nm.default');
 				return nodemailerInstance;
 			}
 
-			if (nm.createTransport) {
+			if (nm && typeof nm.createTransport === 'function') {
 				nodemailerInstance = nm;
 				console.log('✅ Using nm directly');
 				return nodemailerInstance;
 			}
 		} catch (esmError) {
-			console.log('ESM import failed:', esmError.message);
+			console.log('ESM import failed:', (esmError as Error).message);
 		}
 
 		// Method 2: Dynamic require
@@ -56,7 +56,7 @@ export async function getNodemailer() {
 				return nodemailerInstance;
 			}
 		} catch (requireError) {
-			console.log('Require import failed:', requireError.message);
+			console.log('Require import failed:', (requireError as Error).message);
 		}
 
 		throw new Error('All nodemailer import methods failed');

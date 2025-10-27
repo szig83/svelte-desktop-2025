@@ -7,6 +7,8 @@ import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { getRequestEvent } from '$app/server';
 import { eq } from 'drizzle-orm';
 import { customSession } from 'better-auth/plugins';
+import { EmailManager } from '$lib/server/email/manager';
+import { EmailTemplateType } from '$lib/server/email/types';
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -31,8 +33,30 @@ export const auth = betterAuth({
 	},
 	emailAndPassword: {
 		enabled: true,
-		requireEmailVerification: false,
+		requireEmailVerification: true,
 		disableSignUp: false
+	},
+	emailVerification: {
+		sendVerificationEmail: async ({ user, url, token }) => {
+			const emailManager = new EmailManager();
+
+			const result = await emailManager.sendTemplatedEmail({
+				to: user.email,
+				template: EmailTemplateType.EMAIL_VERIFICATION,
+				data: {
+					name: user.name || user.email.split('@')[0],
+					email: user.email,
+					verificationUrl: url,
+					token: token,
+					appName: 'Desktop Environment',
+					expirationTime: '24 óra'
+				}
+			});
+
+			if (!result.success) {
+				throw new Error('Email küldése sikertelen');
+			}
+		}
 	},
 	socialProviders: {
 		google: {

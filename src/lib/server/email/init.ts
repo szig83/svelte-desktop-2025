@@ -33,7 +33,7 @@ function createEmailConfig(): EmailConfig {
 
 	// Base configuration
 	const baseConfig = {
-		testMode: env.EMAIL_TEST_MODE === 'true',
+		testMode: env.EMAIL_TEST_MODE || false,
 		logLevel: env.EMAIL_LOG_LEVEL || (env.NODE_ENV === 'development' ? 'debug' : 'info'),
 		retryAttempts: 3,
 		retryDelay: 1000

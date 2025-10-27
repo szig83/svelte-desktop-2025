@@ -291,10 +291,21 @@ export class EmailManager {
 			}
 
 			// Validate API key with Resend
-			const isValidApiKey = await this.client.validateApiKey();
-			if (!isValidApiKey) {
-				this.log('error', 'Invalid Resend API key');
-				return false;
+			if (
+				this.client &&
+				'validateApiKey' in this.client &&
+				typeof this.client.validateApiKey === 'function'
+			) {
+				try {
+					const isValidApiKey = await this.client.validateApiKey();
+					if (!isValidApiKey) {
+						this.log('error', 'Invalid Resend API key');
+						return false;
+					}
+				} catch (error) {
+					this.log('error', 'Failed to validate API key', error);
+					return false;
+				}
 			}
 
 			// Validate from email format

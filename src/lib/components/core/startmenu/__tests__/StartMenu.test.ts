@@ -171,7 +171,7 @@ async function testSuccessfulAppLoading(): Promise<void> {
 	assert(!mockRegistry.getError(), 'Should have no error after successful load');
 
 	// Simulate app selection
-	mockWindowManager.openWindow(apps[0].appName, apps[0].title, apps[0], apps[0].parameters);
+	mockWindowManager.openWindow(apps[0].appName, apps[0].title, apps[0], apps[0].parameters || {});
 	const openedWindows = mockWindowManager.getOpenedWindows();
 
 	assert(openedWindows.length === 1, 'Should have opened one window');
@@ -358,7 +358,7 @@ async function testAppSelection(): Promise<void> {
 
 	// Simulate selecting multiple apps
 	apps.forEach((app) => {
-		mockWindowManager.openWindow(app.appName, app.title, app, app.parameters);
+		mockWindowManager.openWindow(app.appName, app.title, app, app.parameters || {});
 	});
 
 	const openedWindows = mockWindowManager.getOpenedWindows();

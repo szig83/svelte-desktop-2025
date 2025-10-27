@@ -70,11 +70,11 @@
 	// Validation functions
 	const validateName = (nameValue: string): string => {
 		if (!nameValue.trim()) {
-			return 'Name is required';
+			return 'A név megadása kötelező';
 		}
 
 		if (nameValue.trim().length < 2) {
-			return 'Name must be at least 2 characters long';
+			return 'A névnek legalább 2 karakter hosszúnak kell lennie';
 		}
 
 		return '';
@@ -82,12 +82,12 @@
 
 	const validateEmail = (emailValue: string): string => {
 		if (!emailValue.trim()) {
-			return 'Email is required';
+			return 'Az email cím megadása kötelező';
 		}
 
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(emailValue)) {
-			return 'Please enter a valid email address';
+			return 'Kérjük adjon meg egy érvényes email címet';
 		}
 
 		return '';
@@ -95,11 +95,11 @@
 
 	const validatePassword = (passwordValue: string): string => {
 		if (!passwordValue) {
-			return 'Password is required';
+			return 'A jelszó megadása kötelező';
 		}
 
 		if (passwordValue.length < 8) {
-			return 'Password must be at least 8 characters long';
+			return 'A jelszónak legalább 8 karakter hosszúnak kell lennie';
 		}
 
 		const hasUpperCase = /[A-Z]/.test(passwordValue);
@@ -108,19 +108,19 @@
 		const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(passwordValue);
 
 		if (!hasUpperCase) {
-			return 'Password must contain at least one uppercase letter';
+			return 'A jelszónak tartalmaznia kell legalább egy nagybetűt';
 		}
 
 		if (!hasLowerCase) {
-			return 'Password must contain at least one lowercase letter';
+			return 'A jelszónak tartalmaznia kell legalább egy kisbetűt';
 		}
 
 		if (!hasNumbers) {
-			return 'Password must contain at least one number';
+			return 'A jelszónak tartalmaznia kell legalább egy számot';
 		}
 
 		if (!hasSpecialChar) {
-			return 'Password must contain at least one special character';
+			return 'A jelszónak tartalmaznia kell legalább egy speciális karaktert';
 		}
 
 		return '';
@@ -128,11 +128,11 @@
 
 	const validatePasswordMatch = (passwordValue: string, confirmPasswordValue: string): string => {
 		if (!confirmPasswordValue) {
-			return 'Please confirm your password';
+			return 'Kérjük erősítse meg a jelszót';
 		}
 
 		if (passwordValue !== confirmPasswordValue) {
-			return 'Passwords do not match';
+			return 'A jelszavak nem egyeznek';
 		}
 
 		return '';
@@ -182,6 +182,10 @@
 		return !nameError && !emailError && !passwordError && !confirmPasswordError;
 	};
 
+	// Success state for showing verification message
+	let registrationSuccess = false;
+	let registeredEmail = '';
+
 	const handleSignUp = async () => {
 		// Clear any previous general errors
 		setFieldError('general', '');
@@ -203,8 +207,10 @@
 				},
 				{
 					async onSuccess() {
-						// Registration successful - send welcome email
-						console.log('Registration successful, sending welcome email...');
+						// Registration successful - show verification message
+						console.log('Registration successful, verification email sent');
+						registrationSuccess = true;
+						registeredEmail = $email;
 
 						try {
 							await sendWelcomeEmail({
@@ -232,7 +238,7 @@
 						) {
 							setFieldError(
 								'general',
-								'An account with this email address already exists. Please try signing in instead.'
+								'Ezzel az email címmel már létezik fiók. Kérjük próbáljon bejelentkezni helyette.'
 							);
 							return;
 						}
@@ -246,7 +252,7 @@
 						) {
 							setFieldError(
 								'general',
-								'Unable to create account due to network issues. Please check your internet connection and try again.'
+								'Hálózati hiba miatt nem sikerült létrehozni a fiókot. Kérjük ellenőrizze az internetkapcsolatot és próbálja újra.'
 							);
 							return;
 						}
@@ -336,193 +342,291 @@
 
 <Card.Root class="mx-auto max-w-sm">
 	<Card.Header>
-		<Card.Title class="text-2xl">Create Account</Card.Title>
-		<Card.Description>Enter your details below to create your account</Card.Description>
+		<Card.Title class="text-2xl">
+			{registrationSuccess ? 'Ellenőrizze az emailjét' : 'Fiók létrehozása'}
+		</Card.Title>
+		<Card.Description>
+			{registrationSuccess
+				? 'Megerősítő emailt küldtünk az Ön email címére'
+				: 'Adja meg az adatait a fiók létrehozásához'}
+		</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<div class="grid gap-4">
-			{#if $errors.general}
+		{#if registrationSuccess}
+			<div class="space-y-4 text-center">
 				<div
-					class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
+					class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900"
 				>
-					<div class="flex items-center gap-2">
-						<svg class="h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						<span>{$errors.general}</span>
+					<svg
+						class="h-6 w-6 text-green-600 dark:text-green-400"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M5 13l4 4L19 7"
+						/>
+					</svg>
+				</div>
+
+				<div class="space-y-2">
+					<h3 class="text-lg font-medium">Fiók sikeresen létrehozva!</h3>
+					<p class="text-sm text-gray-600 dark:text-gray-400">
+						Megerősítő emailt küldtünk a <strong>{registeredEmail}</strong> címre.
+					</p>
+				</div>
+
+				<div class="rounded-md bg-blue-50 p-4 text-sm dark:bg-blue-950">
+					<div class="flex items-start gap-3">
+						<div class="shrink-0">
+							<svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+						</div>
+						<div class="text-blue-800 dark:text-blue-200">
+							<p class="mb-2 font-medium">Következő lépések:</p>
+							<ol class="list-inside list-decimal space-y-1 text-xs">
+								<li>Ellenőrizze a postafiókját (beleértve a spam mappát is)</li>
+								<li>Kattintson a megerősítő linkre az emailben</li>
+								<li>Ezután bejelentkezhet a fiókjába</li>
+							</ol>
+							<p class="mt-2 text-xs font-medium">
+								⚠️ A bejelentkezéshez kötelező az email cím megerősítése!
+							</p>
+						</div>
 					</div>
 				</div>
-			{/if}
 
-			<div class="grid gap-2">
-				<Label for="name">Full Name</Label>
-				<Input
-					id="name"
-					type="text"
-					placeholder="John Doe"
-					required
-					bind:value={$name}
-					onblur={handleNameValidation}
-					oninput={() => {
-						// Clear error on input to provide immediate feedback
-						if ($errors.name) {
-							setFieldError('name', '');
-						}
-					}}
-					class={$errors.name
-						? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-						: $name && !$errors.name
-							? 'border-green-500'
-							: ''}
-				/>
-				{#if $errors.name}
-					<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
-						<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+				<div class="space-y-2">
+					<Button class="w-full" onclick={() => (window.location.href = '/resend-verification')}>
+						Nem kapta meg az emailt?
+					</Button>
+					<Button
+						variant="outline"
+						class="w-full"
+						onclick={() => (window.location.href = '/admin/sign-in?registered=true')}
+					>
+						Vissza a bejelentkezéshez
+					</Button>
+				</div>
+
+				<p class="text-xs text-gray-500">Ellenőrizze a spam mappát is, ha nem látja az emailt.</p>
+			</div>
+		{:else}
+			<div class="grid gap-4">
+				<!-- Email verification requirement notice -->
+				<div class="rounded-md bg-amber-50 p-3 text-sm dark:bg-amber-950">
+					<div class="flex items-start gap-2">
+						<svg
+							class="mt-0.5 h-4 w-4 shrink-0 text-amber-400"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
 							<path
 								fill-rule="evenodd"
-								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
+								d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
 								clip-rule="evenodd"
 							/>
 						</svg>
-						<span>{$errors.name}</span>
+						<div class="text-amber-800 dark:text-amber-200">
+							<p class="font-medium">Email megerősítés szükséges</p>
+							<p class="mt-1 text-xs">
+								A regisztráció után megerősítő emailt fog kapni. A bejelentkezéshez kötelező az
+								email cím megerősítése.
+							</p>
+						</div>
+					</div>
+				</div>
+				{#if $errors.general}
+					<div
+						class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
+					>
+						<div class="flex items-center gap-2">
+							<svg class="h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path
+									fill-rule="evenodd"
+									d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							<span>{$errors.general}</span>
+						</div>
 					</div>
 				{/if}
-			</div>
 
-			<div class="grid gap-2">
-				<Label for="email">Email</Label>
-				<Input
-					id="email"
-					type="email"
-					placeholder="m@example.com"
-					required
-					bind:value={$email}
-					onblur={handleEmailValidation}
-					oninput={() => {
-						// Clear error on input to provide immediate feedback
-						if ($errors.email) {
-							setFieldError('email', '');
-						}
+				<div class="grid gap-2">
+					<Label for="name">Teljes név</Label>
+					<Input
+						id="name"
+						type="text"
+						placeholder="Kovács János"
+						required
+						bind:value={$name}
+						onblur={handleNameValidation}
+						oninput={() => {
+							// Clear error on input to provide immediate feedback
+							if ($errors.name) {
+								setFieldError('name', '');
+							}
+						}}
+						class={$errors.name
+							? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+							: $name && !$errors.name
+								? 'border-green-500'
+								: ''}
+					/>
+					{#if $errors.name}
+						<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+							<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							<span>{$errors.name}</span>
+						</div>
+					{/if}
+				</div>
+
+				<div class="grid gap-2">
+					<Label for="email">Email cím</Label>
+					<Input
+						id="email"
+						type="email"
+						placeholder="pelda@email.com"
+						required
+						bind:value={$email}
+						onblur={handleEmailValidation}
+						oninput={() => {
+							// Clear error on input to provide immediate feedback
+							if ($errors.email) {
+								setFieldError('email', '');
+							}
+						}}
+						class={$errors.email
+							? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+							: $email && !$errors.email
+								? 'border-green-500'
+								: ''}
+					/>
+					{#if $errors.email}
+						<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+							<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							<span>{$errors.email}</span>
+						</div>
+					{/if}
+				</div>
+
+				<div class="grid gap-2">
+					<Label for="password">Jelszó</Label>
+					<Input
+						id="password"
+						type="password"
+						required
+						bind:value={$password}
+						onblur={handlePasswordValidation}
+						oninput={() => {
+							// Clear error on input to provide immediate feedback
+							if ($errors.password) {
+								setFieldError('password', '');
+							}
+						}}
+						class={$errors.password
+							? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+							: $password && !$errors.password
+								? 'border-green-500'
+								: ''}
+					/>
+					{#if $errors.password}
+						<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+							<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							<span>{$errors.password}</span>
+						</div>
+					{/if}
+				</div>
+
+				<div class="grid gap-2">
+					<Label for="confirmPassword">Jelszó megerősítése</Label>
+					<Input
+						id="confirmPassword"
+						type="password"
+						required
+						bind:value={$confirmPassword}
+						onblur={handleConfirmPasswordValidation}
+						oninput={() => {
+							// Clear error on input to provide immediate feedback
+							if ($errors.confirmPassword) {
+								setFieldError('confirmPassword', '');
+							}
+						}}
+						class={$errors.confirmPassword
+							? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+							: $confirmPassword && !$errors.confirmPassword
+								? 'border-green-500'
+								: ''}
+					/>
+					{#if $errors.confirmPassword}
+						<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+							<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							<span>{$errors.confirmPassword}</span>
+						</div>
+					{/if}
+				</div>
+
+				<Button
+					type="button"
+					class="w-full"
+					onclick={handleSignUp}
+					disabled={$isLoading || !$isFormValid}
+				>
+					{$isLoading ? 'Fiók létrehozása...' : 'Fiók létrehozása'}
+				</Button>
+
+				<Button
+					variant="outline"
+					class="w-full"
+					disabled={$isLoading}
+					onclick={async () => {
+						await authClient.signIn.social({
+							provider: 'google',
+							callbackURL: '/admin'
+						});
 					}}
-					class={$errors.email
-						? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-						: $email && !$errors.email
-							? 'border-green-500'
-							: ''}
-				/>
-				{#if $errors.email}
-					<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
-						<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						<span>{$errors.email}</span>
-					</div>
-				{/if}
+				>
+					Regisztráció Google-lel
+				</Button>
 			</div>
 
-			<div class="grid gap-2">
-				<Label for="password">Password</Label>
-				<Input
-					id="password"
-					type="password"
-					required
-					bind:value={$password}
-					onblur={handlePasswordValidation}
-					oninput={() => {
-						// Clear error on input to provide immediate feedback
-						if ($errors.password) {
-							setFieldError('password', '');
-						}
-					}}
-					class={$errors.password
-						? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-						: $password && !$errors.password
-							? 'border-green-500'
-							: ''}
-				/>
-				{#if $errors.password}
-					<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
-						<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						<span>{$errors.password}</span>
-					</div>
-				{/if}
+			<div class="mt-4 text-center text-sm">
+				Már van fiókja?
+				<a href="/admin/sign-in" class="underline">Bejelentkezés</a>
 			</div>
-
-			<div class="grid gap-2">
-				<Label for="confirmPassword">Confirm Password</Label>
-				<Input
-					id="confirmPassword"
-					type="password"
-					required
-					bind:value={$confirmPassword}
-					onblur={handleConfirmPasswordValidation}
-					oninput={() => {
-						// Clear error on input to provide immediate feedback
-						if ($errors.confirmPassword) {
-							setFieldError('confirmPassword', '');
-						}
-					}}
-					class={$errors.confirmPassword
-						? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-						: $confirmPassword && !$errors.confirmPassword
-							? 'border-green-500'
-							: ''}
-				/>
-				{#if $errors.confirmPassword}
-					<div class="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
-						<svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zM9.25 15a.75.75 0 011.5 0v.01a.75.75 0 01-1.5 0V15z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						<span>{$errors.confirmPassword}</span>
-					</div>
-				{/if}
-			</div>
-
-			<Button
-				type="button"
-				class="w-full"
-				onclick={handleSignUp}
-				disabled={$isLoading || !$isFormValid}
-			>
-				{$isLoading ? 'Creating Account...' : 'Create Account'}
-			</Button>
-
-			<Button
-				variant="outline"
-				class="w-full"
-				disabled={$isLoading}
-				onclick={async () => {
-					await authClient.signIn.social({
-						provider: 'google',
-						callbackURL: '/admin'
-					});
-				}}
-			>
-				Sign up with Google
-			</Button>
-		</div>
-
-		<div class="mt-4 text-center text-sm">
-			Already have an account?
-			<a href="/admin/sign-in" class="underline">Sign in</a>
-		</div>
+		{/if}
 	</Card.Content>
 </Card.Root>

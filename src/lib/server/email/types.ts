@@ -43,7 +43,8 @@ export interface EmailResult {
 export enum EmailTemplateType {
 	WELCOME = 'welcome',
 	PASSWORD_RESET = 'password_reset',
-	NOTIFICATION = 'notification'
+	NOTIFICATION = 'notification',
+	EMAIL_VERIFICATION = 'email_verification'
 }
 
 export interface TemplatedEmailParams {

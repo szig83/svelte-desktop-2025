@@ -476,5 +476,139 @@ Manage notification preferences: {{unsubscribeUrl}}
 		`,
 		requiredData: ['name', 'email', 'title', 'message', 'appName', 'type'],
 		optionalData: ['details', 'actionUrl', 'actionText', 'timestamp', 'priority', 'unsubscribeUrl']
+	},
+
+	[EmailTemplateType.EMAIL_VERIFICATION]: {
+		subject: 'Erősítsd meg az email címed - {{appName}}',
+		htmlTemplate: `
+			<!DOCTYPE html>
+			<html>
+			<head>
+				<meta charset="utf-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Email megerősítés - {{appName}}</title>
+				<style>
+					body {
+						font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+						line-height: 1.6;
+						color: #333;
+						max-width: 600px;
+						margin: 0 auto;
+						padding: 20px;
+					}
+					.header {
+						text-align: center;
+						padding: 20px 0;
+						border-bottom: 2px solid #f0f0f0;
+						margin-bottom: 30px;
+					}
+					.logo {
+						font-size: 24px;
+						font-weight: bold;
+						color: #2563eb;
+					}
+					.content {
+						padding: 20px 0;
+					}
+					.cta-button {
+						display: inline-block;
+						background-color: #16a34a;
+						color: white;
+						padding: 12px 24px;
+						text-decoration: none;
+						border-radius: 6px;
+						margin: 20px 0;
+						font-weight: bold;
+					}
+					.footer {
+						margin-top: 40px;
+						padding-top: 20px;
+						border-top: 1px solid #e5e5e5;
+						font-size: 14px;
+						color: #666;
+						text-align: center;
+					}
+					.security-note {
+						background-color: #f3f4f6;
+						border-radius: 6px;
+						padding: 16px;
+						margin: 20px 0;
+						font-size: 14px;
+					}
+				</style>
+			</head>
+			<body>
+				<div class="header">
+					<div class="logo">{{appName}}</div>
+				</div>
+
+				<div class="content">
+					<h1>Email cím megerősítése</h1>
+
+					<p>
+						Szia {{name}}!
+					</p>
+
+					<p>
+						Köszönjük, hogy regisztráltál a {{appName}} rendszerbe. Az email címed megerősítéséhez kattints az alábbi gombra:
+					</p>
+
+					<p>
+						<a href="{{verificationUrl}}" class="cta-button">Email cím megerősítése</a>
+					</p>
+
+					<p>
+						Ha a gomb nem működik, másold be ezt a linket a böngésződbe:
+					</p>
+
+					<p style="word-break: break-all; background-color: #f9fafb; padding: 10px; border-radius: 4px;">
+						{{verificationUrl}}
+					</p>
+
+					<div class="security-note">
+						<strong>Fontos tudnivalók:</strong>
+						<ul>
+							<li>Ez a link {{expirationTime}} múlva lejár</li>
+							<li>Ha nem te regisztráltál, figyelmen kívül hagyhatod ezt az emailt</li>
+							<li>Soha ne oszd meg ezt a linket senkivel</li>
+						</ul>
+					</div>
+
+					<p>
+						Üdvözlettel,<br>
+						A {{appName}} csapata
+					</p>
+				</div>
+
+				<div class="footer">
+					<p>
+						Ez az email a {{email}} címre lett küldve.
+					</p>
+				</div>
+			</body>
+			</html>
+		`,
+		textTemplate: `
+Email cím megerősítése - {{appName}}
+
+Szia {{name}}!
+
+Köszönjük, hogy regisztráltál a {{appName}} rendszerbe. Az email címed megerősítéséhez látogasd meg ezt a linket:
+
+{{verificationUrl}}
+
+Fontos tudnivalók:
+- Ez a link {{expirationTime}} múlva lejár
+- Ha nem te regisztráltál, figyelmen kívül hagyhatod ezt az emailt
+- Soha ne oszd meg ezt a linket senkivel
+
+Üdvözlettel,
+A {{appName}} csapata
+
+---
+Ez az email a {{email}} címre lett küldve.
+		`,
+		requiredData: ['name', 'email', 'verificationUrl', 'appName'],
+		optionalData: ['expirationTime']
 	}
 };

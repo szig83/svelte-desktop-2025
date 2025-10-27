@@ -55,5 +55,5 @@ export function getVerifiedEmailAddress(): string {
  */
 export function hasVerifiedDomain(): boolean {
 	const fromEmail = env.RESEND_FROM_EMAIL;
-	return !fromEmail.endsWith('@resend.dev');
+	return fromEmail ? !fromEmail.endsWith('@resend.dev') : false;
 }

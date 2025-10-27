@@ -18,10 +18,10 @@ export class ResendClient {
 
 	constructor(config?: Partial<EmailConfig>) {
 		this.config = {
-			apiKey: env.RESEND_API_KEY,
-			fromEmail: env.RESEND_FROM_EMAIL,
-			webhookSecret: env.RESEND_WEBHOOK_SECRET,
-			testMode: env.EMAIL_TEST_MODE === 'true',
+			apiKey: env.RESEND_API_KEY || '',
+			fromEmail: env.RESEND_FROM_EMAIL || '',
+			webhookSecret: env.RESEND_WEBHOOK_SECRET || '',
+			testMode: env.EMAIL_TEST_MODE || false,
 			logLevel: env.EMAIL_LOG_LEVEL ?? 'info',
 			retryAttempts: 3,
 			retryDelay: 1000,
