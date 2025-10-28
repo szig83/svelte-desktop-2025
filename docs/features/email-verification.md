@@ -6,11 +6,49 @@ Az email megerősítés funkció biztosítja, hogy a felhasználók valós email
 
 ## Főbb Funkciók
 
-- **Automatikus email küldés** regisztráció után
+- **Automatikus verification email küldés** regisztráció után
+- **Welcome email küldés** sikeres email megerősítés után
 - **Biztonságos token alapú megerősítés** 24 órás lejárati idővel
 - **Újraküldési lehetőség** rate limiting védelemmel
 - **Többnyelvű támogatás** (magyar)
 - **Rugalmas email szolgáltató integráció** (Resend, SMTP, SendGrid, AWS SES)
+
+## ⚠️ Fontos: Email Küldési Logika
+
+### Welcome Email Időzítése
+
+A rendszer **két különböző emailt** küld a felhasználóknak:
+
+1. **Verification Email** - Regisztráció után azonnal
+2. **Welcome Email** - Csak sikeres email megerősítés után
+
+Ez megakadályozza, hogy a felhasználók egyszerre kapjanak verification és welcome emaileket, ami zavaró lenne.
+
+### Email Küldési Folyamat
+
+```mermaid
+sequenceDiagram
+    participant U as Felhasználó
+    participant R as Regisztráció
+    participant BA as Better Auth
+    participant EM as Email Manager
+    participant V as Verification Oldal
+
+    U->>R: Regisztráció
+    R->>BA: Fiók létrehozás
+    BA->>EM: Verification email küldés
+    EM-->>U: Verification email
+
+    Note over U: Felhasználó megkapja a verification emailt
+
+    U->>V: Kattint verification linkre
+    V->>BA: Token validáció
+    BA-->>V: Sikeres megerősítés
+    V->>EM: Welcome email küldés
+    EM-->>U: Welcome email
+
+    Note over U: Most kapja meg a welcome emailt
+```
 
 ## Architektúra
 

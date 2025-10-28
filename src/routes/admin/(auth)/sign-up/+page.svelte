@@ -212,16 +212,9 @@
 						registrationSuccess = true;
 						registeredEmail = $email;
 
-						try {
-							await sendWelcomeEmail({
-								name: $name,
-								email: $email
-							});
-							console.log('Welcome email sent successfully');
-						} catch (emailError) {
-							// Don't fail the registration if email fails
-							console.error('Failed to send welcome email:', emailError);
-						}
+						// Note: Welcome email will be sent after email verification is completed
+						// This prevents sending both verification and welcome emails at the same time
+						console.log('Welcome email will be sent after email verification');
 					},
 					onError(context) {
 						// Handle registration errors with comprehensive error mapping

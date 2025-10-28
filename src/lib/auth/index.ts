@@ -37,6 +37,7 @@ export const auth = betterAuth({
 		disableSignUp: false
 	},
 	emailVerification: {
+		autoSignInAfterVerification: true,
 		sendVerificationEmail: async ({ user, url, token }) => {
 			const emailManager = new EmailManager();
 
@@ -51,6 +52,29 @@ export const auth = betterAuth({
 					appName: 'Desktop Environment',
 					expirationTime: '24 óra'
 				}
+			});
+
+			if (!result.success) {
+				throw new Error('Email küldése sikertelen');
+			}
+		},
+		async afterEmailVerification(user) {
+			// Your custom logic here, e.g., grant access to premium features
+			console.log(user);
+			const emailManager = new EmailManager();
+
+			const templateData = {
+				name: user.name,
+				email: user.email,
+				appName: 'Desktop Environment (TEST)',
+				dashboardUrl: '/admin',
+				userId: 'test-user-id'
+			};
+
+			const result = await emailManager.sendTemplatedEmail({
+				to: user.email,
+				template: EmailTemplateType.WELCOME,
+				data: templateData
 			});
 
 			if (!result.success) {

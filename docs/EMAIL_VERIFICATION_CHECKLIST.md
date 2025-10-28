@@ -4,6 +4,10 @@
 
 Ez az ellenőrzőlista biztosítja, hogy az email verification funkció megfelelően van implementálva és konfigurálva az alkalmazásban.
 
+## ⚠️ Fontos Változás: Welcome Email Időzítése
+
+**JAVÍTVA**: A welcome email most **csak akkor** kerül elküldésre, amikor a felhasználó **sikeresen megerősítette** az email címét. Ez megakadályozza, hogy egyszerre kapjanak verification és welcome emaileket a regisztráció során.
+
 ## ✅ Implementációs Státusz
 
 ### 1. Email Sablon Típus és Implementáció ✅ KÉSZ

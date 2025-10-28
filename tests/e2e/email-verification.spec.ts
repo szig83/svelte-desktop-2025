@@ -11,6 +11,33 @@ test.describe('Email Verification E2E Flow', () => {
 			});
 		});
 
+		// Mock welcome email sending (called after verification)
+		await page.route('**/api/auth/send-welcome-email', async (route) => {
+			await route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ success: true, message: 'Welcome email sent' })
+			});
+		});
+
+		// Mock session endpoint for getting user info after verification
+		await page.route('**/api/auth/session', async (route) => {
+			await route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({
+					data: {
+						user: {
+							id: '1',
+							name: 'Test User',
+							email: 'test@example.com',
+							emailVerified: true
+						}
+					}
+				})
+			});
+		});
+
 		await page.route('**/api/auth/verify-email*', async (route) => {
 			const url = new URL(route.request().url());
 			const token = url.searchParams.get('token');

@@ -19,6 +19,10 @@ RESEND_API_KEY=re_your_api_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 ```
 
+### ⚠️ Fontos Változás: Welcome Email Időzítése
+
+A welcome email **csak akkor** kerül elküldésre, amikor a felhasználó **sikeresen megerősítette** az email címét. Ez megakadályozza, hogy a felhasználók egyszerre kapjanak verification és welcome emaileket a regisztráció során.
+
 ### 2. Alkalmazás Indítás
 
 ```bash

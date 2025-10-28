@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth/client';
+	import { sendWelcomeEmail } from '$lib/auth/email.remote';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 
@@ -34,6 +35,23 @@
 
 			if (response.ok) {
 				verificationStatus = 'success';
+
+				// Send welcome email after successful verification
+				try {
+					// Get user info from the response or session
+					const session = await authClient.getSession();
+					if (session.data?.user) {
+						await sendWelcomeEmail({
+							name: session.data.user.name || session.data.user.email.split('@')[0],
+							email: session.data.user.email
+						});
+						console.log('Welcome email sent after successful verification');
+					}
+				} catch (emailError) {
+					// Don't fail the verification if welcome email fails
+					console.error('Failed to send welcome email after verification:', emailError);
+				}
+
 				// Redirect after 3 seconds
 				setTimeout(() => {
 					isRedirecting = true;
