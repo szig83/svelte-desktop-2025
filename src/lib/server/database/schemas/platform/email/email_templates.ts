@@ -5,7 +5,7 @@ export const emailTemplates = schema.table(
 	'email_templates',
 	{
 		id: uuid('id').primaryKey().defaultRandom(),
-		type: varchar('type', { length: 100 }).notNull().unique(),
+		type: varchar('template_type', { length: 100 }).notNull().unique(),
 		name: varchar('name', { length: 255 }).notNull(),
 		subjectTemplate: text('subject_template').notNull(),
 		htmlTemplate: text('html_template').notNull(),
@@ -16,11 +16,13 @@ export const emailTemplates = schema.table(
 		createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
 	},
-	(table) => ({
-		// Performance optimization indexes
-		typeIdx: index('email_templates_type_idx').on(table.type),
-		isActiveIdx: index('email_templates_is_active_idx').on(table.isActive),
-		// Composite index for active templates by type
-		typeActiveIdx: index('email_templates_type_active_idx').on(table.type, table.isActive)
-	})
+	(table) => [
+		index('email_templates_type_idx').on(table.type),
+		index('email_templates_is_active_idx').on(table.isActive),
+		index('email_templates_type_active_idx').on(table.type, table.isActive),
+		index('email_templates_active_only_idx').on(table.type, table.updatedAt),
+		index('email_templates_created_at_idx').on(table.createdAt),
+		index('email_templates_updated_at_idx').on(table.updatedAt),
+		index('email_templates_active_type_updated_idx').on(table.isActive, table.type, table.updatedAt)
+	]
 );

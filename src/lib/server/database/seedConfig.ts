@@ -327,8 +327,8 @@ export const groupPermissions = [
 ];
 
 export const providers = {
-	local: {
-		name: 'local',
+	credential: {
+		name: 'credential',
 		enabled: true,
 		config: {
 			allowRegistration: true,

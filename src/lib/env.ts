@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 
 const envSchema = v.object({
-	NODE_ENV: v.picklist(['development', 'production']),
+	NODE_ENV: v.picklist(['development', 'production', 'test']),
 	DB_HOST: v.string(),
 	DB_USER: v.string(),
 	DB_PASSWORD: v.string(),

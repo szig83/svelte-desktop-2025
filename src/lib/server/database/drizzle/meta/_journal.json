@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1761241291336,
-      "tag": "0000_conscious_molten_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1761317891357,
-      "tag": "0001_lowly_fallen_one",
+      "when": 1762188095915,
+      "tag": "0000_dizzy_genesis",
       "breakpoints": true
     }
   ]

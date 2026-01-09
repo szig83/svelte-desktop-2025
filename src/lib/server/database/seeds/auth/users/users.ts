@@ -1,4 +1,4 @@
-import { auth } from '$lib/auth';
+import { authForSeed as auth } from '$lib/auth/seed';
 import { type DB } from '$lib/server/database';
 import { type UserSchema, users, userGroups } from '$lib/server/database/schemas';
 import { seedConfig } from '$lib/server/database/seedConfig';
@@ -47,6 +47,7 @@ const updateUserAndAssignGroup = async (db: DB, userId: number, groupId: number)
  * Létrehoz egy rendszergazda felhasználót és hozzárendeli a rendszergazda csoporthoz.
  *
  * @param auth - Az auth példány.
+ * @param authInstance
  * @param db - Az adatbázis példány.
  *
  * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
@@ -74,6 +75,7 @@ const addSysAdmin = async (
  * Létrehoz egy admin felhasználót és hozzárendeli az admin csoporthoz.
  *
  * @param auth - Az auth példány.
+ * @param authInstance
  * @param db - Az adatbázis példány.
  *
  * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
@@ -98,6 +100,7 @@ const addAdmin = async (authInstance: typeof auth, db: DB): Promise<{ user?: { i
  * Létrehoz egy tartalomszerkesztő felhasználót és hozzárendeli a tartalomszerkesztő csoporthoz.
  *
  * @param auth - Az auth példány.
+ * @param authInstance
  * @param db - Az adatbázis példány.
  *
  * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
@@ -125,9 +128,11 @@ const addContentEditor = async (
  * Létrehoz egy nyilvános felhasználót és hozzárendeli a nyilvános felhasználói csoporthoz.
  *
  * @param auth - Az auth példány.
+ * @param authInstance
  * @param db - Az adatbázis példány.
  * @param user - A létrehozandó mock felhasználó.
  *
+ * @param mockUser
  * @returns {Promise<{ user?: { id: string } }>} A signUpEmail hívás eredménye.
  */
 const addPublicUser = async (
@@ -138,6 +143,8 @@ const addPublicUser = async (
 	const { user } = await authInstance.api.signUpEmail({
 		body: mockUser
 	});
+
+	console.log(mockUser);
 
 	if (user) {
 		await updateUserAndAssignGroup(db, parseInt(user.id), seedConfig.users.public_user.groupId);
@@ -156,6 +163,7 @@ const addPublicUser = async (
  *  4. Ha a darabszám nagyobb mint 0, létrehozza a megadott számú nyilvános felhasználót és hozzárendeli őket a nyilvános felhasználói csoporthoz.
  *
  * @param auth - Az auth példány.
+ * @param authInstance
  * @param db - Az adatbázis példány.
  * @param publicUserCount - A létrehozandó nyilvános felhasználók száma.
  */

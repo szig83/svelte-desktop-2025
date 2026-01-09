@@ -4,10 +4,9 @@ import { providers as providersSeedConfig } from '$lib/server/database/seedConfi
 
 /**
  * Konvertálja a seedConfig szolgáltató adatokat a séma formátumára.
- * Az id mező string helyett number típusú a sémában, illetve elhagyjuk
- * mert a serial típus automatikusan generálódik.
+ * Az id mező automatikusan generálódik (serial), ezért nem adjuk meg.
  */
-const initData = Object.values(providersSeedConfig).map((provider) => ({
+const initData = Object.entries(providersSeedConfig).map(([, provider]) => ({
 	name: provider.name,
 	enabled: provider.enabled,
 	config: provider.config

@@ -1,9 +1,8 @@
 import { serial, integer, varchar, timestamp } from 'drizzle-orm/pg-core';
-import { relations as drizzleRelations } from 'drizzle-orm';
-import { users } from '../users/users';
 import { authSchema as schema } from '../schema';
+import { users } from '../users/users';
 
-const sessions = schema.table('sessions', {
+export const sessions = schema.table('sessions', {
 	id: serial('id').primaryKey(),
 	userId: integer('user_id')
 		.notNull()
@@ -15,12 +14,3 @@ const sessions = schema.table('sessions', {
 	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
 });
-
-const relations = drizzleRelations(sessions, ({ one }) => ({
-	user: one(users, {
-		fields: [sessions.userId],
-		references: [users.id]
-	})
-}));
-
-export { sessions, relations };

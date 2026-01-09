@@ -1,13 +1,13 @@
 import { integer, timestamp, primaryKey } from 'drizzle-orm/pg-core';
-import { relations as drizzleRelations, type InferSelectModel } from 'drizzle-orm';
+import { type InferSelectModel } from 'drizzle-orm';
+import { authSchema as schema } from '../schema';
 import { users } from '../users/users';
 import { groups } from './groups';
-import { authSchema as schema } from '../schema';
 
 import { createInsertSchema } from 'drizzle-valibot';
 import * as v from 'valibot';
 
-const userGroups = schema.table(
+export const userGroups = schema.table(
 	'user_groups',
 	{
 		userId: integer('user_id').references(() => users.id),
@@ -17,19 +17,8 @@ const userGroups = schema.table(
 	(table) => [primaryKey({ columns: [table.userId, table.groupId] })]
 );
 
-const relations = drizzleRelations(userGroups, ({ one }) => ({
-	user: one(users, {
-		fields: [userGroups.userId],
-		references: [users.id]
-	}),
-	group: one(groups, {
-		fields: [userGroups.groupId],
-		references: [groups.id]
-	})
-}));
-
 const userGroupsSchema = createInsertSchema(userGroups);
 
-export { userGroups, relations as userGroupsRelations, userGroupsSchema };
+export { userGroupsSchema };
 export type UserGroupSchema = v.InferInput<typeof userGroupsSchema>;
 export type UserGroupSelectModel = InferSelectModel<typeof userGroups>;

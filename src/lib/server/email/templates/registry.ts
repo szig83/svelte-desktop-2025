@@ -2,17 +2,41 @@ import { TemplateEngine } from './engine';
 import { builtInTemplates } from './built-in';
 import { EmailTemplateType } from '../types';
 import type { EmailTemplate, TemplateData } from './engine';
+import type {
+	IDatabaseTemplateRepository,
+	DatabaseEmailTemplate
+} from '../../database/types/email-templates';
+import { DatabaseTemplateRepository } from '../../database/repositories/email-template-repository';
 
 /**
- * Template registry for managing email templates
+ * Template registry for managing email templates with database integration
  */
 export class TemplateRegistry {
 	private engine: TemplateEngine;
 	private customTemplates: Map<string, EmailTemplate> = new Map();
 	private templateInheritance: Map<string, string> = new Map();
+	private databaseRepository: IDatabaseTemplateRepository;
+	private fallbackToBuiltIn: boolean;
 
-	constructor() {
+	constructor(databaseRepository?: IDatabaseTemplateRepository, fallbackToBuiltIn: boolean = true) {
 		this.engine = new TemplateEngine();
+		this.fallbackToBuiltIn = fallbackToBuiltIn;
+
+		// Initialize database repository with default config if not provided
+		this.databaseRepository =
+			databaseRepository ||
+			new DatabaseTemplateRepository({
+				enableCache: true,
+				cacheConfig: {
+					defaultTtl: 3600, // 1 hour
+					templateByTypeTtl: 3600, // 1 hour
+					allActiveTemplatesTtl: 1800, // 30 minutes
+					templateByIdTtl: 7200 // 2 hours
+				},
+				retryAttempts: 3,
+				retryDelay: 1000
+			});
+
 		this.initializeBuiltInTemplates();
 	}
 
@@ -32,6 +56,9 @@ export class TemplateRegistry {
 
 	/**
 	 * Register a custom template.
+	 * @param name
+	 * @param template
+	 * @param parentTemplate
 	 */
 	registerCustomTemplate(name: string, template: EmailTemplate, parentTemplate?: string): void {
 		try {
@@ -66,46 +93,201 @@ export class TemplateRegistry {
 	}
 
 	/**
-	 * Render a template (built-in or custom).
+	 * Render a template (database, built-in, or custom) with audit logging.
+	 * @param templateName
+	 * @param data
+	 * @param context - Additional context for audit logging.
 	 */
 	async renderTemplate(
 		templateName: string,
-		data: TemplateData
+		data: TemplateData,
+		context?: {
+			userId?: string;
+			userAgent?: string;
+			ipAddress?: string;
+			sessionId?: string;
+			requestId?: string;
+		}
 	): Promise<{ subject: string; html: string; text: string }> {
+		const startTime = Date.now();
+
 		try {
-			// Check if it's a built-in template
-			if (this.isBuiltInTemplate(templateName)) {
-				return await this.engine.render(templateName as EmailTemplateType, data);
+			// First, try to get template from database
+			const databaseTemplate = await this.getDatabaseTemplate(templateName);
+			if (databaseTemplate) {
+				const result = await this.renderDatabaseTemplate(databaseTemplate, data);
+
+				// Log template rendering via database repository's audit logger
+				const renderTime = Date.now() - startTime;
+				if (this.databaseRepository instanceof DatabaseTemplateRepository) {
+					await (this.databaseRepository as any).auditLogger?.logTemplateRendered(
+						templateName as EmailTemplateType,
+						data,
+						{ ...context, renderTime }
+					);
+				}
+
+				return result;
+			}
+
+			// Fallback to built-in templates if enabled
+			if (this.fallbackToBuiltIn && this.isBuiltInTemplate(templateName)) {
+				this.log('warn', 'Using built-in template fallback', { templateName });
+				const result = await this.engine.render(templateName as EmailTemplateType, data);
+
+				// Log fallback usage
+				const renderTime = Date.now() - startTime;
+				if (this.databaseRepository instanceof DatabaseTemplateRepository) {
+					await (this.databaseRepository as any).auditLogger?.logTemplateRendered(
+						templateName as EmailTemplateType,
+						data,
+						{ ...context, renderTime, fallback: true }
+					);
+				}
+
+				return result;
 			}
 
 			// Check if it's a custom template
 			const customTemplate = this.customTemplates.get(templateName);
-			if (!customTemplate) {
-				throw new Error(`Template not found: ${templateName}`);
+			if (customTemplate) {
+				return await this.renderCustomTemplate(templateName, customTemplate, data);
 			}
 
-			// Create a temporary template engine instance for custom template
-			const tempEngine = new TemplateEngine();
-			tempEngine.registerTemplate(templateName as EmailTemplateType, customTemplate);
-
-			return await tempEngine.render(templateName as EmailTemplateType, data);
+			throw new Error(`Template not found: ${templateName}`);
 		} catch (error) {
 			this.log('error', 'Template rendering failed', {
 				templateName,
 				error: error instanceof Error ? error.message : 'Unknown error'
 			});
+
+			// Log rendering failure
+			if (this.databaseRepository instanceof DatabaseTemplateRepository) {
+				await (this.databaseRepository as any).auditLogger?.logSecurityViolation(
+					'template_rendering_failed',
+					{
+						templateName,
+						error: error instanceof Error ? error.message : 'Unknown error',
+						renderTime: Date.now() - startTime
+					},
+					context
+				);
+			}
+
 			throw error;
 		}
 	}
 
 	/**
-	 * Get template information.
+	 * Get template from database with retry logic.
+	 * @param templateName
 	 */
-	getTemplateInfo(templateName: string): {
-		type: 'built-in' | 'custom';
-		template: EmailTemplate;
+	private async getDatabaseTemplate(templateName: string): Promise<DatabaseEmailTemplate | null> {
+		try {
+			// Try to get by type if it's a valid EmailTemplateType
+			if (this.isBuiltInTemplate(templateName)) {
+				return await this.databaseRepository.getTemplateByType(templateName as EmailTemplateType);
+			}
+
+			// For custom templates, we would need to implement a different lookup strategy
+			// For now, return null to fall back to other methods
+			return null;
+		} catch (error) {
+			this.log('warn', 'Database template lookup failed', {
+				templateName,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+
+			// Return null to allow fallback mechanisms
+			return null;
+		}
+	}
+
+	/**
+	 * Render a database template.
+	 * @param databaseTemplate
+	 * @param data
+	 */
+	private async renderDatabaseTemplate(
+		databaseTemplate: DatabaseEmailTemplate,
+		data: TemplateData
+	): Promise<{ subject: string; html: string; text: string }> {
+		// Convert database template to engine template format
+		const engineTemplate: EmailTemplate = {
+			subject: databaseTemplate.subjectTemplate,
+			htmlTemplate: databaseTemplate.htmlTemplate,
+			textTemplate: databaseTemplate.textTemplate,
+			requiredData: databaseTemplate.requiredData,
+			optionalData: databaseTemplate.optionalData || []
+		};
+
+		// Validate template data
+		this.validateTemplateDataForEngineTemplate(engineTemplate, data);
+
+		// Create a temporary engine instance for rendering
+		const tempEngine = new TemplateEngine();
+		tempEngine.registerTemplate(databaseTemplate.type as EmailTemplateType, engineTemplate);
+
+		return await tempEngine.render(databaseTemplate.type as EmailTemplateType, data);
+	}
+
+	/**
+	 * Render a custom template.
+	 * @param templateName
+	 * @param customTemplate
+	 * @param data
+	 */
+	private async renderCustomTemplate(
+		templateName: string,
+		customTemplate: EmailTemplate,
+		data: TemplateData
+	): Promise<{ subject: string; html: string; text: string }> {
+		// Create a temporary template engine instance for custom template
+		const tempEngine = new TemplateEngine();
+		tempEngine.registerTemplate(templateName as EmailTemplateType, customTemplate);
+
+		return await tempEngine.render(templateName as EmailTemplateType, data);
+	}
+
+	/**
+	 * Validate template data against engine template requirements.
+	 * @param template
+	 * @param data
+	 */
+	private validateTemplateDataForEngineTemplate(
+		template: EmailTemplate,
+		data: TemplateData
+	): boolean {
+		// Check required data fields
+		const missingFields = template.requiredData.filter(
+			(field) => !(field in data) || data[field] === undefined || data[field] === null
+		);
+
+		if (missingFields.length > 0) {
+			throw new Error(`Missing required template data: ${missingFields.join(', ')}`);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get template information (enhanced with database support).
+	 * @param templateName
+	 */
+	async getTemplateInfo(templateName: string): Promise<{
+		type: 'database' | 'built-in' | 'custom';
+		template: EmailTemplate | DatabaseEmailTemplate;
 		parentTemplate?: string;
-	} | null {
+	} | null> {
+		// Check database templates first
+		const databaseTemplate = await this.getDatabaseTemplate(templateName);
+		if (databaseTemplate) {
+			return {
+				type: 'database',
+				template: databaseTemplate
+			};
+		}
+
 		// Check built-in templates
 		if (this.isBuiltInTemplate(templateName)) {
 			const template = this.engine.getTemplate(templateName as EmailTemplateType);
@@ -131,13 +313,26 @@ export class TemplateRegistry {
 	}
 
 	/**
-	 * List all available templates.
+	 * List all available templates (enhanced with database support).
 	 */
-	listTemplates(): {
+	async listTemplates(): Promise<{
+		database: string[];
 		builtIn: string[];
 		custom: string[];
-	} {
+	}> {
+		let databaseTemplates: string[] = [];
+
+		try {
+			const dbTemplates = await this.databaseRepository.getAllActiveTemplates();
+			databaseTemplates = dbTemplates.map((t) => t.type);
+		} catch (error) {
+			this.log('warn', 'Failed to list database templates', {
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+
 		return {
+			database: databaseTemplates,
 			builtIn: Object.values(EmailTemplateType),
 			custom: Array.from(this.customTemplates.keys())
 		};
@@ -145,6 +340,7 @@ export class TemplateRegistry {
 
 	/**
 	 * Remove a custom template.
+	 * @param name
 	 */
 	removeCustomTemplate(name: string): boolean {
 		const removed = this.customTemplates.delete(name);
@@ -156,18 +352,29 @@ export class TemplateRegistry {
 	}
 
 	/**
-	 * Validate template data for a specific template.
+	 * Validate template data for a specific template (enhanced with database support).
+	 * @param templateName
+	 * @param data
 	 */
-	validateTemplateData(templateName: string, data: TemplateData): boolean {
-		const templateInfo = this.getTemplateInfo(templateName);
+	async validateTemplateData(templateName: string, data: TemplateData): Promise<boolean> {
+		const templateInfo = await this.getTemplateInfo(templateName);
 		if (!templateInfo) {
 			throw new Error(`Template not found: ${templateName}`);
 		}
 
-		const template = templateInfo.template;
+		let requiredData: string[];
+
+		// Handle different template types
+		if (templateInfo.type === 'database') {
+			const dbTemplate = templateInfo.template as DatabaseEmailTemplate;
+			requiredData = dbTemplate.requiredData;
+		} else {
+			const engineTemplate = templateInfo.template as EmailTemplate;
+			requiredData = engineTemplate.requiredData;
+		}
 
 		// Check required data fields
-		const missingFields = template.requiredData.filter(
+		const missingFields = requiredData.filter(
 			(field) => !(field in data) || data[field] === undefined || data[field] === null
 		);
 
@@ -181,7 +388,9 @@ export class TemplateRegistry {
 	}
 
 	/**
-	 * Create a template preview with sample data.
+	 * Create a template preview with sample data (enhanced with database support).
+	 * @param templateName
+	 * @param sampleData
 	 */
 	async createPreview(
 		templateName: string,
@@ -191,19 +400,20 @@ export class TemplateRegistry {
 		html: string;
 		text: string;
 	}> {
-		const templateInfo = this.getTemplateInfo(templateName);
+		const templateInfo = await this.getTemplateInfo(templateName);
 		if (!templateInfo) {
 			throw new Error(`Template not found: ${templateName}`);
 		}
 
 		// Generate sample data if not provided
-		const data = sampleData || this.generateSampleData(templateInfo.template);
+		const data = sampleData || this.generateSampleDataForTemplate(templateInfo);
 
 		return await this.renderTemplate(templateName, data);
 	}
 
 	/**
 	 * Check if a template name is a built-in template.
+	 * @param templateName
 	 */
 	private isBuiltInTemplate(templateName: string): boolean {
 		return Object.values(EmailTemplateType).includes(templateName as EmailTemplateType);
@@ -211,6 +421,8 @@ export class TemplateRegistry {
 
 	/**
 	 * Inherit properties from a parent template.
+	 * @param template
+	 * @param parentName
 	 */
 	private inheritFromTemplate(template: EmailTemplate, parentName: string): EmailTemplate {
 		let parentTemplate: EmailTemplate | undefined;
@@ -246,6 +458,7 @@ export class TemplateRegistry {
 
 	/**
 	 * Validate custom template structure.
+	 * @param template
 	 */
 	private validateCustomTemplate(template: EmailTemplate): void {
 		// Basic validation
@@ -271,6 +484,7 @@ export class TemplateRegistry {
 
 	/**
 	 * Validate template variables for potential issues.
+	 * @param template
 	 */
 	private validateTemplateVariables(template: EmailTemplate): void {
 		const variablePattern = /\{\{(\w+)\}\}/g;
@@ -299,6 +513,8 @@ export class TemplateRegistry {
 
 	/**
 	 * Extract variables from template string.
+	 * @param template
+	 * @param pattern
 	 */
 	private extractVariables(template: string, pattern: RegExp): string[] {
 		const variables: string[] = [];
@@ -313,6 +529,7 @@ export class TemplateRegistry {
 
 	/**
 	 * Validate template name.
+	 * @param name
 	 */
 	private validateTemplateName(name: string): void {
 		if (!name || typeof name !== 'string') {
@@ -333,7 +550,48 @@ export class TemplateRegistry {
 	}
 
 	/**
-	 * Generate sample data for template preview.
+	 * Generate sample data for template preview (enhanced for different template types).
+	 * @param templateInfo
+	 * @param templateInfo.type
+	 * @param templateInfo.template
+	 * @param templateInfo.parentTemplate
+	 */
+	private generateSampleDataForTemplate(templateInfo: {
+		type: 'database' | 'built-in' | 'custom';
+		template: EmailTemplate | DatabaseEmailTemplate;
+		parentTemplate?: string;
+	}): TemplateData {
+		const sampleData: TemplateData = {};
+		let requiredData: string[];
+		let optionalData: string[];
+
+		// Handle different template types
+		if (templateInfo.type === 'database') {
+			const dbTemplate = templateInfo.template as DatabaseEmailTemplate;
+			requiredData = dbTemplate.requiredData;
+			optionalData = dbTemplate.optionalData || [];
+		} else {
+			const engineTemplate = templateInfo.template as EmailTemplate;
+			requiredData = engineTemplate.requiredData;
+			optionalData = engineTemplate.optionalData || [];
+		}
+
+		// Generate sample data for required fields
+		requiredData.forEach((field) => {
+			sampleData[field] = this.generateSampleValue(field);
+		});
+
+		// Generate sample data for optional fields
+		optionalData.forEach((field) => {
+			sampleData[field] = this.generateSampleValue(field);
+		});
+
+		return sampleData;
+	}
+
+	/**
+	 * Generate sample data for template preview (legacy method for backward compatibility).
+	 * @param template
 	 */
 	private generateSampleData(template: EmailTemplate): TemplateData {
 		const sampleData: TemplateData = {};
@@ -353,6 +611,7 @@ export class TemplateRegistry {
 
 	/**
 	 * Generate sample value based on field name.
+	 * @param fieldName
 	 */
 	private generateSampleValue(fieldName: string): string {
 		const sampleValues: Record<string, string> = {
@@ -377,7 +636,94 @@ export class TemplateRegistry {
 	}
 
 	/**
+	 * Invalidate template cache for a specific type or all caches.
+	 * @param templateType
+	 */
+	async invalidateCache(templateType?: EmailTemplateType): Promise<void> {
+		try {
+			await this.databaseRepository.invalidateCache(templateType);
+			this.log('info', 'Template cache invalidated', { templateType });
+		} catch (error) {
+			this.log('error', 'Failed to invalidate template cache', {
+				templateType,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			throw error;
+		}
+	}
+
+	/**
+	 * Refresh all template caches.
+	 */
+	async refreshCache(): Promise<void> {
+		try {
+			await this.databaseRepository.refreshCache();
+			this.log('info', 'Template cache refreshed');
+		} catch (error) {
+			this.log('error', 'Failed to refresh template cache', {
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			throw error;
+		}
+	}
+
+	/**
+	 * Get multiple templates by types (batch operation).
+	 * @param types
+	 */
+	async getTemplatesByTypes(
+		types: EmailTemplateType[]
+	): Promise<Map<EmailTemplateType, DatabaseEmailTemplate>> {
+		try {
+			return await this.databaseRepository.getTemplatesByTypes(types);
+		} catch (error) {
+			this.log('error', 'Failed to get templates by types', {
+				types,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+
+			// Return empty map on error to allow fallback handling
+			return new Map();
+		}
+	}
+
+	/**
+	 * Check if database repository is available and working.
+	 */
+	async isDatabaseAvailable(): Promise<boolean> {
+		try {
+			// Try to get all active templates as a health check
+			await this.databaseRepository.getAllActiveTemplates();
+			return true;
+		} catch (error) {
+			this.log('warn', 'Database repository not available', {
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			return false;
+		}
+	}
+
+	/**
+	 * Get database repository instance (for advanced usage).
+	 */
+	getDatabaseRepository(): IDatabaseTemplateRepository {
+		return this.databaseRepository;
+	}
+
+	/**
+	 * Enable or disable fallback to built-in templates.
+	 * @param enabled
+	 */
+	setFallbackToBuiltIn(enabled: boolean): void {
+		this.fallbackToBuiltIn = enabled;
+		this.log('info', 'Fallback to built-in templates changed', { enabled });
+	}
+
+	/**
 	 * Logging utility.
+	 * @param level
+	 * @param message
+	 * @param data
 	 */
 	private log(level: 'debug' | 'info' | 'warn' | 'error', message: string, data?: unknown): void {
 		const timestamp = new Date().toISOString();

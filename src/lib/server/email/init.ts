@@ -1,28 +1,30 @@
 import { env } from '$lib/env';
 import { EmailManager } from './manager';
 import { EmailLogger } from './logger';
-import { createTemplateRegistry } from './templates';
+import { createTemplateRegistryWithDatabase } from './templates';
 import { EmailProviderFactory } from './providers/factory';
+import {
+	EmailInitializationService,
+	type EmailServiceState,
+	type InitializationConfig,
+	type HealthCheckResult
+} from './initialization-service';
 import type { EmailConfig } from './types';
-
-/**
- * Email service initialization state.
- */
-interface EmailServiceState {
-	initialized: boolean;
-	manager?: EmailManager;
-	config?: EmailConfig;
-	error?: string;
-	degraded: boolean;
-}
 
 /**
  * Global email service state.
  */
 let emailServiceState: EmailServiceState = {
 	initialized: false,
-	degraded: false
+	degraded: false,
+	cacheWarmedUp: false,
+	healthStatus: 'unavailable'
 };
+
+/**
+ * Global initialization service instance.
+ */
+let initializationService: EmailInitializationService | null = null;
 
 /**
  * Create email configuration from environment variables.
@@ -126,71 +128,34 @@ function isValidEmail(email: string): boolean {
 }
 
 /**
- * Initialize email service with graceful degradation.
+ * Initialize email service with enhanced configuration, migration, and cache warm-up.
+ * @param {InitializationConfig} config Optional initialization configuration.
  * @returns {Promise<EmailServiceState>} Promise resolving to email service state.
  */
-export async function initializeEmailService(): Promise<EmailServiceState> {
+export async function initializeEmailService(
+	config?: InitializationConfig
+): Promise<EmailServiceState> {
 	try {
-		log('info', 'Initializing email service...');
+		log('info', 'Starting enhanced email service initialization...');
 
-		// Create configuration from environment
-		const config = createEmailConfig();
-
-		// Validate configuration
-		const validation = validateEmailConfig(config);
-		if (!validation.valid) {
-			const errorMessage = `Email service configuration errors: ${validation.errors.join(', ')}`;
-			log('error', errorMessage);
-
-			// Return degraded state
-			emailServiceState = {
-				initialized: false,
-				config,
-				error: errorMessage,
-				degraded: true
-			};
-
-			return emailServiceState;
+		// Create initialization service if not exists
+		if (!initializationService) {
+			initializationService = new EmailInitializationService(config);
 		}
 
-		// Create email service components
-		const client = EmailProviderFactory.createConfiguredClient(config);
-		const logger = new EmailLogger();
-		const templateRegistry = createTemplateRegistry();
-		const manager = new EmailManager(client, logger, templateRegistry, config);
+		// Run full initialization
+		emailServiceState = await initializationService.initialize();
 
-		// Validate API connectivity (only in non-test mode)
-		if (!config.testMode) {
-			log('info', 'Validating API connectivity...');
-			const isValidConnection = await manager.validateConfiguration();
-
-			if (!isValidConnection) {
-				const provider = env.EMAIL_PROVIDER || 'resend';
-				const errorMessage = `Failed to validate ${provider} connection`;
-				log('warn', `${errorMessage}, running in degraded mode`);
-
-				// Return degraded state but still provide manager
-				emailServiceState = {
-					initialized: true,
-					manager,
-					config,
-					error: errorMessage,
-					degraded: true
-				};
-
-				return emailServiceState;
+		if (emailServiceState.initialized) {
+			if (emailServiceState.degraded) {
+				log('warn', 'Email service initialized in degraded mode');
+			} else {
+				log('info', 'Email service initialized successfully');
 			}
+		} else {
+			log('error', 'Email service initialization failed');
 		}
 
-		// Success - fully initialized
-		emailServiceState = {
-			initialized: true,
-			manager,
-			config,
-			degraded: false
-		};
-
-		log('info', `Email service initialized successfully (test mode: ${config.testMode})`);
 		return emailServiceState;
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : 'Unknown initialization error';
@@ -200,7 +165,9 @@ export async function initializeEmailService(): Promise<EmailServiceState> {
 		emailServiceState = {
 			initialized: false,
 			error: errorMessage,
-			degraded: true
+			degraded: true,
+			cacheWarmedUp: false,
+			healthStatus: 'unavailable'
 		};
 
 		return emailServiceState;
@@ -257,6 +224,7 @@ export function getEmailServiceHealth(): {
 	initialized: boolean;
 	testMode: boolean;
 	error?: string;
+	cacheWarmedUp: boolean;
 	config?: {
 		hasApiKey: boolean;
 		hasFromEmail: boolean;
@@ -266,20 +234,12 @@ export function getEmailServiceHealth(): {
 } {
 	const state = emailServiceState;
 
-	let status: 'healthy' | 'degraded' | 'unavailable';
-	if (!state.initialized) {
-		status = 'unavailable';
-	} else if (state.degraded) {
-		status = 'degraded';
-	} else {
-		status = 'healthy';
-	}
-
 	return {
-		status,
+		status: state.healthStatus,
 		initialized: state.initialized,
 		testMode: state.config?.testMode || false,
 		error: state.error,
+		cacheWarmedUp: state.cacheWarmedUp,
 		config: state.config
 			? {
 					hasApiKey: !!state.config.apiKey,
@@ -292,19 +252,41 @@ export function getEmailServiceHealth(): {
 }
 
 /**
+ * Perform comprehensive health check of the email service.
+ * @returns {Promise<HealthCheckResult>} Detailed health check result.
+ */
+export async function performEmailHealthCheck(): Promise<HealthCheckResult> {
+	if (!initializationService) {
+		// Create a temporary service for health check
+		const tempService = new EmailInitializationService();
+		return await tempService.performHealthCheck();
+	}
+
+	return await initializationService.performHealthCheck();
+}
+
+/**
  * Reinitialize email service (useful for configuration changes).
+ * @param {InitializationConfig} config Optional new initialization configuration.
  * @returns Promise resolving to new email service state
  */
-export async function reinitializeEmailService(): Promise<EmailServiceState> {
+export async function reinitializeEmailService(
+	config?: InitializationConfig
+): Promise<EmailServiceState> {
 	log('info', 'Reinitializing email service...');
 
 	// Reset state
 	emailServiceState = {
 		initialized: false,
-		degraded: false
+		degraded: false,
+		cacheWarmedUp: false,
+		healthStatus: 'unavailable'
 	};
 
-	return await initializeEmailService();
+	// Reset initialization service
+	initializationService = null;
+
+	return await initializeEmailService(config);
 }
 
 /**

@@ -18,14 +18,12 @@ export const emailLogs = schema.table(
 		createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
 	},
-	(table) => ({
-		// Performance optimization indexes
-		recipientIdx: index('email_logs_recipient_idx').on(table.recipient),
-		statusIdx: index('email_logs_status_idx').on(table.status),
-		createdAtIdx: index('email_logs_created_at_idx').on(table.createdAt),
-		messageIdIdx: index('email_logs_message_id_idx').on(table.messageId),
-		// Composite index for common queries
-		recipientStatusIdx: index('email_logs_recipient_status_idx').on(table.recipient, table.status),
-		statusCreatedAtIdx: index('email_logs_status_created_at_idx').on(table.status, table.createdAt)
-	})
+	(table) => [
+		index('email_logs_recipient_idx').on(table.recipient),
+		index('email_logs_status_idx').on(table.status),
+		index('email_logs_created_at_idx').on(table.createdAt),
+		index('email_logs_message_id_idx').on(table.messageId),
+		index('email_logs_recipient_status_idx').on(table.recipient, table.status),
+		index('email_logs_status_created_at_idx').on(table.status, table.createdAt)
+	]
 );

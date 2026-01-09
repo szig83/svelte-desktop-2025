@@ -4,7 +4,12 @@ export { ResendClient } from './client';
 export { EmailLogger } from './logger';
 
 // Template system exports
-export { TemplateEngine, TemplateRegistry, createTemplateRegistry } from './templates';
+export {
+	TemplateEngine,
+	TemplateRegistry,
+	createTemplateRegistry,
+	createTemplateRegistryWithDatabase
+} from './templates';
 export type { EmailTemplate, RenderedTemplate, TemplateData } from './templates';
 
 // Initialization and configuration exports
@@ -15,9 +20,25 @@ export {
 	isEmailServiceAvailable,
 	isEmailServiceDegraded,
 	getEmailServiceHealth,
+	performEmailHealthCheck,
 	reinitializeEmailService,
 	getEnvironmentSpecificConfig
 } from './init';
+
+// Enhanced initialization exports
+export {
+	EmailInitializationService,
+	type EmailServiceState,
+	type InitializationConfig,
+	type HealthCheckResult
+} from './initialization-service';
+
+// Configuration validation exports
+export {
+	EmailConfigValidator,
+	validateEmailConfiguration,
+	type ConfigValidationResult
+} from './config-validator';
 
 // Utility functions for graceful email handling
 export {
@@ -52,13 +73,13 @@ export { EmailErrorType, EmailTemplateType, EmailDeliveryStatus } from './types'
 import { EmailManager } from './manager';
 import { ResendClient } from './client';
 import { EmailLogger } from './logger';
-import { createTemplateRegistry } from './templates';
+import { createTemplateRegistryWithDatabase } from './templates';
 import type { EmailConfig } from './types';
 
 // Convenience factory function
 export function createEmailManager(config?: Partial<EmailConfig>): EmailManager {
 	const client = new ResendClient(config);
 	const logger = new EmailLogger();
-	const templateRegistry = createTemplateRegistry();
+	const templateRegistry = createTemplateRegistryWithDatabase();
 	return new EmailManager(client, logger, templateRegistry);
 }

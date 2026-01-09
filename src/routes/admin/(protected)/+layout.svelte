@@ -1,7 +1,7 @@
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
+    import './protected.css';
 	import '../appAdmin.css';
-	import './protected.css';
 	import Desktop from '$lib/components/core/Desktop.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { browser } from '$app/environment';
@@ -10,7 +10,8 @@
 	let { children, data } = $props();
 
 	// Settings kontextus beállítása, hogy a gyerek komponensek elérjék
-	setContext('settings', data.settings);
+	const settings = $derived(data.settings);
+	setContext('settings', settings);
 </script>
 
 {#if browser}

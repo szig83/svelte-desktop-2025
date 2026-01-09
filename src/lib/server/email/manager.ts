@@ -187,7 +187,10 @@ export class EmailManager {
 			});
 
 			// Validate template data
-			this.templateRegistry.validateTemplateData(validatedParams.template, validatedParams.data);
+			await this.templateRegistry.validateTemplateData(
+				validatedParams.template,
+				validatedParams.data
+			);
 
 			// Render the template
 			const renderedContent = await this.templateRegistry.renderTemplate(
@@ -270,8 +273,8 @@ export class EmailManager {
 	/**
 	 * List all available templates.
 	 */
-	listTemplates(): { builtIn: string[]; custom: string[] } {
-		return this.templateRegistry.listTemplates();
+	async listTemplates(): Promise<{ database: string[]; builtIn: string[]; custom: string[] }> {
+		return await this.templateRegistry.listTemplates();
 	}
 
 	/**
