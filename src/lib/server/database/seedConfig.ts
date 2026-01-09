@@ -327,8 +327,8 @@ export const groupPermissions = [
 ];
 
 export const providers = {
-	local: {
-		name: 'local',
+	credential: {
+		name: 'credential',
 		enabled: true,
 		config: {
 			allowRegistration: true,
@@ -337,7 +337,7 @@ export const providers = {
 		}
 	},
 	google: {
-		name: 'Google',
+		name: 'google',
 		enabled: true,
 		config: {
 			clientId: 'YOUR_GOOGLE_CLIENT_ID',
@@ -346,7 +346,7 @@ export const providers = {
 		}
 	},
 	facebook: {
-		name: 'Facebook',
+		name: 'facebook',
 		enabled: false,
 		config: {
 			clientId: '',
@@ -355,7 +355,7 @@ export const providers = {
 		}
 	},
 	github: {
-		name: 'GitHub',
+		name: 'github',
 		enabled: false,
 		config: {
 			clientId: '',

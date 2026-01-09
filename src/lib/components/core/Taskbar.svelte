@@ -1,15 +1,14 @@
 <script lang="ts">
-	import { Rocket, Menu } from 'lucide-svelte';
-	import { getThemeManager } from '$lib/stores/themeStore.svelte';
-	import type { WindowManager } from '$lib/stores/windowStore.svelte';
-	import UniversalIcon from '$lib/components/UniversalIcon.svelte';
+	import { Menu } from 'lucide-svelte';
+	import type { WindowManager } from '$lib/stores';
+	import { UniversalIcon } from '$lib/components/shared';
 	import StartMenu from './startmenu/StartMenu.svelte';
-	import Clock from '$lib/components/Clock.svelte';
+	import Clock from '$lib/components/ui/Clock.svelte';
 	import * as Popover from '$lib/components/ui/popover';
-	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
-	import WindowLink from '$lib/components/WindowLink.svelte';
+	import ThemeSwitcher from '$lib/components/ui/ThemeSwitcher.svelte';
+	import WindowLink from '$lib/components/ui/WindowLink.svelte';
 	import { getContext } from 'svelte';
-	import { takeWindowScreenshot } from '$lib/utils/screenshot';
+	import { takeWindowScreenshot } from '$lib/services/client/screenshot';
 	import type { TaskbarPosition } from '$lib/types/desktopEnviroment.ts';
 	let { windowManager }: { windowManager: WindowManager } = $props();
 
@@ -19,10 +18,6 @@
 		preferPerformance: boolean;
 		taskbarPosition: TaskbarPosition;
 	}>('settings');
-	/**
-	 * @TODO ahhoz fog kelleni, hogy a taskbar/startmenü-t külön lehessen dark módba kapcsolni.
-	 */
-	const themeManager = getThemeManager();
 
 	let startMenuOpen = $state(false);
 </script>
@@ -31,7 +26,7 @@
 	<div class="taskbar-left">
 		<Popover.Root bind:open={startMenuOpen}>
 			<Popover.Trigger class="btn-startmenu btn-click-effect"><Menu size={24} /></Popover.Trigger>
-			<Popover.Content class="z-[1000] mx-2 my-2 flex w-[var(--startmenu-width)] items-stretch"
+			<Popover.Content class="z-1000 mx-2 my-2 flex w-(--startmenu-width) items-stretch"
 				><StartMenu bind:open={startMenuOpen} /></Popover.Content
 			>
 		</Popover.Root>

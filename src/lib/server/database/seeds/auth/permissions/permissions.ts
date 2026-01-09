@@ -1,8 +1,8 @@
-import { type DB } from '@/database'
-import { permissions } from '@/database/schemas'
-import { permissions as permissionsSeedConfig } from '@/database/seedConfig'
+import { type DB } from '$lib/server/database';
+import { permissions } from '$lib/server/database/schemas';
+import { permissions as permissionsSeedConfig } from '$lib/server/database/seedConfig';
 
-const initData = Object.values(permissionsSeedConfig)
+const initData = Object.values(permissionsSeedConfig);
 
 /**
  * Inicializálja a jogosultságok táblát a seedConfig-ban megadott adatokkal.
@@ -10,5 +10,5 @@ const initData = Object.values(permissionsSeedConfig)
  * @param db Az adatbázis példány.
  */
 export async function seed(db: DB) {
-	await db.insert(permissions).values(initData)
+	await db.insert(permissions).values(initData);
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getAppParameters, getParameter, getWindowId } from '$lib/services/appContext';
-	import { getWindowManager } from '$lib/stores/windowStore.svelte';
+	import { getAppParameters, getParameter, getWindowId } from '$lib/services/client/appContext';
+	import { getWindowManager } from '$lib/stores';
 	const helpId = getParameter<number | undefined>('helpId', undefined);
 	const parameters = getAppParameters();
 	const helps = [

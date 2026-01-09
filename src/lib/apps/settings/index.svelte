@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ColorSchemePicker from '$lib/components/ColorSchemePicker.svelte';
-	import AppSideBar from '$lib/components/AppSideBar.svelte';
+	import ColorSchemePicker from '$lib/components/ui/ColorSchemePicker.svelte';
+	import { AppSideBar } from '$lib/components/shared';
 
 	/*function scrollToSection(id: string) {
 		const element = document.getElementById(id);

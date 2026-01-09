@@ -1,18 +1,18 @@
-import { serial, varchar, timestamp, integer, boolean, text } from 'drizzle-orm/pg-core'
-import { relations as drizzleRelations } from 'drizzle-orm'
-import { users } from '../users/users'
-import { providers } from './providers'
-import { authSchema as schema } from '../schema'
+import { serial, varchar, timestamp, integer, boolean, text } from 'drizzle-orm/pg-core';
+import { authSchema as schema } from '../schema';
+import { users } from '../users/users';
+import { providers } from './providers';
 
-const accounts = schema.table('accounts', {
+export const accounts = schema.table('accounts', {
 	id: serial('id').primaryKey(),
 	userId: integer('user_id')
 		.notNull()
 		.references(() => users.id),
 	providerAccountId: text('provider_account_id').notNull(),
 	//accountId: text('account_id').notNull(),
-	providerId: text('provider_id').notNull(),
-	//.references(() => providers.id),
+	providerId: text('provider_id')
+		.notNull()
+		.references(() => providers.name),
 	accessToken: text('access_token'),
 	refreshToken: text('refresh_token'),
 	accessTokenExpiresAt: timestamp('access_token_expires_at', { withTimezone: true }),
@@ -25,18 +25,5 @@ const accounts = schema.table('accounts', {
 	lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
 	passwordChangedAt: timestamp('password_changed_at', { withTimezone: true }),
 	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-})
-
-const relations = drizzleRelations(accounts, ({ one }) => ({
-	user: one(users, {
-		fields: [accounts.userId],
-		references: [users.id],
-	}),
-	provider: one(providers, {
-		fields: [accounts.providerId],
-		references: [providers.id],
-	}),
-}))
-
-export { accounts, relations }
+	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
+});

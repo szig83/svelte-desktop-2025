@@ -1,2 +1,2 @@
-export type TaskbarPosition = 'top' | 'bottom';
-export type BackgroundType = 'color' | 'image' | 'video';
+// Re-export types from constants for backward compatibility
+export type { TaskbarPosition, BackgroundType } from '../constants';

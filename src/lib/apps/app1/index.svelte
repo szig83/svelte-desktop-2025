@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { getAppParameters, getParameter, getWindowId, updateWindowTitleById } from '$lib/services/appContext';
+	import {
+		getAppParameters,
+		getParameter,
+		getWindowId,
+		updateWindowTitleById
+	} from '$lib/services/client/appContext';
 
 	let count = $state(0);
 	let inputValue = $state('');
@@ -10,7 +15,6 @@
 	const userId = getParameter<string>('userId', 'unknown');
 	const theme = getParameter<string>('theme', 'default');
 	const initialCount = getParameter<number>('initialCount', 0);
-
 
 	// Set initial count from parameters
 	count = initialCount;
@@ -128,9 +132,9 @@
 
 	.parameters-section {
 		margin-top: 24px;
-		padding: 16px;
-		background: #f5f5f5;
 		border-radius: 8px;
+		background: #f5f5f5;
+		padding: 16px;
 	}
 
 	.parameters-section h3 {
@@ -143,19 +147,19 @@
 	}
 
 	.parameters-section pre {
+		border-radius: 4px;
 		background: #fff;
 		padding: 8px;
-		border-radius: 4px;
-		font-size: 12px;
 		overflow-x: auto;
+		font-size: 12px;
 	}
 
 	.title-controls {
 		margin: 24px 0;
-		padding: 16px;
-		background: #e8f4f8;
-		border-radius: 8px;
 		border: 2px solid #4caf50;
+		border-radius: 8px;
+		background: #e8f4f8;
+		padding: 16px;
 	}
 
 	.title-controls h3 {
