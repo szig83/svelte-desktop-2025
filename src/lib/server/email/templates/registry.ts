@@ -711,6 +711,13 @@ export class TemplateRegistry {
 	}
 
 	/**
+	 * Get the count of built-in templates registered in the engine.
+	 */
+	getBuiltInTemplatesCount(): number {
+		return this.engine.getRegisteredTemplates().length;
+	}
+
+	/**
 	 * Enable or disable fallback to built-in templates.
 	 * @param enabled
 	 */

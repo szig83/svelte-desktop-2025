@@ -128,10 +128,11 @@ async function seedTableData() {
 	await seeds.groupPermissions(db); // Csoport-jogosultság kapcsolatok
 
 	// 4. Felhasználók és kapcsolataik
-	console.log(' - Felhasználók és kapcsolataik betöltése...');
+	/*	console.log(' - Felhasználók és kapcsolataik betöltése...');
 	await seeds.users(auth, db, seedOptions.publicUserCount); // Felhasználók
 	await seeds.userRoles(db); // Felhasználó-szerepkör kapcsolatok
 	console.log('🟢 Minden tábla adat sikeresen betöltve\n');
+*/
 }
 
 /**

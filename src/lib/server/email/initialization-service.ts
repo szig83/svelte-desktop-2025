@@ -51,6 +51,7 @@ export interface HealthCheckResult {
 		initializationTime: number;
 		cacheSize: number;
 		templatesCount: number;
+		builtInTemplatesCount: number;
 	};
 }
 
@@ -182,7 +183,8 @@ export class EmailInitializationService {
 			metrics: {
 				initializationTime: 0,
 				cacheSize: 0,
-				templatesCount: 0
+				templatesCount: 0,
+				builtInTemplatesCount: 0
 			}
 		};
 
@@ -219,6 +221,7 @@ export class EmailInitializationService {
 			result.metrics.initializationTime = Date.now() - startTime;
 			result.metrics.cacheSize = await this.getCacheSize();
 			result.metrics.templatesCount = await this.getTemplatesCount();
+			result.metrics.builtInTemplatesCount = this.getBuiltInTemplatesCount();
 
 			// Determine overall status
 			const criticalChecks = [result.checks.configuration, result.checks.database];
@@ -446,6 +449,17 @@ export class EmailInitializationService {
 			const repository = new DatabaseTemplateRepository(this.repositoryConfig);
 			const templates = await repository.getAllActiveTemplates();
 			return templates.length;
+		} catch {
+			return 0;
+		}
+	}
+
+	private getBuiltInTemplatesCount(): number {
+		try {
+			if (this.state.manager) {
+				return this.state.manager.getRegisteredTemplatesCount();
+			}
+			return 0;
 		} catch {
 			return 0;
 		}

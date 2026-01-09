@@ -12,6 +12,7 @@ import type {
 	ResendEmailPayload
 } from './types';
 import * as v from 'valibot';
+import { env } from '$lib/env';
 
 /**
  * Email validation schemas
@@ -284,10 +285,22 @@ export class EmailManager {
 		try {
 			this.log('info', 'Validating email configuration');
 
-			// Check required configuration
-			if (!this.config.apiKey || !this.config.fromEmail) {
-				this.log('error', 'Missing required configuration', {
-					hasApiKey: !!this.config.apiKey,
+			const provider = env.EMAIL_PROVIDER || 'resend';
+
+			// Check required configuration based on provider
+			// SMTP doesn't use apiKey, it uses SMTP credentials
+			const requiresApiKey = provider !== 'smtp';
+
+			if (requiresApiKey && !this.config.apiKey) {
+				this.log('error', 'Missing required API key', {
+					provider,
+					hasApiKey: !!this.config.apiKey
+				});
+				return false;
+			}
+
+			if (!this.config.fromEmail) {
+				this.log('error', 'Missing required from email', {
 					hasFromEmail: !!this.config.fromEmail
 				});
 				return false;
@@ -362,6 +375,13 @@ export class EmailManager {
 			success: true,
 			messageId: mockMessageId
 		};
+	}
+
+	/**
+	 * Get the count of built-in templates
+	 */
+	public getRegisteredTemplatesCount(): number {
+		return this.templateRegistry.getBuiltInTemplatesCount();
 	}
 
 	/**
