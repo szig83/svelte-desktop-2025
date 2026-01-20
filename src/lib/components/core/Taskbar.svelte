@@ -65,7 +65,7 @@
 						<span>{window.title}</span>
 					</div>
 				</button>
-				{#if window.screenshot}
+				{#if window.screenshot && settings.windowPreview && !settings.preferPerformance}
 					<div class="screenshot-preview">
 						<img
 							style:height="{settings.screenshotThumbnailHeight}px"

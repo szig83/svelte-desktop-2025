@@ -19,6 +19,9 @@ export { DEFAULT_THEME_SETTINGS } from './theme.js';
 // Ablak és alkalmazás típusok
 export type { WindowSize, AppMetadata, AppParameters } from './window.js';
 
+// Menü típusok
+export type { MenuItem, MenuItemClickEvent } from './menu.js';
+
 // Alkalmazás regiszter típusok (újra-exportálás a konzisztencia érdekében)
 export type { Permission, AppCategory, AppModule, AppStructure } from '../apps/registry/index.js';
 

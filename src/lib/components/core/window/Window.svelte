@@ -24,24 +24,37 @@
 	}>('settings');
 
 	// App kontextus beállítás a gyerek komponensekhez.
+	// Context values should be stable, but we can use a getter pattern
 	const appContext: AppContext = {
-		parameters: windowState.parameters || {},
-		windowId: windowState.id
+		get parameters() {
+			return windowState.parameters || {};
+		},
+		get windowId() {
+			return windowState.id;
+		}
 	};
 	setContext(APP_CONTEXT_KEY, appContext);
 
-	// Minimum és maximum ablak méretek
-	const MIN_WINDOW_WIDTH = windowState.minSize.width;
-	const MIN_WINDOW_HEIGHT = windowState.minSize.height;
-	const MAX_WINDOW_WIDTH = windowState.maxSize.width;
-	const MAX_WINDOW_HEIGHT = windowState.maxSize.height;
+	// Minimum és maximum ablak méretek - use $derived for proper reactivity
+	const MIN_WINDOW_WIDTH = $derived(windowState.minSize.width);
+	const MIN_WINDOW_HEIGHT = $derived(windowState.minSize.height);
+	const MAX_WINDOW_WIDTH = $derived(windowState.maxSize.width);
+	const MAX_WINDOW_HEIGHT = $derived(windowState.maxSize.height);
 	const WORKSPACE_PADDING = 0;
-	const SCREENSHOT_THUMBNAIL_HEIGHT = settings.screenshotThumbnailHeight; // Screenshot thumbnail fix magassága pixelben
+	const SCREENSHOT_THUMBNAIL_HEIGHT = $derived(settings.screenshotThumbnailHeight); // Screenshot thumbnail fix magassága pixelben
 
-	// Teljesítmény vs Vizuális élmény
-	// true: teljesítmény prioritás (tartalom elrejtése mozgatás közben)
-	// false: vizuális élmény prioritás (tartalom látható marad)
-	const PREFER_PERFORMANCE = settings.preferPerformance;
+	// Teljesítmény vs Vizuális élmény - reaktív érték
+	let preferPerformance = $derived(settings.preferPerformance);
+
+	// Debug logging
+	$effect(() => {
+		console.log(
+			'Window.svelte - preferPerformance changed:',
+			preferPerformance,
+			'for window:',
+			windowState.id
+		);
+	});
 
 	let dragStartX = 0;
 	let dragStartY = 0;
@@ -71,7 +84,12 @@
 	let resizeStartTop = 0;
 
 	let windowElement: HTMLDivElement | null = $state(null);
-	let lastActiveState = $state(windowState.isActive);
+	let lastActiveState = $state(false);
+
+	// Track active state changes
+	$effect(() => {
+		lastActiveState = windowState.isActive;
+	});
 
 	// Screenshot készítés amikor ablak inaktívvá válik
 	$effect(() => {
@@ -712,7 +730,7 @@
 					<Tooltip.Trigger>
 						<WindowControlButton controlType="link" onClick={async () => link()} />
 					</Tooltip.Trigger>
-					<Tooltip.Content class="z-[1001]">Guid generálás az ablak megosztáshoz</Tooltip.Content>
+					<Tooltip.Content class="z-1001">Guid generálás az ablak megosztáshoz</Tooltip.Content>
 				</Tooltip.Root>
 			</Tooltip.Provider>
 			<WindowControlButton controlType="minimize" onClick={async () => minimize()} />
@@ -726,7 +744,7 @@
 		</div>
 	</div>
 
-	<div class="window-content" class:dragging={PREFER_PERFORMANCE && isVisuallyDragging}>
+	<div class="window-content" class:dragging={preferPerformance && isVisuallyDragging}>
 		<div>
 			{#if windowState.isLoading}
 				<div class="loading">Betöltés...</div>

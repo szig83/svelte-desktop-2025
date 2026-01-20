@@ -39,7 +39,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	console.log(event.route.id);
 	if (event.route.id?.startsWith('/admin/(protected)')) {
-		event.locals.settings = {
+		// Betöltjük a beállításokat a cookie-ból, ha létezik
+		const savedSettings = event.cookies.get('user_settings');
+		const defaultSettings = {
 			windowPreview: true,
 			screenshotThumbnailHeight: 200,
 			preferPerformance: false,
@@ -55,6 +57,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 				fontSize: 'medium'
 			}
 		};
+
+		if (savedSettings) {
+			try {
+				console.log(savedSettings);
+				event.locals.settings = JSON.parse(savedSettings);
+			} catch {
+				event.locals.settings = defaultSettings;
+			}
+		} else {
+			event.locals.settings = defaultSettings;
+		}
 		// Fetch current session from Better Auth
 		const session = await auth.api.getSession({
 			headers: event.request.headers

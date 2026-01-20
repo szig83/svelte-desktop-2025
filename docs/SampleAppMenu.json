@@ -1,0 +1,164 @@
+[
+	{
+		"label": "Általános",
+		"href": "#general",
+		"icon": "Settings",
+		"component": "GeneralSettings"
+	},
+	{
+		"label": "Megjelenés",
+		"href": "#appearance",
+		"icon": "Palette",
+		"component": "AppearanceSettings",
+		"props": {
+			"defaultTab": "colors"
+		}
+	},
+	{
+		"label": "Háttér",
+		"href": "#background",
+		"icon": "Image",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Háttér",
+			"message": "A háttér beállítások kezelése fejlesztés alatt áll."
+		}
+	},
+	{
+		"label": "Teljesítmény",
+		"href": "#performance",
+		"icon": "CircleGauge",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Teljesítmény",
+			"message": "A teljesítmény beállítások kezelése fejlesztés alatt áll."
+		}
+	},
+	{
+		"label": "Egyenleglekérdezés",
+		"href": "#balance",
+		"icon": "Wallet",
+		"children": [
+			{
+				"label": "24 Forintos lakáshitel",
+				"href": "#balance-housing",
+				"icon": "Home",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "Lakáshitel",
+					"message": "A lakáshitel funkció fejlesztés alatt áll."
+				}
+			},
+			{
+				"label": "Folyószámla-hitelkeret",
+				"href": "#balance-credit",
+				"icon": "CreditCard",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "Folyószámla-hitelkeret",
+					"message": "A folyószámla-hitelkeret funkció fejlesztés alatt áll."
+				}
+			},
+			{
+				"label": "Számlatörlés",
+				"href": "#balance-clear",
+				"icon": "Trash2",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "Számlatörlés",
+					"message": "A számlatörlés funkció fejlesztés alatt áll."
+				}
+			},
+			{
+				"label": "Állami bankárfolyam",
+				"href": "#balance-exchange",
+				"icon": "TrendingUp",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "Állami bankárfolyam",
+					"message": "Az állami bankárfolyam funkció fejlesztés alatt áll."
+				}
+			},
+			{
+				"label": "Megtakarítás",
+				"href": "#balance-savings",
+				"icon": "PiggyBank",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "Megtakarítás",
+					"message": "A megtakarítás funkció fejlesztés alatt áll."
+				}
+			},
+			{
+				"label": "Befektetés",
+				"href": "#balance-investment",
+				"icon": "Landmark",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "Befektetés",
+					"message": "A befektetés funkció fejlesztés alatt áll."
+				}
+			},
+			{
+				"label": "E-aláírás-feliratkozás",
+				"href": "#balance-esign",
+				"icon": "FileSignature",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "E-aláírás",
+					"message": "Az e-aláírás funkció fejlesztés alatt áll."
+				}
+			}
+		]
+	},
+	{
+		"label": "Pénzügyek",
+		"href": "#finance",
+		"icon": "DollarSign",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Pénzügyek",
+			"message": "A pénzügyi funkciók fejlesztés alatt állnak."
+		}
+	},
+	{
+		"label": "Kérések",
+		"href": "#requests",
+		"icon": "FileText",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Kérések",
+			"message": "A kérések funkció fejlesztés alatt áll."
+		}
+	},
+	{
+		"label": "Szolgáltatások",
+		"href": "#services",
+		"icon": "Wrench",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Szolgáltatások",
+			"message": "A szolgáltatások funkció fejlesztés alatt áll."
+		}
+	},
+	{
+		"label": "Dokumentumtartók",
+		"href": "#documents",
+		"icon": "FolderOpen",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Dokumentumtartók",
+			"message": "A dokumentumtartók funkció fejlesztés alatt áll."
+		}
+	},
+	{
+		"label": "Egyéb",
+		"href": "#other",
+		"icon": "MoreHorizontal",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Egyéb beállítások",
+			"message": "Az egyéb beállítások fejlesztés alatt állnak."
+		}
+	}
+]

@@ -1,18 +1,14 @@
 <script lang="ts">
+	import type { MenuItem } from '$lib/types/menu';
 	import UniversalIcon from './UniversalIcon.svelte';
-
-	interface MenuItem {
-		label: string;
-		href: string;
-		icon?: string;
-		children?: MenuItem[];
-	}
 
 	interface Props {
 		items: MenuItem[];
+		activeHref?: string;
+		onItemClick?: (item: MenuItem) => void;
 	}
 
-	let { items = [] }: Props = $props();
+	let { items = [], activeHref, onItemClick }: Props = $props();
 
 	// Track which menu items are expanded
 	let expandedItems = $state<Set<string>>(new Set());
@@ -30,17 +26,35 @@
 	function isExpanded(label: string): boolean {
 		return expandedItems.has(label);
 	}
+
+	function handleClick(item: MenuItem, event: MouseEvent) {
+		event.preventDefault();
+		onItemClick?.(item);
+	}
+
+	function handleParentClick(item: MenuItem, event: MouseEvent) {
+		event.preventDefault();
+		toggleExpand(item.label);
+		// Ha a szülő elemnek van komponense, akkor azt is meghívjuk
+		if (item.component) {
+			onItemClick?.(item);
+		}
+	}
 </script>
 
 <nav class="sidebar-menu">
 	{#each items as item}
 		<div class="menu-item-wrapper">
-			{#if item.children && item.children.length > 0}
+			{#if item.separator}
+				<!-- Separator line -->
+				<div class="menu-separator"></div>
+			{:else if item.children && item.children.length > 0}
 				<!-- Parent item with children -->
 				<button
 					class="menu-item parent"
 					class:expanded={isExpanded(item.label)}
-					onclick={() => toggleExpand(item.label)}
+					class:active={item.href === activeHref}
+					onclick={(e) => handleParentClick(item, e)}
 				>
 					<div class="menu-item-content">
 						{#if item.icon}
@@ -73,7 +87,11 @@
 				<div class="submenu-wrapper" class:expanded={isExpanded(item.label)}>
 					<div class="submenu">
 						{#each item.children as child}
-							<a href={child.href} class="menu-item child">
+							<button
+								class="menu-item child"
+								class:active={child.href === activeHref}
+								onclick={(e) => handleClick(child, e)}
+							>
 								<div class="menu-item-content">
 									{#if child.icon}
 										<UniversalIcon icon={child.icon} size={14} />
@@ -82,13 +100,17 @@
 									{/if}
 									<span class="label">{child.label}</span>
 								</div>
-							</a>
+							</button>
 						{/each}
 					</div>
 				</div>
 			{:else}
 				<!-- Simple menu item without children -->
-				<a href={item.href} class="menu-item">
+				<button
+					class="menu-item"
+					class:active={item.href === activeHref}
+					onclick={(e) => handleClick(item, e)}
+				>
 					<div class="menu-item-content">
 						{#if item.icon}
 							<UniversalIcon icon={item.icon} size={18} />
@@ -97,7 +119,7 @@
 						{/if}
 						<span class="label">{item.label}</span>
 					</div>
-				</a>
+				</button>
 			{/if}
 		</div>
 	{/each}
@@ -137,6 +159,17 @@
 		color: var(--color-neutral-900);
 	}
 
+	.menu-item.active {
+		background-color: var(--color-neutral-300);
+		color: var(--color-primary-alpha-70);
+		font-weight: 600;
+	}
+
+	.menu-item.active:hover {
+		background-color: var(--color-neutral-300);
+		color: var(--color-primary-alpha-90);
+	}
+
 	.menu-item.child {
 		padding: 0.5rem 0.625rem 0.5rem 2.25rem;
 		color: var(--color-neutral-500);
@@ -146,6 +179,17 @@
 
 	.menu-item.child:hover {
 		color: var(--color-neutral-800);
+	}
+
+	.menu-item.child.active {
+		background-color: var(--color-neutral-300);
+		color: var(--color-primary-alpha-70);
+		font-weight: 600;
+	}
+
+	.menu-item.child.active:hover {
+		background-color: var(--color-neutral-300);
+		color: var(--color-primary-alpha-90);
 	}
 
 	.menu-item-content {
@@ -205,6 +249,13 @@
 		min-height: 0;
 	}
 
+	/* Separator styles */
+	.menu-separator {
+		margin: 0.5rem 0;
+		background-color: var(--color-neutral-300);
+		height: 1px;
+	}
+
 	/* Dark mode styles */
 	:global(.dark) .menu-item {
 		color: var(--color-neutral-300);
@@ -215,12 +266,32 @@
 		color: var(--color-neutral-100);
 	}
 
+	:global(.dark) .menu-item.active {
+		background-color: var(--color-neutral-700);
+		color: var(--color-primary-alpha-70);
+	}
+
+	:global(.dark) .menu-item.active:hover {
+		background-color: var(--color-neutral-700);
+		color: var(--color-primary-alpha-90);
+	}
+
 	:global(.dark) .menu-item.child {
 		color: var(--color-neutral-500);
 	}
 
 	:global(.dark) .menu-item.child:hover {
 		color: var(--color-neutral-200);
+	}
+
+	:global(.dark) .menu-item.child.active {
+		background-color: var(--color-neutral-700);
+		color: var(--color-primary-alpha-70);
+	}
+
+	:global(.dark) .menu-item.child.active:hover {
+		background-color: var(--color-neutral-700);
+		color: var(--color-primary-alpha-90);
 	}
 
 	:global(.dark) .icon-placeholder {
@@ -233,5 +304,9 @@
 
 	:global(.dark) .chevron {
 		color: var(--color-neutral-500);
+	}
+
+	:global(.dark) .menu-separator {
+		background-color: var(--color-neutral-700);
 	}
 </style>

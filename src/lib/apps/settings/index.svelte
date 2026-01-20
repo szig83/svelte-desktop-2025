@@ -1,23 +1,56 @@
 <script lang="ts">
-	import ColorSchemePicker from '$lib/components/ui/ColorSchemePicker.svelte';
-	import { AppSideBar } from '$lib/components/shared';
-	import { AppSideBarMenu } from '$lib/components/shared';
+	import type { MenuItem } from '$lib/types/menu';
+	import { AppSideBar, AppSideBarMenu, AppContentArea } from '$lib/components/shared';
 	import menuItems from './menu.json';
+	import { getContext } from 'svelte';
 
-	/*function scrollToSection(id: string) {
-		const element = document.getElementById(id);
-		if (element) {
-			element.scrollIntoView({ behavior: 'smooth' });
+	// Settings betöltése a kontextusból
+	const settings = getContext('settings');
+
+	// Állapotkezelés
+	let activeMenuItem = $state<string | null>(null);
+	let activeComponent = $state<string | null>(null);
+	let componentProps = $state<Record<string, any>>({});
+
+	// Alapértelmezett menüpont beállítása
+	$effect(() => {
+		const defaultItem = findDefaultMenuItem(menuItems);
+		if (defaultItem) {
+			handleMenuItemClick(defaultItem);
 		}
-	}*/
+	});
+
+	function findDefaultMenuItem(items: MenuItem[]): MenuItem | null {
+		for (const item of items) {
+			if (item.component) {
+				return item;
+			}
+			if (item.children) {
+				const found = findDefaultMenuItem(item.children);
+				if (found) return found;
+			}
+		}
+		return null;
+	}
+
+	function handleMenuItemClick(item: MenuItem) {
+		activeMenuItem = item.href;
+		activeComponent = item.component || null;
+		// Mindig átadjuk a settings-et a komponensnek
+		componentProps = { ...item.props, data: { settings } };
+	}
 </script>
 
 <div class="settings-app">
 	<AppSideBar>
-		<AppSideBarMenu items={menuItems} />
+		<AppSideBarMenu
+			items={menuItems}
+			activeHref={activeMenuItem ?? undefined}
+			onItemClick={handleMenuItemClick}
+		/>
 	</AppSideBar>
 	<div class="settings-content">
-		<ColorSchemePicker />
+		<AppContentArea appName="settings" component={activeComponent} props={componentProps} />
 	</div>
 </div>
 
@@ -46,18 +79,18 @@
 
 	.settings-content::-webkit-scrollbar-thumb {
 		border-radius: 4px;
-		background: #d1d5db;
+		background: var(--color-neutral-300);
 	}
 
 	.settings-content::-webkit-scrollbar-thumb:hover {
-		background: #9ca3af;
+		background: var(--color-neutral-400);
 	}
 
-	:global(#desktop.dark) .settings-content::-webkit-scrollbar-thumb {
-		background: #4b5563;
+	:global(.dark) .settings-content::-webkit-scrollbar-thumb {
+		background: var(--color-neutral-600);
 	}
 
-	:global(#desktop.dark) .settings-content::-webkit-scrollbar-thumb:hover {
-		background: #6b7280;
+	:global(.dark) .settings-content::-webkit-scrollbar-thumb:hover {
+		background: var(--color-neutral-500);
 	}
 </style>

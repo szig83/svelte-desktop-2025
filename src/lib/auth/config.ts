@@ -18,7 +18,7 @@ export const baseAuthConfig: Omit<BetterAuthOptions, 'plugins'> = {
 		schema: {
 			...schema
 		},
-		debugLogs: true,
+		debugLogs: false,
 		usePlural: true
 	}),
 	account: {

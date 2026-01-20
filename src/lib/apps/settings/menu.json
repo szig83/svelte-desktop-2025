@@ -1,69 +1,47 @@
 [
 	{
-		"label": "Egyenleglekérdezés",
-		"href": "#",
-		"icon": "Wallet",
-		"children": [
-			{
-				"label": "24 Forintos lakáshitel",
-				"href": "/",
-				"icon": "Home"
-			},
-			{
-				"label": "Folyószámla-hitelkeret",
-				"href": "/",
-				"icon": "CreditCard"
-			},
-			{
-				"label": "Számlatörlés",
-				"href": "/",
-				"icon": "Trash2"
-			},
-			{
-				"label": "Állami bankárfolyam",
-				"href": "/",
-				"icon": "TrendingUp"
-			},
-			{
-				"label": "Megtakarítás",
-				"href": "/",
-				"icon": "PiggyBank"
-			},
-			{
-				"label": "Megtakarítás",
-				"href": "/",
-				"icon": "Landmark"
-			},
-			{
-				"label": "E-aláírás-feliratkozás",
-				"href": "/",
-				"icon": "FileSignature"
-			}
-		]
+		"label": "Általános",
+		"href": "#general",
+		"icon": "Settings",
+		"component": "GeneralSettings"
 	},
 	{
-		"label": "Pénzügyek",
-		"href": "#",
-		"icon": "DollarSign"
+		"separator": true,
+		"label": "",
+		"href": ""
 	},
 	{
-		"label": "Kérések",
-		"href": "#",
-		"icon": "FileText"
+		"label": "Megjelenés",
+		"href": "#appearance",
+		"icon": "Palette",
+		"component": "AppearanceSettings",
+		"props": {
+			"defaultTab": "colors"
+		}
 	},
 	{
-		"label": "Szolgáltatások",
-		"href": "#",
-		"icon": "Settings"
+		"label": "Háttér",
+		"href": "#background",
+		"icon": "Image",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Háttér",
+			"message": "A háttér beállítások kezelése fejlesztés alatt áll."
+		}
 	},
 	{
-		"label": "Dokumentumtartók",
-		"href": "#",
-		"icon": "FolderOpen"
+		"separator": true,
+		"label": "",
+		"href": ""
 	},
 	{
-		"label": "Egyéb",
-		"href": "#",
-		"icon": "MoreHorizontal"
+		"label": "Teljesítmény",
+		"href": "#performance",
+		"icon": "CircleGauge",
+		"component": "PerformanceSettings",
+		"props": {
+			"title": "Teljesítmény",
+			"message": "A teljesítmény beállítások kezelése fejlesztés alatt áll."
+		}
 	}
 ]
