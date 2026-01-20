@@ -891,7 +891,11 @@
 		border-radius: calc(var(--default-border-radius, 8px) - 2px)
 			calc(var(--default-border-radius, 8px) - 2px) 0 0;
 		/*background-color: var(--color-primary-alpha-70);*/
-		/*background: var(--color-background);*/
+		background: linear-gradient(
+			to bottom,
+			var(--color-background),
+			color-mix(in srgb, var(--color-background) 25%, transparent)
+		);
 		padding: 8px 12px;
 		color: var(--color-primary-alpha-90);
 		user-select: none;

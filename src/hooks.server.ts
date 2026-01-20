@@ -37,7 +37,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		emailServiceInitialized = true;
 	}
 
-	console.log(event.route.id);
 	if (event.route.id?.startsWith('/admin/(protected)')) {
 		// Betöltjük a beállításokat a cookie-ból, ha létezik
 		const savedSettings = event.cookies.get('user_settings');
@@ -60,7 +59,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		if (savedSettings) {
 			try {
-				console.log(savedSettings);
 				event.locals.settings = JSON.parse(savedSettings);
 			} catch {
 				event.locals.settings = defaultSettings;

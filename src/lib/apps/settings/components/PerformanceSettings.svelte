@@ -90,8 +90,8 @@
 		<div class="setting-item">
 			<div class="setting-header">
 				<div class="setting-label-group">
-					<Label for="prefer-performance">Teljesítmény prioritás</Label>
-					<p class="setting-description">Teljesítmény optimalizálás a vizuális effektek rovására</p>
+					<Label>Teljesítmény optimalizálás</Label>
+					<p class="setting-description">Gyorsabb működés a vizuális effektek rovására</p>
 				</div>
 				<Switch
 					id="prefer-performance"
@@ -113,7 +113,7 @@
 		<div class="setting-item">
 			<div class="setting-header">
 				<div class="setting-label-group" class:disabled={isWindowPreviewDisabled}>
-					<Label for="window-preview">Ablak előnézet</Label>
+					<Label>Ablak előnézet</Label>
 					<p class="setting-description">Előnézeti képek megjelenítése a tálcán</p>
 				</div>
 				<Switch
@@ -137,7 +137,7 @@
 		<div class="setting-item">
 			<div class="setting-header">
 				<div class="setting-label-group" class:disabled={isScreenshotHeightDisabled}>
-					<Label for="screenshot-height">Előnézeti kép magassága</Label>
+					<Label>Előnézeti kép magassága</Label>
 					<p class="setting-description">Az előnézeti képek magassága pixelben</p>
 				</div>
 				<div class="input-with-unit">
@@ -172,10 +172,11 @@
 	}
 
 	h2 {
-		margin-bottom: 1.5rem;
+		margin-bottom: 2rem;
 		color: var(--color-neutral-900);
 		font-weight: 600;
 		font-size: 1.5rem;
+		letter-spacing: -0.025em;
 	}
 
 	:global(.dark) h2 {
@@ -183,37 +184,39 @@
 	}
 
 	.settings-section {
-		margin-bottom: 2rem;
+		margin-bottom: 2.5rem;
 		border-bottom: 1px solid var(--color-neutral-200);
-		padding-bottom: 2rem;
+		padding-bottom: 2.5rem;
 	}
 
 	:global(.dark) .settings-section {
-		border-bottom-color: var(--color-neutral-700);
+		border-bottom-color: var(--color-neutral-800);
 	}
 
 	.settings-section:last-child {
+		margin-bottom: 0;
 		border-bottom: none;
+		padding-bottom: 0;
 	}
 
 	.setting-item {
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
+		gap: 1rem;
 	}
 
 	.setting-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		gap: 1rem;
+		gap: 1.5rem;
 	}
 
 	.setting-label-group {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
-		gap: 0.25rem;
+		gap: 0.375rem;
 	}
 
 	.setting-label-group.disabled {
@@ -221,39 +224,56 @@
 		cursor: not-allowed;
 	}
 
+	.setting-label-group :global(label) {
+		color: var(--color-neutral-900);
+		font-weight: 600;
+		font-size: 1.0625rem;
+		letter-spacing: -0.01em;
+	}
+
+	:global(.dark) .setting-label-group :global(label) {
+		color: var(--color-neutral-100);
+	}
+
 	.setting-description {
 		margin: 0;
-		color: var(--color-neutral-600);
-		font-size: 0.875rem;
+		color: var(--color-neutral-500);
+		font-weight: 400;
+		font-size: 0.8125rem;
 		line-height: 1.4;
 	}
 
 	:global(.dark) .setting-description {
-		color: var(--color-neutral-400);
+		color: var(--color-neutral-500);
 	}
 
 	.info-block {
+		border: 1px solid var(--color-neutral-200);
 		border-radius: var(--radius-md, 0.375rem);
-		background-color: var(--color-primary-50);
-		padding: 0.75rem 1rem;
-		color: var(--color-primary-900);
-		font-size: 0.8125rem;
-		line-height: 1.5;
+		background-color: var(--color-neutral-50);
+		padding: 0.875rem 1rem;
+		color: var(--color-neutral-600);
+		font-size: 0.75rem;
+		line-height: 1.6;
 	}
 
 	:global(.dark) .info-block {
-		background-color: var(--color-primary-950);
-		color: var(--color-primary-100);
+		border-color: var(--color-neutral-800);
+		background-color: var(--color-neutral-900);
+		color: var(--color-neutral-400);
 	}
 
 	.info-block.disabled {
-		background-color: var(--color-neutral-100);
-		color: var(--color-neutral-500);
+		opacity: 0.6;
+		border-color: var(--color-neutral-200);
+		background-color: var(--color-neutral-50);
+		color: var(--color-neutral-400);
 	}
 
 	:global(.dark) .info-block.disabled {
-		background-color: var(--color-neutral-800);
-		color: var(--color-neutral-500);
+		border-color: var(--color-neutral-800);
+		background-color: var(--color-neutral-900);
+		color: var(--color-neutral-600);
 	}
 
 	.info-block p {
