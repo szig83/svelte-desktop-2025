@@ -1,7 +1,8 @@
 /**
- * Közös komponensek exportja
- * Alkalmazások között megosztott komponensek
+ * Közös komponensek exportja.
+ * Alkalmazások között megosztott komponensek.
  */
 
 export { default as AppSideBar } from './AppSideBar.svelte';
+export { default as AppSideBarMenu } from './AppSideBarMenu.svelte';
 export { default as UniversalIcon } from './UniversalIcon.svelte';

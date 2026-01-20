@@ -1,0 +1,69 @@
+[
+	{
+		"label": "Egyenleglekérdezés",
+		"href": "#",
+		"icon": "Wallet",
+		"children": [
+			{
+				"label": "24 Forintos lakáshitel",
+				"href": "/",
+				"icon": "Home"
+			},
+			{
+				"label": "Folyószámla-hitelkeret",
+				"href": "/",
+				"icon": "CreditCard"
+			},
+			{
+				"label": "Számlatörlés",
+				"href": "/",
+				"icon": "Trash2"
+			},
+			{
+				"label": "Állami bankárfolyam",
+				"href": "/",
+				"icon": "TrendingUp"
+			},
+			{
+				"label": "Megtakarítás",
+				"href": "/",
+				"icon": "PiggyBank"
+			},
+			{
+				"label": "Megtakarítás",
+				"href": "/",
+				"icon": "Landmark"
+			},
+			{
+				"label": "E-aláírás-feliratkozás",
+				"href": "/",
+				"icon": "FileSignature"
+			}
+		]
+	},
+	{
+		"label": "Pénzügyek",
+		"href": "#",
+		"icon": "DollarSign"
+	},
+	{
+		"label": "Kérések",
+		"href": "#",
+		"icon": "FileText"
+	},
+	{
+		"label": "Szolgáltatások",
+		"href": "#",
+		"icon": "Settings"
+	},
+	{
+		"label": "Dokumentumtartók",
+		"href": "#",
+		"icon": "FolderOpen"
+	},
+	{
+		"label": "Egyéb",
+		"href": "#",
+		"icon": "MoreHorizontal"
+	}
+]

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import ColorSchemePicker from '$lib/components/ui/ColorSchemePicker.svelte';
 	import { AppSideBar } from '$lib/components/shared';
+	import { AppSideBarMenu } from '$lib/components/shared';
+	import menuItems from './menu.json';
 
 	/*function scrollToSection(id: string) {
 		const element = document.getElementById(id);
@@ -11,7 +13,9 @@
 </script>
 
 <div class="settings-app">
-	<AppSideBar>oldalsó menü</AppSideBar>
+	<AppSideBar>
+		<AppSideBarMenu items={menuItems} />
+	</AppSideBar>
 	<div class="settings-content">
 		<ColorSchemePicker />
 	</div>

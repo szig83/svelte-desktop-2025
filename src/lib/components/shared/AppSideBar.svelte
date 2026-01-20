@@ -17,7 +17,7 @@
 	:global {
 		.dark {
 			.app-sidebar {
-				background-color: var(--color-neutral-900);
+				background-color: var(--color-neutral-800);
 			}
 		}
 	}
