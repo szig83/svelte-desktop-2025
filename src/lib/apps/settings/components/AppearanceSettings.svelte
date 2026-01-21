@@ -7,11 +7,9 @@
 	import { getContext } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import type { ThemeMode, FontSize } from '$lib/types/theme';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	// Ikonok
-	import Sun from 'lucide-svelte/icons/sun';
-	import Moon from 'lucide-svelte/icons/moon';
-	import Monitor from 'lucide-svelte/icons/monitor';
 	import Type from 'lucide-svelte/icons/type';
 
 	// Settings objektum a kontextusból
@@ -112,40 +110,66 @@
 				<p class="setting-description">Válaszd ki a desktop megjelenését</p>
 			</div>
 
-			<div class="theme-mode-cards">
-				<button
-					class="theme-card"
-					class:active={settings.theme.mode === 'light'}
-					onclick={() => handleThemeModeChange('light')}
-				>
-					<div class="theme-card-icon">
-						<Sun size={28} />
-					</div>
-					<span class="theme-card-label">Világos</span>
-				</button>
+			<Tooltip.Provider delayDuration={200}>
+				<div class="theme-mode-swatches">
+					<!-- Világos mód -->
 
-				<button
-					class="theme-card"
-					class:active={settings.theme.mode === 'dark'}
-					onclick={() => handleThemeModeChange('dark')}
-				>
-					<div class="theme-card-icon">
-						<Moon size={28} />
-					</div>
-					<span class="theme-card-label">Sötét</span>
-				</button>
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								class="theme-swatch light-swatch"
+								class:active={settings.theme.mode === 'light'}
+								onclick={() => handleThemeModeChange('light')}
+								aria-label="Világos mód"
+								type="button"
+							>
+								{#if settings.theme.mode === 'light'}
+									<span class="checkmark">✓</span>
+								{/if}
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content>Világos mód</Tooltip.Content>
+					</Tooltip.Root>
 
-				<button
-					class="theme-card"
-					class:active={settings.theme.mode === 'auto'}
-					onclick={() => handleThemeModeChange('auto')}
-				>
-					<div class="theme-card-icon">
-						<Monitor size={28} />
-					</div>
-					<span class="theme-card-label">Automatikus</span>
-				</button>
-			</div>
+					<!-- Sötét mód -->
+
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								class="theme-swatch dark-swatch"
+								class:active={settings.theme.mode === 'dark'}
+								onclick={() => handleThemeModeChange('dark')}
+								aria-label="Sötét mód"
+								type="button"
+							>
+								{#if settings.theme.mode === 'dark'}
+									<span class="checkmark">✓</span>
+								{/if}
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content>Sötét mód</Tooltip.Content>
+					</Tooltip.Root>
+
+					<!-- Automatikus mód -->
+
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								class="theme-swatch auto-swatch"
+								class:active={settings.theme.mode === 'auto'}
+								onclick={() => handleThemeModeChange('auto')}
+								aria-label="Automatikus mód"
+								type="button"
+							>
+								{#if settings.theme.mode === 'auto'}
+									<span class="checkmark">✓</span>
+								{/if}
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content>Automatikus mód</Tooltip.Content>
+					</Tooltip.Root>
+				</div>
+			</Tooltip.Provider>
 
 			<div class="info-block">
 				<p>
@@ -165,32 +189,63 @@
 				<p class="setting-description">A taskbar eltérő témát használhat a desktoptól</p>
 			</div>
 
-			<div class="mode-buttons">
-				<Button
-					variant={settings.theme.modeTaskbarStartMenu === 'light' ? 'default' : 'outline'}
-					size="sm"
-					onclick={() => handleTaskbarModeChange('light')}
-				>
-					<Sun size={16} />
-					Világos
-				</Button>
-				<Button
-					variant={settings.theme.modeTaskbarStartMenu === 'dark' ? 'default' : 'outline'}
-					size="sm"
-					onclick={() => handleTaskbarModeChange('dark')}
-				>
-					<Moon size={16} />
-					Sötét
-				</Button>
-				<Button
-					variant={settings.theme.modeTaskbarStartMenu === 'auto' ? 'default' : 'outline'}
-					size="sm"
-					onclick={() => handleTaskbarModeChange('auto')}
-				>
-					<Monitor size={16} />
-					Auto
-				</Button>
-			</div>
+			<Tooltip.Provider delayDuration={200}>
+				<div class="theme-mode-swatches">
+					<!-- Világos mód -->
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								class="theme-swatch light-swatch"
+								class:active={settings.theme.modeTaskbarStartMenu === 'light'}
+								onclick={() => handleTaskbarModeChange('light')}
+								aria-label="Világos mód"
+								type="button"
+							>
+								{#if settings.theme.modeTaskbarStartMenu === 'light'}
+									<span class="checkmark">✓</span>
+								{/if}
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content>Világos mód</Tooltip.Content>
+					</Tooltip.Root>
+
+					<!-- Sötét mód -->
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								class="theme-swatch dark-swatch"
+								class:active={settings.theme.modeTaskbarStartMenu === 'dark'}
+								onclick={() => handleTaskbarModeChange('dark')}
+								aria-label="Sötét mód"
+								type="button"
+							>
+								{#if settings.theme.modeTaskbarStartMenu === 'dark'}
+									<span class="checkmark">✓</span>
+								{/if}
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content>Sötét mód</Tooltip.Content>
+					</Tooltip.Root>
+
+					<!-- Automatikus mód -->
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								class="theme-swatch auto-swatch"
+								class:active={settings.theme.modeTaskbarStartMenu === 'auto'}
+								onclick={() => handleTaskbarModeChange('auto')}
+								aria-label="Automatikus mód"
+								type="button"
+							>
+								{#if settings.theme.modeTaskbarStartMenu === 'auto'}
+									<span class="checkmark">✓</span>
+								{/if}
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content>Automatikus mód</Tooltip.Content>
+					</Tooltip.Root>
+				</div>
+			</Tooltip.Provider>
 
 			<div class="info-block">
 				<p>
@@ -358,109 +413,163 @@
 		margin: 0;
 	}
 
-	/* Téma mód kártyák - Modernebb megjelenés */
-	.theme-mode-cards {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	/* Téma mód korongok - Hasonló a szín választóhoz */
+	.theme-mode-swatches {
+		display: flex;
+		flex-wrap: wrap;
 		gap: 0.75rem;
 		margin-top: 0.5rem;
 	}
 
-	.theme-card {
+	.theme-swatch {
 		display: flex;
-		flex-direction: column;
+		position: relative;
 		justify-content: center;
 		align-items: center;
-		gap: 0.625rem;
-		transition: all 0.2s ease;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
 		cursor: pointer;
-		border: 2px solid var(--color-neutral-200);
-		border-radius: var(--radius-lg, 0.5rem);
-		background-color: transparent;
-		padding: 1.25rem 0.75rem;
-		min-height: 100px;
+		border: 3px solid transparent;
+		border-radius: 50%;
+		padding: 0;
+		width: 40px;
+		height: 40px;
 	}
 
-	:global(.dark) .theme-card {
+	.theme-swatch:hover {
+		border-color: rgba(0, 0, 0, 0.3);
+	}
+
+	:global(.dark) .theme-swatch:hover {
+		border-color: rgba(255, 255, 255, 0.3);
+	}
+
+	.theme-swatch:focus {
+		outline: 2px solid var(--primary);
+		outline-offset: 2px;
+	}
+
+	.theme-swatch:focus:not(:focus-visible) {
+		outline: none;
+	}
+
+	.theme-swatch.active {
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+		border-color: rgba(0, 0, 0, 0.5);
+	}
+
+	:global(.dark) .theme-swatch.active {
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.6);
+	}
+
+	/* Világos mód korong */
+	.light-swatch {
+		border: 3px solid var(--color-neutral-300);
+		background: linear-gradient(135deg, #e5e5e5 0%, #d0d0d0 100%);
+	}
+
+	:global(.dark) .light-swatch {
+		border-color: var(--color-neutral-600);
+	}
+
+	.light-swatch:hover {
+		border-color: var(--color-neutral-400);
+	}
+
+	:global(.dark) .light-swatch:hover {
+		border-color: var(--color-neutral-500);
+	}
+
+	.light-swatch.active {
+		border-color: var(--color-neutral-600);
+	}
+
+	:global(.dark) .light-swatch.active {
+		border-color: var(--color-neutral-400);
+	}
+
+	/* Sötét mód korong */
+	.dark-swatch {
+		border: 3px solid var(--color-neutral-700);
+		background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+	}
+
+	:global(.dark) .dark-swatch {
+		border-color: var(--color-neutral-500);
+	}
+
+	.dark-swatch:hover {
+		border-color: var(--color-neutral-600);
+	}
+
+	:global(.dark) .dark-swatch:hover {
+		border-color: var(--color-neutral-400);
+	}
+
+	.dark-swatch.active {
+		border-color: var(--color-neutral-900);
+	}
+
+	:global(.dark) .dark-swatch.active {
+		border-color: var(--color-neutral-300);
+	}
+
+	/* Automatikus mód korong - fele világos, fele sötét */
+	.auto-swatch {
+		border: 3px solid var(--color-neutral-400);
+		background: linear-gradient(90deg, #e5e5e5 0%, #e5e5e5 50%, #1a1a1a 50%, #1a1a1a 100%);
+	}
+
+	:global(.dark) .auto-swatch {
+		border-color: var(--color-neutral-500);
+	}
+
+	.auto-swatch:hover {
+		border-color: var(--color-neutral-500);
+	}
+
+	:global(.dark) .auto-swatch:hover {
+		border-color: var(--color-neutral-400);
+	}
+
+	.auto-swatch.active {
 		border-color: var(--color-neutral-700);
 	}
 
-	.theme-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-		border-color: var(--color-primary-400);
-		background-color: var(--color-primary-50);
+	:global(.dark) .auto-swatch.active {
+		border-color: var(--color-neutral-300);
 	}
 
-	:global(.dark) .theme-card:hover {
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-		border-color: var(--color-primary-500);
-		background-color: var(--color-primary-950);
-	}
-
-	.theme-card.active {
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		border-color: var(--color-primary-500);
-		background-color: var(--color-primary-50);
-	}
-
-	:global(.dark) .theme-card.active {
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-		border-color: var(--color-primary-400);
-		background-color: var(--color-primary-900);
-	}
-
-	.theme-card-icon {
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	/* Checkmark a korongokon */
+	.theme-swatch .checkmark {
+		transition: opacity 0.2s ease;
 		color: var(--color-neutral-600);
+		font-weight: bold;
+		font-size: 20px;
+		text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
 	}
 
-	:global(.dark) .theme-card-icon {
-		color: var(--color-neutral-400);
+	.dark-swatch .checkmark {
+		color: var(--color-neutral-300);
+		text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 	}
 
-	.theme-card.active .theme-card-icon {
-		color: var(--color-primary-600);
-	}
-
-	:global(.dark) .theme-card.active .theme-card-icon {
-		color: var(--color-primary-400);
-	}
-
-	.theme-card-label {
+	.auto-swatch .checkmark {
 		color: var(--color-neutral-700);
-		font-weight: 500;
-		font-size: 0.8125rem;
+		text-shadow:
+			-1px -1px 0 #fff,
+			1px -1px 0 #fff,
+			-1px 1px 0 #fff,
+			1px 1px 0 #fff;
 	}
 
-	:global(.dark) .theme-card-label {
+	:global(.dark) .auto-swatch .checkmark {
 		color: var(--color-neutral-300);
 	}
 
-	.theme-card.active .theme-card-label {
-		color: var(--color-primary-700);
-		font-weight: 600;
-	}
-
-	:global(.dark) .theme-card.active .theme-card-label {
-		color: var(--color-primary-300);
-	}
-
-	/* Taskbar és betűméret gombok */
-	.mode-buttons {
-		display: flex;
-		gap: 0.5rem;
-		margin-top: 0.5rem;
-	}
-
-	.mode-buttons :global(button) {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
+	/* Betűméret gombok */
 	.font-size-buttons {
 		display: flex;
 		gap: 0.5rem;

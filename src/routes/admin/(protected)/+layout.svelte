@@ -8,6 +8,7 @@
 	import { setContext } from 'svelte';
 	import { createThemeManager } from '$lib/stores';
 	import { updateSettings } from '$lib/apps/settings/settings.remote';
+	import '@fontsource-variable/quicksand';
 
 	let { children, data } = $props();
 
@@ -35,22 +36,25 @@
 	setContext('settings', settingsContext);
 
 	// ThemeManager inicializálása a szerver beállításokkal
-	// Csak kliens oldalon, de NEM $effect-ben, hanem közvetlenül
+	// Csak kliens oldalon
 	if (browser) {
-		const themeManager = createThemeManager(data.settings.theme);
+		let themeManager = $state<ReturnType<typeof createThemeManager>>();
 
-		// Beállítjuk a mentési callback-et, ami cookie-ba menti
-		themeManager.setSaveCallback(async (themeSettings) => {
-			await updateSettings({ theme: themeSettings });
-		});
-
-		// Figyeljük a data.settings.theme változásait és frissítjük a ThemeManager-t
-		// DE csak akkor, ha tényleg változott (nem mentés miatt)
+		// Inicializáljuk és frissítjük a ThemeManager-t
 		$effect(() => {
-			// Frissítjük a ThemeManager settings-ét közvetlenül, mentés nélkül
-			const currentSettings = data.settings.theme;
-			if (JSON.stringify(themeManager.settings) !== JSON.stringify(currentSettings)) {
-				themeManager.settings = { ...currentSettings };
+			if (!themeManager) {
+				themeManager = createThemeManager(data.settings.theme);
+
+				// Beállítjuk a mentési callback-et, ami cookie-ba menti
+				themeManager.setSaveCallback(async (themeSettings) => {
+					await updateSettings({ theme: themeSettings });
+				});
+			} else {
+				// Frissítjük a ThemeManager settings-ét közvetlenül, mentés nélkül
+				const currentSettings = data.settings.theme;
+				if (JSON.stringify(themeManager.settings) !== JSON.stringify(currentSettings)) {
+					themeManager.settings = { ...currentSettings };
+				}
 			}
 		});
 	}
@@ -62,3 +66,9 @@
 <Desktop>
 	{@render children()}
 </Desktop>
+
+<style>
+	:global(h1, h2, h3, h4, h5, h6, lablel) {
+		font-family: 'Quicksand Variable', serif;
+	}
+</style>
