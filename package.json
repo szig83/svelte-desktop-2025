@@ -74,6 +74,7 @@
 	},
 	"dependencies": {
 		"@faker-js/faker": "^10.2.0",
+		"@fontsource-variable/montserrat": "^5.2.8",
 		"@types/pg": "^8.16.0",
 		"better-auth": "^1.4.16",
 		"clsx": "^2.1.1",

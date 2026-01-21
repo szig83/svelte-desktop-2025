@@ -27,6 +27,13 @@ export const baseAuthConfig: Omit<BetterAuthOptions, 'plugins'> = {
 			accountId: 'providerAccountId'
 		}
 	},
+	trustedOrigins: [
+		'http://localhost:5173',
+		'http://127.0.0.1:5173',
+		...(process.env.NODE_ENV === 'development'
+			? ['http://10.8.0.33:5173', 'http://192.168.*:5173']
+			: [])
+	],
 	advanced: {
 		database: {
 			generateId: false
