@@ -9,7 +9,7 @@ let emailServiceInitialized = false;
 
 export const handle: Handle = async ({ event, resolve }) => {
 	// Initialize email service once on first request with enhanced configuration
-	if (!emailServiceInitialized && !building) {
+	/*if (!emailServiceInitialized && !building) {
 		try {
 			// Enhanced initialization with migration and cache warm-up
 			const emailState = await initializeEmailService({
@@ -36,10 +36,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 		emailServiceInitialized = true;
 	}
+        */
 
 	if (event.route.id?.startsWith('/admin/(protected)')) {
 		// Betöltjük a beállításokat a cookie-ból, ha létezik
-		const savedSettings = event.cookies.get('user_settings');
+		const savedSettings = event.cookies.get('app.user_settings');
 		const defaultSettings = {
 			windowPreview: true,
 			screenshotThumbnailHeight: 200,
@@ -74,11 +75,38 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (session) {
 			event.locals.session = session.session;
 			event.locals.user = session.user;
-			return svelteKitHandler({ event, resolve, auth, building });
+			return svelteKitHandler({
+				event,
+				resolve: (event) =>
+					resolve(event, {
+						transformPageChunk: ({ html }) => {
+							// Itt cserélhetsz le vagy adhatsz hozzá bármit a HTML-hez
+							// Például: meta tag hozzáadása, script injektálása, stb.
+							return (
+								html
+									//.replace('</head>', '<meta name="custom" content="value" /></head>')
+									.replace('#class-placeholder#', event.locals.settings.theme.mode)
+							);
+						}
+					}),
+				auth,
+				building
+			});
 		} else {
 			return redirect(307, '/admin/sign-in');
 		}
 	} else {
-		return svelteKitHandler({ event, resolve, auth, building });
+		return svelteKitHandler({
+			event,
+			resolve: (event) =>
+				resolve(event, {
+					transformPageChunk: ({ html }) => {
+						// Ugyanaz a transzformáció a nem védett oldalakra is
+						return html.replace('#class-placeholder#', 'new-text');
+					}
+				}),
+			auth,
+			building
+		});
 	}
 };

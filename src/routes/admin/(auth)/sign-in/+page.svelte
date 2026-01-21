@@ -174,7 +174,13 @@
 				</div>
 				<Input id="password" type="password" required bind:value={password} />
 			</div>
-			<Button type="button" class="w-full" onclick={handleSignIn} disabled={isLoading}>
+			<Button
+				type="button"
+				class="w-full"
+				onclick={handleSignIn}
+				disabled={isLoading}
+				variant="login"
+			>
 				{#if isLoading}
 					<div class="flex items-center">
 						<div class="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>

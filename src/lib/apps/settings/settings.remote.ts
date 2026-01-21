@@ -15,67 +15,64 @@ const updateSettingsSchema = v.object({
  * @param updates - A frissítendő beállítások.
  * @returns A frissített beállítások objektum.
  */
-export const updateSettings = command(
-	updateSettingsSchema,
-	async (updates) => {
-		const event = getRequestEvent();
-		const { cookies, locals } = event;
+export const updateSettings = command(updateSettingsSchema, async (updates) => {
+	const event = getRequestEvent();
+	const { cookies, locals } = event;
 
-		// Inicializáljuk a settings-et, ha még nincs
-		if (!locals.settings) {
-			locals.settings = {
-				windowPreview: true,
-				screenshotThumbnailHeight: APP_CONSTANTS.DEFAULT_SCREENSHOT_HEIGHT,
-				preferPerformance: false,
-				background: {
-					type: 'video',
-					value: 'bg-video.mp4'
-				},
-				taskbarPosition: 'bottom',
-				theme: {
-					mode: 'dark',
-					modeTaskbarStartMenu: 'dark',
-					colorPrimaryHue: '225',
-					fontSize: 'medium'
-				}
-			};
-		}
-
-		// Frissítjük a locals.settings objektumot
-		if (updates.preferPerformance !== undefined) {
-			locals.settings.preferPerformance = updates.preferPerformance;
-
-			// Ha preferPerformance true, akkor windowPreview automatikusan false
-			if (updates.preferPerformance) {
-				locals.settings.windowPreview = false;
+	// Inicializáljuk a settings-et, ha még nincs
+	if (!locals.settings) {
+		locals.settings = {
+			windowPreview: true,
+			screenshotThumbnailHeight: APP_CONSTANTS.DEFAULT_SCREENSHOT_HEIGHT,
+			preferPerformance: false,
+			background: {
+				type: 'video',
+				value: 'bg-video.mp4'
+			},
+			taskbarPosition: 'bottom',
+			theme: {
+				mode: 'dark',
+				modeTaskbarStartMenu: 'dark',
+				colorPrimaryHue: '225',
+				fontSize: 'medium'
 			}
-		}
-
-		if (updates.windowPreview !== undefined && !locals.settings.preferPerformance) {
-			locals.settings.windowPreview = updates.windowPreview;
-		}
-
-		if (updates.screenshotThumbnailHeight !== undefined) {
-			// Csak akkor frissítjük, ha windowPreview engedélyezve van
-			if (locals.settings.windowPreview && !locals.settings.preferPerformance) {
-				locals.settings.screenshotThumbnailHeight = updates.screenshotThumbnailHeight;
-			}
-		}
-
-		// Mentjük cookie-ban
-		cookies.set('user_settings', JSON.stringify(locals.settings), {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'strict',
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 60 * 60 * 24 * 365 // 1 év
-		});
-
-		console.log('Settings updated:', locals.settings);
-
-		return {
-			success: true,
-			settings: locals.settings as UserSettings
 		};
 	}
-);
+
+	// Frissítjük a locals.settings objektumot
+	if (updates.preferPerformance !== undefined) {
+		locals.settings.preferPerformance = updates.preferPerformance;
+
+		// Ha preferPerformance true, akkor windowPreview automatikusan false
+		if (updates.preferPerformance) {
+			locals.settings.windowPreview = false;
+		}
+	}
+
+	if (updates.windowPreview !== undefined && !locals.settings.preferPerformance) {
+		locals.settings.windowPreview = updates.windowPreview;
+	}
+
+	if (updates.screenshotThumbnailHeight !== undefined) {
+		// Csak akkor frissítjük, ha windowPreview engedélyezve van
+		if (locals.settings.windowPreview && !locals.settings.preferPerformance) {
+			locals.settings.screenshotThumbnailHeight = updates.screenshotThumbnailHeight;
+		}
+	}
+
+	// Mentjük cookie-ban
+	cookies.set('app.user_settings', JSON.stringify(locals.settings), {
+		path: '/',
+		httpOnly: true,
+		sameSite: 'strict',
+		secure: process.env.NODE_ENV === 'production',
+		maxAge: 60 * 60 * 24 * 365 // 1 év
+	});
+
+	console.log('Settings updated:', locals.settings);
+
+	return {
+		success: true,
+		settings: locals.settings as UserSettings
+	};
+});
