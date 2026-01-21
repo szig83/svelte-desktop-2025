@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth/client';
 	import { Button } from '$lib/components/ui/button';
-	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import type { PageData } from './$types';
+	import Decor from './Decor.svelte';
+	import Logo from '$lib/components/shared/Logo.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -80,13 +81,13 @@
 	};
 </script>
 
-<Card.Root class="mx-auto max-w-sm">
-	<Card.Header>
-		<Card.Title class="text-2xl">Bejelentkezés</Card.Title>
-		<Card.Description>Adja meg az email címét és jelszavát a bejelentkezéshez</Card.Description>
-	</Card.Header>
-	<Card.Content>
-		<div class="grid gap-4">
+<div class="flex w-[70%] max-w-[1000px] overflow-hidden rounded-2xl shadow-2xl">
+	<!-- Bal oldal - Form -->
+	<div class="flex w-full flex-col justify-between bg-white p-8 lg:w-2/5 lg:p-10">
+		<!-- Logo -->
+		<Logo title="Svelte Desktop" />
+
+		<div class="mt-8 grid gap-4">
 			<!-- Email verification info notice - only show when relevant -->
 			{#if showInfoNotice}
 				<div class="rounded-md bg-blue-50 p-3 text-sm dark:bg-blue-950">
@@ -202,5 +203,18 @@
 				<a href="/admin/sign-up" class="underline">Regisztráljon itt</a>
 			</div>
 		{/if}
-	</Card.Content>
-</Card.Root>
+	</div>
+
+	<!-- Jobb oldal - Dekoratív háttér -->
+	<div class="relative hidden overflow-hidden lg:block lg:w-3/5">
+		<Decor />
+
+		<!-- Szöveg tartalom -->
+		<div class="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
+			<h1 class="mb-4 font-serif text-3xl font-light tracking-wide text-white">
+				Üdvözöljünk a <span class="block font-normal text-white">Svelte Desktop</span> rendszerben
+			</h1>
+			<p class="text-base text-gray-300">Fiókja eléréshez kérjük jelentkezzen be.</p>
+		</div>
+	</div>
+</div>
