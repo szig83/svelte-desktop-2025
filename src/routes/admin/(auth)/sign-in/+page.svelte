@@ -1,31 +1,31 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth/client';
-	import { writable } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import type { PageData } from './$types';
 
-	import { page } from '$app/stores';
+	let { data }: { data: PageData } = $props();
 
-	const email = writable('');
-	const password = writable('');
-	const isLoading = writable(false);
-	const errorMessage = writable('');
-	const showVerificationPrompt = writable(false);
+	let email = $state('');
+	let password = $state('');
+	let isLoading = $state(false);
+	let errorMessage = $state('');
+	let showVerificationPrompt = $state(false);
 
 	// Show info notice only if coming from registration or if there's a verification error
-	$: showInfoNotice = $page.url.searchParams.has('registered') || $showVerificationPrompt;
+	let showInfoNotice = $derived(data.registered || showVerificationPrompt);
 
 	const handleSignIn = async () => {
-		$isLoading = true;
-		$errorMessage = '';
-		$showVerificationPrompt = false;
+		isLoading = true;
+		errorMessage = '';
+		showVerificationPrompt = false;
 
 		await authClient.signIn.email(
 			{
-				email: $email,
-				password: $password,
+				email: email,
+				password: password,
 				callbackURL: '/admin'
 			},
 			{
@@ -40,43 +40,43 @@
 						error.message?.toLowerCase().includes('not verified') ||
 						error.code === 'EMAIL_NOT_VERIFIED'
 					) {
-						$showVerificationPrompt = true;
-						$errorMessage =
+						showVerificationPrompt = true;
+						errorMessage =
 							'Az email címe még nincs megerősítve. A bejelentkezéshez először meg kell erősítenie az email címét.';
 					} else if (
 						error.message?.toLowerCase().includes('invalid') &&
 						error.message?.toLowerCase().includes('credentials')
 					) {
-						$errorMessage = 'Helytelen email cím vagy jelszó. Kérjük ellenőrizze az adatokat.';
+						errorMessage = 'Helytelen email cím vagy jelszó. Kérjük ellenőrizze az adatokat.';
 					} else if (
 						error.message?.toLowerCase().includes('user') &&
 						error.message?.toLowerCase().includes('not found')
 					) {
-						$errorMessage =
+						errorMessage =
 							'Nincs regisztrált fiók ezzel az email címmel. Kérjük először regisztráljon.';
 					} else if (
 						error.message?.toLowerCase().includes('account') &&
 						error.message?.toLowerCase().includes('locked')
 					) {
-						$errorMessage = 'A fiók ideiglenesen zárolva van. Kérjük próbálja újra később.';
+						errorMessage = 'A fiók ideiglenesen zárolva van. Kérjük próbálja újra később.';
 					} else if (
 						error.message?.toLowerCase().includes('rate') ||
 						error.message?.toLowerCase().includes('limit')
 					) {
-						$errorMessage =
+						errorMessage =
 							'Túl sok bejelentkezési kísérlet. Kérjük várjon egy kicsit és próbálja újra.';
 					} else {
-						$errorMessage = error.message || 'Bejelentkezési hiba történt. Kérjük próbálja újra.';
+						errorMessage = error.message || 'Bejelentkezési hiba történt. Kérjük próbálja újra.';
 					}
 				}
 			}
 		);
 
-		$isLoading = false;
+		isLoading = false;
 	};
 
 	const handleResendVerification = () => {
-		window.location.href = `/resend-verification?email=${encodeURIComponent($email)}`;
+		window.location.href = `/resend-verification?email=${encodeURIComponent(email)}`;
 	};
 </script>
 
@@ -105,7 +105,7 @@
 						<div class="text-blue-800 dark:text-blue-200">
 							<p class="font-medium">Email megerősítés szükséges</p>
 							<p class="mt-1 text-xs">
-								{#if $page.url.searchParams.has('registered')}
+								{#if data.registered}
 									Sikeres regisztráció! Ellenőrizze a postafiókját a megerősítő email után, majd
 									jelentkezzen be.
 								{:else}
@@ -117,7 +117,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if $errorMessage}
+			{#if errorMessage}
 				<div
 					class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
 				>
@@ -130,8 +130,8 @@
 							/>
 						</svg>
 						<div class="flex-1">
-							<span>{$errorMessage}</span>
-							{#if $showVerificationPrompt}
+							<span>{errorMessage}</span>
+							{#if showVerificationPrompt}
 								<div class="mt-3 space-y-2">
 									<p class="text-xs text-red-700 dark:text-red-300">
 										Ellenőrizze a postafiókját (beleértve a spam mappát is) a megerősítő email után.
@@ -162,7 +162,7 @@
 			{/if}
 			<div class="grid gap-2">
 				<Label for="email">Email cím</Label>
-				<Input id="email" type="email" placeholder="pelda@email.com" required bind:value={$email} />
+				<Input id="email" type="email" placeholder="pelda@email.com" required bind:value={email} />
 			</div>
 			<div class="grid gap-2">
 				<div class="flex items-center">
@@ -171,10 +171,10 @@
 						Elfelejtette a jelszavát?
 					</a>
 				</div>
-				<Input id="password" type="password" required bind:value={$password} />
+				<Input id="password" type="password" required bind:value={password} />
 			</div>
-			<Button type="button" class="w-full" onclick={handleSignIn} disabled={$isLoading}>
-				{#if $isLoading}
+			<Button type="button" class="w-full" onclick={handleSignIn} disabled={isLoading}>
+				{#if isLoading}
 					<div class="flex items-center">
 						<div class="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
 						Bejelentkezés...
@@ -183,20 +183,24 @@
 					Bejelentkezés
 				{/if}
 			</Button>
-			<Button
-				variant="outline"
-				class="w-full"
-				onclick={async () => {
-					await authClient.signIn.social({
-						provider: 'google',
-						callbackURL: '/admin'
-					});
-				}}>Bejelentkezés Google-lel</Button
-			>
+			{#if data.socialLoginEnabled}
+				<Button
+					variant="outline"
+					class="w-full"
+					onclick={async () => {
+						await authClient.signIn.social({
+							provider: 'google',
+							callbackURL: '/admin'
+						});
+					}}>Bejelentkezés Google-lel</Button
+				>
+			{/if}
 		</div>
-		<div class="mt-4 text-center text-sm">
-			Nincs még fiókja?
-			<a href="/admin/sign-up" class="underline">Regisztráljon itt</a>
-		</div>
+		{#if data.registrationEnabled}
+			<div class="mt-4 text-center text-sm">
+				Nincs még fiókja?
+				<a href="/admin/sign-up" class="underline">Regisztráljon itt</a>
+			</div>
+		{/if}
 	</Card.Content>
 </Card.Root>

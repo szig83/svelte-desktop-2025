@@ -19,6 +19,20 @@ const envSchema = v.object({
 	GOOGLE_CLIENT_SECRET: v.optional(v.string()),
 	BETTER_AUTH_SECRET: v.optional(v.string()),
 	BETTER_AUTH_URL: v.optional(v.string()),
+	REGISTRATION_ENABLED: v.optional(
+		v.pipe(
+			v.string(),
+			v.check((s) => s === 'true' || s === 'false'),
+			v.transform((s) => s === 'true')
+		)
+	),
+	SOCIAL_LOGIN_ENABLED: v.optional(
+		v.pipe(
+			v.string(),
+			v.check((s) => s === 'true' || s === 'false'),
+			v.transform((s) => s === 'true')
+		)
+	),
 	// Email service configuration
 	EMAIL_PROVIDER: v.optional(v.picklist(['resend', 'sendgrid', 'smtp', 'ses']), 'resend'),
 
@@ -206,6 +220,8 @@ function validateEnv(): Env {
 			GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 			BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
 			BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+			REGISTRATION_ENABLED: process.env.REGISTRATION_ENABLED,
+			SOCIAL_LOGIN_ENABLED: process.env.SOCIAL_LOGIN_ENABLED,
 			EMAIL_PROVIDER: process.env.EMAIL_PROVIDER,
 			RESEND_API_KEY: process.env.RESEND_API_KEY,
 			RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
