@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
+	import ColorHuePicker from '$lib/components/ui/ColorHuePicker.svelte';
 	import { toast } from 'svelte-sonner';
 	import { updateSettings } from '../settings.remote';
 	import { getContext } from 'svelte';
@@ -18,6 +19,7 @@
 		theme: {
 			mode: ThemeMode;
 			modeTaskbarStartMenu: ThemeMode;
+			colorPrimaryHue: string;
 			fontSize: FontSize;
 		};
 	}>('settings');
@@ -72,6 +74,24 @@
 			}
 		} catch (error) {
 			console.error('Font size update error:', error);
+			toast.error('Hiba történt a mentés során');
+		}
+	}
+
+	// Szín változtatása
+	async function handleColorChange(newHue: number) {
+		try {
+			const result = await updateSettings({
+				theme: { colorPrimaryHue: newHue.toString() }
+			});
+			if (result && 'success' in result && result.success) {
+				await invalidate('app:settings');
+				toast.success('Szín mentve');
+			} else {
+				toast.error('Hiba történt a mentés során');
+			}
+		} catch (error) {
+			console.error('Color update error:', error);
 			toast.error('Hiba történt a mentés során');
 		}
 	}
@@ -158,20 +178,43 @@
 					<Moon size={16} />
 					Sötét
 				</Button>
-				<Button
+				<!-- <Button
 					variant={settings.theme.modeTaskbarStartMenu === 'auto' ? 'default' : 'outline'}
 					size="sm"
 					onclick={() => handleTaskbarModeChange('auto')}
 				>
 					<Monitor size={16} />
 					Auto
-				</Button>
+				</Button> -->
 			</div>
 
 			<div class="info-block">
 				<p>
-					A taskbar és a start menü eltérő témát használhat, mint a desktop. Ez hasznos lehet, ha
-					szeretnéd, hogy a taskbar jobban kiemelkedjen vagy kevésbé legyen feltűnő.
+					Ez hasznos lehet, ha szeretnéd, hogy a taskbar jobban kiemelkedjen vagy kevésbé legyen
+					feltűnő.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- Színek Szekció -->
+	<div class="settings-section">
+		<div class="setting-item">
+			<div class="setting-label-group">
+				<Label>Színek</Label>
+				<p class="setting-description">Válaszd ki az alkalmazás elsődleges színét</p>
+			</div>
+
+			<ColorHuePicker
+				currentHue={parseInt(settings.theme.colorPrimaryHue)}
+				onHueChange={handleColorChange}
+			/>
+
+			<div class="info-block">
+				<p>
+					Az elsődleges szín határozza meg az alkalmazás kiemelő színét, amely megjelenik a
+					gombokban, linkekben és más interaktív elemekben. Válassz egy előre definiált színt, vagy
+					hozz létre egyedi színt az árnyalat csúszkával.
 				</p>
 			</div>
 		</div>

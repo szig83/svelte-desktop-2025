@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Menu } from 'lucide-svelte';
 	import type { WindowManager } from '$lib/stores';
+	import { getThemeManager } from '$lib/stores';
 	import { UniversalIcon } from '$lib/components/shared';
 	import StartMenu from './startmenu/StartMenu.svelte';
 	import Clock from '$lib/components/ui/Clock.svelte';
@@ -10,6 +11,8 @@
 	import { getContext } from 'svelte';
 	import { takeWindowScreenshot } from '$lib/services/client/screenshot';
 	import type { TaskbarPosition } from '$lib/types/desktopEnviroment.ts';
+	import { browser } from '$app/environment';
+
 	let { windowManager }: { windowManager: WindowManager } = $props();
 
 	const settings = getContext<{
@@ -17,12 +20,89 @@
 		windowPreview: boolean;
 		preferPerformance: boolean;
 		taskbarPosition: TaskbarPosition;
+		theme: {
+			mode: 'light' | 'dark' | 'auto';
+			modeTaskbarStartMenu: 'light' | 'dark' | 'auto';
+			colorPrimaryHue: string;
+			fontSize: 'small' | 'medium' | 'large';
+		};
 	}>('settings');
 
 	let startMenuOpen = $state(false);
+
+	// ThemeManager csak kliens oldalon
+	let themeManager = $state<ReturnType<typeof getThemeManager> | null>(null);
+
+	$effect(() => {
+		if (browser) {
+			themeManager = getThemeManager();
+		}
+	});
+
+	// SSR-hez: effektív taskbar téma mód kiszámítása settings-ből
+	function getEffectiveTaskbarMode() {
+		if (settings.theme.modeTaskbarStartMenu === 'auto') {
+			return 'dark'; // SSR fallback
+		}
+		return settings.theme.modeTaskbarStartMenu;
+	}
+
+	// CSS osztályok SSR-hez és kliens oldalhoz
+	const taskbarCssClasses = $derived(
+		themeManager
+			? themeManager.cssClassesTaskBarStartMenu
+			: `${getEffectiveTaskbarMode()} font-${settings.theme.fontSize}`
+	);
+
+	// Taskbar-specifikus CSS változók
+	const taskbarCssVariables = $derived.by(() => {
+		const mode = themeManager
+			? themeManager.effectiveModeTaskBarStartMenu
+			: getEffectiveTaskbarMode();
+
+		// Taskbar színek a mód alapján
+		if (mode === 'dark') {
+			return {
+				'--taskbar-background': 'oklch(20.463% 0.00002 271.152)',
+				'--taskbar-foreground': 'oklch(82.968% 0.00009 271.152)',
+				'--color-taskbar-background': 'oklch(20.463% 0.00002 271.152 / 0.8)',
+				'--color-taskbar-foreground': 'oklch(82.968% 0.00009 271.152)',
+				'--secondary': 'oklch(0.269 0 0)',
+				'--color-secondary': 'oklch(0.269 0 0)',
+				'--secondary-foreground': 'oklch(0.985 0 0)',
+				'--popover': 'oklch(20.463% 0.00002 271.152 / 0.8)',
+				'--color-popover': 'oklch(20.463% 0.00002 271.152 / 0.8)',
+				'--popover-foreground': 'oklch(0.985 0 0)',
+				'--color-popover-foreground': 'oklch(0.985 0 0)'
+			};
+		} else {
+			return {
+				'--taskbar-background': 'oklch(92.494% 0.00011 271.152)',
+				'--taskbar-foreground': 'oklch(0.145 0 0)',
+				'--color-taskbar-background': 'oklch(92.494% 0.00011 271.152 / 0.8)',
+				'--color-taskbar-foreground': 'oklch(0.145 0 0)',
+				'--secondary': 'oklch(0.97 0 0)',
+				'--color-secondary': 'oklch(0.97 0 0)',
+				'--secondary-foreground': 'oklch(0.205 0 0)',
+				'--popover': 'oklch(1 0 0)',
+				'--color-popover': 'oklch(1 0 0)',
+				'--popover-foreground': 'oklch(0.145 0 0)',
+				'--color-popover-foreground': 'oklch(0.145 0 0)'
+			};
+		}
+	});
 </script>
 
-<div class={['taskbar', settings.taskbarPosition === 'top' ? 'order-1' : 'order-3']}>
+<div
+	class={['taskbar', settings.taskbarPosition === 'top' ? 'order-1' : 'order-3', taskbarCssClasses]}
+	style:--taskbar-background={taskbarCssVariables['--taskbar-background']}
+	style:--taskbar-foreground={taskbarCssVariables['--taskbar-foreground']}
+	style:--color-taskbar-background={taskbarCssVariables['--color-taskbar-background']}
+	style:--color-taskbar-foreground={taskbarCssVariables['--color-taskbar-foreground']}
+	style:--secondary={taskbarCssVariables['--secondary']}
+	style:--color-secondary={taskbarCssVariables['--color-secondary']}
+	style:--secondary-foreground={taskbarCssVariables['--secondary-foreground']}
+>
 	<div class="taskbar-left">
 		<Popover.Root bind:open={startMenuOpen}>
 			<Popover.Trigger class="btn-startmenu btn-click-effect"><Menu size={24} /></Popover.Trigger>

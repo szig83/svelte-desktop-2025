@@ -6,6 +6,7 @@
 
 :root {
 	--primary-h: 260;
+	--base-font-size: 16px; /* Alapértelmezett betűméret */
 
 	/* ============================================
        ÁTLÁTSZÓSÁGI SKÁLA
@@ -163,6 +164,11 @@
 	* {
 		@apply border-border outline-ring/50;
 	}
+
+	html {
+		font-size: var(--base-font-size, 16px);
+	}
+
 	body {
 		@apply bg-background text-foreground;
 	}
