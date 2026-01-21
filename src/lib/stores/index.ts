@@ -18,12 +18,7 @@ export {
 export type { WindowState } from './windowStore.svelte.js';
 
 // Theme management store
-export {
-	ThemeManager,
-	createThemeManager,
-	setThemeManager,
-	getThemeManager
-} from './themeStore.svelte.js';
+export { ThemeManager, createThemeManager, getThemeManager } from './themeStore.svelte.js';
 
 // Re-export theme types for convenience
 export type { ThemeSettings, ThemeMode } from '../types/theme.js';

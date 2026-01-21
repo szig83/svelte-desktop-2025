@@ -1,15 +1,21 @@
-import { getContext, setContext } from 'svelte';
 import { type ThemeSettings, type ThemeMode, DEFAULT_THEME_SETTINGS } from '$lib/types/theme';
+import { invalidate } from '$app/navigation';
 
 const THEME_STORAGE_KEY = 'desktop-theme-settings';
 
 export class ThemeManager {
 	settings = $state<ThemeSettings>({ ...DEFAULT_THEME_SETTINGS });
 	private mediaQuery: MediaQueryList | null = null;
+	private saveCallback: ((settings: ThemeSettings) => Promise<void>) | null = null;
 
-	constructor() {
-		// Betöltjük a mentett beállításokat
-		this.loadSettings();
+	constructor(initialSettings?: Partial<ThemeSettings>) {
+		// Ha kapunk kezdeti beállításokat (szerverről), használjuk azokat
+		if (initialSettings) {
+			this.settings = { ...DEFAULT_THEME_SETTINGS, ...initialSettings };
+		} else {
+			// Fallback: betöltjük a localStorage-ból (csak kliens oldalon, első betöltéskor)
+			this.loadSettings();
+		}
 
 		// Auto mód esetén figyelünk a rendszer témára
 		if (typeof window !== 'undefined') {
@@ -19,48 +25,56 @@ export class ThemeManager {
 	}
 
 	/**
-	 * Téma mód beállítása (light, dark, auto).
-	 * @param {ThemeMode} mode - Téma mód.
+	 * Beállítja a mentési callback-et, ami cookie-ba menti a beállításokat.
+	 * @param callback - A mentési callback függvény
 	 */
-	setMode(mode: ThemeMode) {
+	setSaveCallback(callback: (settings: ThemeSettings) => Promise<void>) {
+		this.saveCallback = callback;
+	}
+
+	/**
+	 * Téma mód beállítása (light, dark, auto).
+	 * @param mode - Téma mód
+	 */
+	async setMode(mode: ThemeMode) {
 		this.settings.mode = mode;
-		this.saveSettings();
+		await this.saveSettings();
 	}
 
 	/**
 	 * Start menu / Taskbar téma mód beállítása (light, dark, auto).
-	 * @param {ThemeMode} mode - Téma mód.
+	 * @param mode - Téma mód
 	 */
-	setModeTaskbarStartMenu(mode: ThemeMode) {
+	async setModeTaskbarStartMenu(mode: ThemeMode) {
 		this.settings.modeTaskbarStartMenu = mode;
-		this.saveSettings();
+		await this.saveSettings();
 	}
 
 	/**
 	 * Színséma beállítása.
-	 * @param {string} color - Színséma.
+	 * @param color - Színséma
 	 */
-	setColor(color: string) {
+	async setColor(color: string) {
 		this.settings.colorPrimaryHue = color;
-		this.saveSettings();
+		await this.saveSettings();
 	}
 
 	/**
 	 * Betűméret beállítása.
-	 * @param {"small" | "medium" | "large"} size - Betűméret.
+	 * @param size - Betűméret
 	 */
-	setFontSize(size: 'small' | 'medium' | 'large') {
+	async setFontSize(size: 'small' | 'medium' | 'large') {
 		this.settings.fontSize = size;
-		this.saveSettings();
+		await this.saveSettings();
 	}
 
 	/**
 	 * Teljes beállítások frissítése.
-	 * @param {Partial<ThemeSettings>} newSettings - Új beállítások.
+	 * @param newSettings - Új beállítások
 	 */
-	updateSettings(newSettings: Partial<ThemeSettings>) {
+	async updateSettings(newSettings: Partial<ThemeSettings>) {
 		this.settings = { ...this.settings, ...newSettings };
-		this.saveSettings();
+		await this.saveSettings();
 	}
 
 	effectiveModeBase(mode: 'mode' | 'modeTaskbarStartMenu'): 'light' | 'dark' {
@@ -159,12 +173,20 @@ export class ThemeManager {
 	}
 
 	/**
-	 * Beállítások mentése localStorage-ba.
+	 * Beállítások mentése cookie-ba (szerver API-n keresztül).
 	 */
-	private saveSettings() {
+	private async saveSettings() {
 		if (typeof window !== 'undefined') {
 			try {
-				localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(this.settings));
+				// Ha van callback (szerver API), használjuk azt
+				if (this.saveCallback) {
+					await this.saveCallback(this.settings);
+					// Frissítjük az oldalt, hogy a szerver újratöltse a beállításokat
+					await invalidate('app:settings');
+				} else {
+					// Fallback: localStorage (csak fejlesztés során, ha nincs API)
+					localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(this.settings));
+				}
 			} catch (error) {
 				console.error('Nem sikerült menteni a téma beállításokat:', error);
 			}
@@ -208,44 +230,28 @@ export class ThemeManager {
 	}
 }
 
-const THEME_MANAGER_KEY = Symbol('themeManager');
-
 // Global singleton instance
 let globalThemeManager: ThemeManager | null = null;
 
 /**
  * Creates a new theme manager instance.
- * @returns {ThemeManager} The theme manager instance.
+ * @param initialSettings - Kezdeti beállítások a szerverről
+ * @returns A theme manager példány
  */
-export function createThemeManager() {
+export function createThemeManager(initialSettings?: Partial<ThemeSettings>) {
 	if (!globalThemeManager) {
-		globalThemeManager = new ThemeManager();
+		globalThemeManager = new ThemeManager(initialSettings);
 	}
 	return globalThemeManager;
 }
 
 /**
- * Set the theme manager instance in context.
- * @param {ThemeManager} manager Instance.
- */
-export function setThemeManager(manager: ThemeManager) {
-	globalThemeManager = manager;
-	setContext(THEME_MANAGER_KEY, manager);
-}
-
-/**
- * Gets the theme manager instance from context or global.
- * @returns {ThemeManager} The theme manager instance.
+ * Gets the theme manager instance (global singleton).
+ * @returns The theme manager instance
  */
 export function getThemeManager(): ThemeManager {
-	// Try context first (for components), then fallback to global
-	try {
-		return getContext(THEME_MANAGER_KEY);
-	} catch {
-		// If context fails (e.g., outside component), use global
-		if (!globalThemeManager) {
-			globalThemeManager = new ThemeManager();
-		}
-		return globalThemeManager;
+	if (!globalThemeManager) {
+		globalThemeManager = new ThemeManager();
 	}
+	return globalThemeManager;
 }

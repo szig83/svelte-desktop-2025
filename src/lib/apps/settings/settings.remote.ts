@@ -7,7 +7,15 @@ import { APP_CONSTANTS } from '$lib/constants';
 const updateSettingsSchema = v.object({
 	preferPerformance: v.optional(v.boolean()),
 	windowPreview: v.optional(v.boolean()),
-	screenshotThumbnailHeight: v.optional(v.pipe(v.number(), v.minValue(100), v.maxValue(400)))
+	screenshotThumbnailHeight: v.optional(v.pipe(v.number(), v.minValue(100), v.maxValue(400))),
+	theme: v.optional(
+		v.object({
+			mode: v.optional(v.picklist(['light', 'dark', 'auto'])),
+			modeTaskbarStartMenu: v.optional(v.picklist(['light', 'dark', 'auto'])),
+			colorPrimaryHue: v.optional(v.string()),
+			fontSize: v.optional(v.picklist(['small', 'medium', 'large']))
+		})
+	)
 });
 
 /**
@@ -58,6 +66,14 @@ export const updateSettings = command(updateSettingsSchema, async (updates) => {
 		if (locals.settings.windowPreview && !locals.settings.preferPerformance) {
 			locals.settings.screenshotThumbnailHeight = updates.screenshotThumbnailHeight;
 		}
+	}
+
+	// Téma beállítások frissítése
+	if (updates.theme !== undefined) {
+		locals.settings.theme = {
+			...locals.settings.theme,
+			...updates.theme
+		};
 	}
 
 	// Mentjük cookie-ban

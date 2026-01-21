@@ -1,8 +1,14 @@
 <script lang="ts">
 	import { getThemeManager } from '$lib/stores';
-	//import type { ColorScheme } from '$lib/types/theme';
+	import { browser } from '$app/environment';
 
-	const theme = getThemeManager();
+	let theme = $state<ReturnType<typeof getThemeManager> | null>(null);
+
+	$effect(() => {
+		if (browser) {
+			theme = getThemeManager();
+		}
+	});
 
 	const schemes: { label: string; color: string }[] = [
 		{ label: 'Kék', color: '225' },
@@ -11,21 +17,29 @@
 		{ label: 'Narancs', color: '45' },
 		{ label: 'Piros', color: '30' }
 	];
+
+	async function handleColorChange(color: string) {
+		if (theme) {
+			await theme.setColor(color);
+		}
+	}
 </script>
 
-<div class="color-scheme-picker">
-	{#each schemes as scheme}
-		<button
-			class="scheme-btn"
-			class:active={theme.settings.colorPrimaryHue === scheme.color}
-			onclick={() => theme.setColor(scheme.color)}
-			title={scheme.label}
-			style="--scheme-color: oklch(56% var(--primary-c) {scheme.color})"
-		>
-			<span class="color-dot"></span>
-		</button>
-	{/each}
-</div>
+{#if browser && theme}
+	<div class="color-scheme-picker">
+		{#each schemes as scheme}
+			<button
+				class="scheme-btn"
+				class:active={theme.settings.colorPrimaryHue === scheme.color}
+				onclick={() => handleColorChange(scheme.color)}
+				title={scheme.label}
+				style="--scheme-color: oklch(56% var(--primary-c) {scheme.color})"
+			>
+				<span class="color-dot"></span>
+			</button>
+		{/each}
+	</div>
+{/if}
 
 <style>
 	.color-scheme-picker {

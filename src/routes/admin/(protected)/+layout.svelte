@@ -6,6 +6,8 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { browser } from '$app/environment';
 	import { setContext } from 'svelte';
+	import { createThemeManager } from '$lib/stores';
+	import { updateSettings } from '$lib/apps/settings/settings.remote';
 
 	let { children, data } = $props();
 
@@ -31,6 +33,17 @@
 		}
 	};
 	setContext('settings', settingsContext);
+
+	// ThemeManager inicializálása a szerver beállításokkal
+	// Csak kliens oldalon, de NEM $effect-ben, hanem közvetlenül
+	if (browser) {
+		const themeManager = createThemeManager(data.settings.theme);
+
+		// Beállítjuk a mentési callback-et, ami cookie-ba menti
+		themeManager.setSaveCallback(async (themeSettings) => {
+			await updateSettings({ theme: themeSettings });
+		});
+	}
 </script>
 
 {#if browser}

@@ -1,27 +1,35 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import {
-		createWindowManager,
-		setWindowManager,
-		createThemeManager,
-		setThemeManager
-	} from '$lib/stores';
+	import { createWindowManager, setWindowManager, getThemeManager } from '$lib/stores';
 	import Window from '$lib/components/core/window/Window.svelte';
 	import Taskbar from '$lib/components/core/Taskbar.svelte';
 	import type { BackgroundType } from '$lib/types/desktopEnviroment.ts';
+	import { browser } from '$app/environment';
 
 	const settings = getContext<{
 		background: {
 			type: BackgroundType;
 			value: string;
 		};
+		theme: {
+			mode: 'light' | 'dark' | 'auto';
+			modeTaskbarStartMenu: 'light' | 'dark' | 'auto';
+			colorPrimaryHue: string;
+			fontSize: 'small' | 'medium' | 'large';
+		};
 	}>('settings');
 
 	const windowManager = createWindowManager();
 	setWindowManager(windowManager);
 
-	const themeManager = createThemeManager();
-	setThemeManager(themeManager);
+	// ThemeManager csak kliens oldalon
+	let themeManager = $state<ReturnType<typeof getThemeManager> | null>(null);
+
+	$effect(() => {
+		if (browser) {
+			themeManager = getThemeManager();
+		}
+	});
 
 	let { children } = $props();
 
@@ -42,19 +50,34 @@
 
 	// CSS változók és osztályok alkalmazása a document root-ra (html elem)
 	$effect(() => {
-		// CSS változók beállítása
-		const vars = themeManager.cssVariables;
-		Object.entries(vars).forEach(([key, value]) => {
-			document.documentElement.style.setProperty(key, value);
-		});
+		if (themeManager) {
+			// CSS változók beállítása
+			const vars = themeManager.cssVariables;
+			Object.entries(vars).forEach(([key, value]) => {
+				document.documentElement.style.setProperty(key, value);
+			});
 
-		// CSS osztályok szinkronizálása (dark/light mód, stb.)
-		document.documentElement.className = themeManager.cssClasses;
+			// CSS osztályok szinkronizálása (dark/light mód, stb.)
+			document.documentElement.className = themeManager.cssClasses;
+		}
 	});
+
+	// SSR-hez: effektív téma mód kiszámítása settings-ből
+	function getEffectiveMode() {
+		if (settings.theme.mode === 'auto') {
+			return 'dark'; // SSR fallback
+		}
+		return settings.theme.mode;
+	}
+
+	// CSS osztályok SSR-hez és kliens oldalhoz
+	const cssClasses = $derived(
+		themeManager ? themeManager.cssClasses : `${getEffectiveMode()} font-${settings.theme.fontSize}`
+	);
 </script>
 
 <div
-	class={['desktop', themeManager.cssClasses]}
+	class={['desktop', cssClasses]}
 	style:background-color={settings.background.type === 'color' &&
 	settings.background.value &&
 	settings.background.value.length > 0
@@ -65,6 +88,7 @@
 	settings.background.value.length > 0
 		? `url(${settings.background.value}) center center / cover no-repeat fixed`
 		: ''}
+	style:--primary-h={settings.theme.colorPrimaryHue}
 >
 	{#if settings.background.type === 'video' && settings.background.value && settings.background.value.length > 0}
 		<div class="video-background">

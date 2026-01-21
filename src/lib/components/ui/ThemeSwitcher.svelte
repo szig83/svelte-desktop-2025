@@ -3,38 +3,53 @@
 	import { Sun } from 'lucide-svelte';
 	import { Moon } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { browser } from '$app/environment';
 
-	const theme = getThemeManager();
-	function toggleTheme() {
-		theme.setMode(theme.isDark ? 'light' : 'dark');
+	let theme = $state<ReturnType<typeof getThemeManager> | null>(null);
+
+	$effect(() => {
+		if (browser) {
+			theme = getThemeManager();
+		}
+	});
+
+	// SSR fallback és kliens oldali érték
+	const isDark = $derived(theme?.isDark ?? false);
+
+	async function toggleTheme() {
+		if (theme) {
+			await theme.setMode(isDark ? 'light' : 'dark');
+		}
 	}
 </script>
 
-<Tooltip.Provider>
-	<Tooltip.Root>
-		<Tooltip.Trigger>
-			<label for="toggle" class="self-center">
-				<div class={['toggle', theme.isDark ? 'enabled' : 'disabled']}>
-					<span class="hidden">
-						{theme.isDark ? 'Enable Light Mode' : 'Enable Dark Mode'}
-					</span>
-					<div class="icons">
-						<Sun />
-						<Moon />
+{#if browser}
+	<Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger>
+				<label for="toggle" class="self-center">
+					<div class={['toggle', isDark ? 'enabled' : 'disabled']}>
+						<span class="hidden">
+							{isDark ? 'Enable Light Mode' : 'Enable Dark Mode'}
+						</span>
+						<div class="icons">
+							<Sun />
+							<Moon />
+						</div>
+						<input
+							id="toggle"
+							name="toggle"
+							type="checkbox"
+							checked={!isDark}
+							onclick={toggleTheme}
+						/>
 					</div>
-					<input
-						id="toggle"
-						name="toggle"
-						type="checkbox"
-						checked={!theme.isDark}
-						onclick={toggleTheme}
-					/>
-				</div>
-			</label></Tooltip.Trigger
-		>
-		<Tooltip.Content>Váltás {theme.isDark ? 'világos' : 'sötét'} módra</Tooltip.Content>
-	</Tooltip.Root>
-</Tooltip.Provider>
+				</label></Tooltip.Trigger
+			>
+			<Tooltip.Content>Váltás {isDark ? 'világos' : 'sötét'} módra</Tooltip.Content>
+		</Tooltip.Root>
+	</Tooltip.Provider>
+{/if}
 
 <style>
 	:root {
