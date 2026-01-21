@@ -43,6 +43,16 @@
 		themeManager.setSaveCallback(async (themeSettings) => {
 			await updateSettings({ theme: themeSettings });
 		});
+
+		// Figyeljük a data.settings.theme változásait és frissítjük a ThemeManager-t
+		// DE csak akkor, ha tényleg változott (nem mentés miatt)
+		$effect(() => {
+			// Frissítjük a ThemeManager settings-ét közvetlenül, mentés nélkül
+			const currentSettings = data.settings.theme;
+			if (JSON.stringify(themeManager.settings) !== JSON.stringify(currentSettings)) {
+				themeManager.settings = { ...currentSettings };
+			}
+		});
 	}
 </script>
 
