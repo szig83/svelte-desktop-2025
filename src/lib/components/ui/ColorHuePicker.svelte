@@ -32,13 +32,23 @@
 		{ label: 'Rózsaszín', hue: 330 }
 	];
 
+	// Effect to sync customHue with currentHue when it's not a predefined color
+	$effect(() => {
+		const isPredefined = PREDEFINED_COLORS.some((color) => color.hue === currentHue);
+		if (!isPredefined) {
+			customHue = currentHue;
+		}
+	});
+
 	/**
 	 * Generate OKLCH color CSS string for a given hue value
+	 * Uses the same lightness and chroma as the system's --primary color
 	 * @param hue - Hue value (0-360)
 	 * @returns CSS color string in OKLCH format
 	 */
 	function getColorStyle(hue: number): string {
-		return `oklch(0.55 0.2 ${hue})`;
+		// Use CSS custom property with the hue value to match system colors
+		return `oklch(from var(--primary) l c ${hue})`;
 	}
 
 	/**
@@ -118,8 +128,10 @@
 		<!-- Custom color swatch with popover -->
 		<Popover.Root bind:open={isPopoverOpen}>
 			<Popover.Trigger
-				class="color-swatch custom-swatch {isCustomActive() ? 'active' : ''}"
-				style="background-color: {getColorStyle(customHue)}"
+				class="color-swatch custom-swatch {isCustomActive() ? 'active' : 'inactive'}"
+				style="background-color: {isCustomActive()
+					? getColorStyle(customHue)
+					: 'var(--color-muted)'}"
 				aria-label="Custom color"
 				type="button"
 			>
@@ -176,20 +188,22 @@
 		justify-content: center;
 		align-items: center;
 		transition:
-			transform 0.2s ease,
 			border-color 0.2s ease,
 			box-shadow 0.2s ease;
 		cursor: pointer;
-		border: 2px solid transparent;
+		border: 3px solid transparent;
 		border-radius: 50%;
 		padding: 0;
-		width: 44px;
-		height: 44px;
+		width: 40px;
+		height: 40px;
 	}
 
 	.color-swatch:hover {
-		transform: scale(1.1);
-		border-color: rgba(0, 0, 0, 0.2);
+		border-color: rgba(0, 0, 0, 0.3);
+	}
+
+	:global(.dark) .color-swatch:hover {
+		border-color: rgba(255, 255, 255, 0.3);
 	}
 
 	.color-swatch:focus {
@@ -202,8 +216,13 @@
 	}
 
 	.color-swatch.active {
-		box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
-		border-color: rgba(0, 0, 0, 0.4);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+		border-color: rgba(0, 0, 0, 0.5);
+	}
+
+	:global(.dark) .color-swatch.active {
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.6);
 	}
 
 	.checkmark {
@@ -221,20 +240,22 @@
 		justify-content: center;
 		align-items: center;
 		transition:
-			transform 0.2s ease,
 			border-color 0.2s ease,
 			box-shadow 0.2s ease;
 		cursor: pointer;
-		border: 2px solid transparent;
+		border: 3px solid transparent;
 		border-radius: 50%;
 		padding: 0;
-		width: 44px;
-		height: 44px;
+		width: 40px;
+		height: 40px;
 	}
 
 	:global(.custom-swatch:hover) {
-		transform: scale(1.1);
-		border-color: rgba(0, 0, 0, 0.2);
+		border-color: rgba(0, 0, 0, 0.3);
+	}
+
+	:global(.dark .custom-swatch:hover) {
+		border-color: rgba(255, 255, 255, 0.3);
 	}
 
 	:global(.custom-swatch:focus) {
@@ -247,8 +268,21 @@
 	}
 
 	:global(.custom-swatch.active) {
-		box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
-		border-color: rgba(0, 0, 0, 0.4);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+		border-color: rgba(0, 0, 0, 0.5);
+	}
+
+	:global(.dark .custom-swatch.active) {
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.6);
+	}
+
+	:global(.custom-swatch.inactive) {
+		border: 2px dashed rgba(0, 0, 0, 0.2);
+	}
+
+	:global(.dark .custom-swatch.inactive) {
+		border: 2px dashed rgba(255, 255, 255, 0.2);
 	}
 
 	:global(.custom-swatch::after) {
@@ -416,9 +450,10 @@
 			gap: 0.5rem;
 		}
 
-		.color-swatch {
-			width: 40px;
-			height: 40px;
+		.color-swatch,
+		:global(.custom-swatch) {
+			width: 36px;
+			height: 36px;
 		}
 
 		.custom-hue-picker {

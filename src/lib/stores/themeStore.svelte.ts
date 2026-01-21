@@ -34,10 +34,13 @@ export class ThemeManager {
 
 	/**
 	 * Téma mód beállítása (light, dark, auto).
+	 * Desktop mód változtatásakor a taskbar mód is automatikusan követi.
 	 * @param mode - Téma mód
 	 */
 	async setMode(mode: ThemeMode) {
 		this.settings.mode = mode;
+		// Desktop mód változtatásakor a taskbar mód is automatikusan követi
+		this.settings.modeTaskbarStartMenu = mode;
 		await this.saveSettings();
 	}
 

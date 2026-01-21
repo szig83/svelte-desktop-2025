@@ -73,7 +73,9 @@
 				'--popover': 'oklch(20.463% 0.00002 271.152 / 0.8)',
 				'--color-popover': 'oklch(20.463% 0.00002 271.152 / 0.8)',
 				'--popover-foreground': 'oklch(0.985 0 0)',
-				'--color-popover-foreground': 'oklch(0.985 0 0)'
+				'--color-popover-foreground': 'oklch(0.985 0 0)',
+				'--taskbar-accent': 'oklch(0.269 0 0)',
+				'--color-taskbar-accent': 'oklch(0.269 0 0)'
 			};
 		} else {
 			return {
@@ -87,7 +89,9 @@
 				'--popover': 'oklch(1 0 0)',
 				'--color-popover': 'oklch(1 0 0)',
 				'--popover-foreground': 'oklch(0.145 0 0)',
-				'--color-popover-foreground': 'oklch(0.145 0 0)'
+				'--color-popover-foreground': 'oklch(0.145 0 0)',
+				'--taskbar-accent': 'oklch(0.97 0 0)',
+				'--color-taskbar-accent': 'oklch(0.97 0 0)'
 			};
 		}
 	});
@@ -102,6 +106,8 @@
 	style:--secondary={taskbarCssVariables['--secondary']}
 	style:--color-secondary={taskbarCssVariables['--color-secondary']}
 	style:--secondary-foreground={taskbarCssVariables['--secondary-foreground']}
+	style:--taskbar-accent={taskbarCssVariables['--taskbar-accent']}
+	style:--color-taskbar-accent={taskbarCssVariables['--color-taskbar-accent']}
 >
 	<div class="taskbar-left">
 		<Popover.Root bind:open={startMenuOpen}>
@@ -237,7 +243,7 @@
 			}
 
 			&:hover {
-				background-color: var(--color-accent) !important;
+				background-color: var(--color-taskbar-accent) !important;
 			}
 
 			.taskbar-item-icon {

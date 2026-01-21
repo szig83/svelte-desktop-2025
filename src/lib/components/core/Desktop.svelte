@@ -86,16 +86,18 @@
 	style:background={settings.background.type === 'image' &&
 	settings.background.value &&
 	settings.background.value.length > 0
-		? `url(${settings.background.value}) center center / cover no-repeat fixed`
+		? `url(/backgrounds/image/${settings.background.value}) center center / cover no-repeat fixed`
 		: ''}
 	style:--primary-h={settings.theme.colorPrimaryHue}
 >
 	{#if settings.background.type === 'video' && settings.background.value && settings.background.value.length > 0}
 		<div class="video-background">
-			<video autoplay muted loop playsinline>
-				<source src={settings.background.value} type="video/mp4" />
-				A böngésződ nem támogatja a videó lejátszást.
-			</video>
+			{#key settings.background.value}
+				<video autoplay muted loop playsinline>
+					<source src={`/backgrounds/video/${settings.background.value}`} type="video/mp4" />
+					A böngésződ nem támogatja a videó lejátszást.
+				</video>
+			{/key}
 		</div>
 	{/if}
 	<div

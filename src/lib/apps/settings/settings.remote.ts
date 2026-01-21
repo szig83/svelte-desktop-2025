@@ -8,6 +8,12 @@ const updateSettingsSchema = v.object({
 	preferPerformance: v.optional(v.boolean()),
 	windowPreview: v.optional(v.boolean()),
 	screenshotThumbnailHeight: v.optional(v.pipe(v.number(), v.minValue(100), v.maxValue(400))),
+	background: v.optional(
+		v.object({
+			type: v.optional(v.picklist(['color', 'image', 'video'])),
+			value: v.optional(v.string())
+		})
+	),
 	theme: v.optional(
 		v.object({
 			mode: v.optional(v.picklist(['light', 'dark', 'auto'])),
@@ -66,6 +72,14 @@ export const updateSettings = command(updateSettingsSchema, async (updates) => {
 		if (locals.settings.windowPreview && !locals.settings.preferPerformance) {
 			locals.settings.screenshotThumbnailHeight = updates.screenshotThumbnailHeight;
 		}
+	}
+
+	// Háttér beállítások frissítése
+	if (updates.background !== undefined) {
+		locals.settings.background = {
+			...locals.settings.background,
+			...updates.background
+		};
 	}
 
 	// Téma beállítások frissítése

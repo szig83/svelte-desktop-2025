@@ -50,7 +50,9 @@
 		/>
 	</AppSideBar>
 	<div class="settings-content">
-		<AppContentArea appName="settings" component={activeComponent} props={componentProps} />
+		<div class="max-w-3xl">
+			<AppContentArea appName="settings" component={activeComponent} props={componentProps} />
+		</div>
 	</div>
 </div>
 

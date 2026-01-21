@@ -23,11 +23,7 @@
 		"label": "Háttér",
 		"href": "#background",
 		"icon": "Image",
-		"component": "PlaceholderSettings",
-		"props": {
-			"title": "Háttér",
-			"message": "A háttér beállítások kezelése fejlesztés alatt áll."
-		}
+		"component": "BackgroundSettings"
 	},
 	{
 		"separator": true,

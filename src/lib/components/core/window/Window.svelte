@@ -870,7 +870,7 @@
 		border-radius: 0;
 	}
 
-	:global(.window.active) {
+	/*:global(.window.active) {
 		box-shadow:
 			0 0 0 1px var(--color-primary-alpha-10),
 			0 0 20px var(--color-primary-alpha-10),
@@ -880,7 +880,7 @@
 
 	:global(.window:not(.active)) {
 		box-shadow: none;
-	}
+	}*/
 
 	.window-header {
 		display: flex;

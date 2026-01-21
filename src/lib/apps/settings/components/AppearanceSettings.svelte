@@ -27,8 +27,12 @@
 	// Desktop téma mód változtatása
 	async function handleThemeModeChange(newMode: ThemeMode) {
 		try {
+			// Desktop mód változtatásakor a taskbar mód is automatikusan követi
 			const result = await updateSettings({
-				theme: { mode: newMode }
+				theme: {
+					mode: newMode,
+					modeTaskbarStartMenu: newMode
+				}
 			});
 			if (result && 'success' in result && result.success) {
 				await invalidate('app:settings');
@@ -178,14 +182,14 @@
 					<Moon size={16} />
 					Sötét
 				</Button>
-				<!-- <Button
+				<Button
 					variant={settings.theme.modeTaskbarStartMenu === 'auto' ? 'default' : 'outline'}
 					size="sm"
 					onclick={() => handleTaskbarModeChange('auto')}
 				>
 					<Monitor size={16} />
 					Auto
-				</Button> -->
+				</Button>
 			</div>
 
 			<div class="info-block">
