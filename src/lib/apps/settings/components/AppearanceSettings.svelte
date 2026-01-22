@@ -99,231 +99,229 @@
 	}
 </script>
 
-<div>
-	<h2>Megjelenés beállítások</h2>
+<h2>Megjelenés beállítások</h2>
 
-	<!-- Desktop Téma Mód Szekció -->
-	<section>
-		<div class="setting-item">
-			<div class="setting-label-group">
-				<Label>Desktop téma mód</Label>
-				<p class="setting-description">Válaszd ki a desktop megjelenését</p>
-			</div>
-
-			<Tooltip.Provider delayDuration={200}>
-				<div class="theme-mode-swatches">
-					<!-- Világos mód -->
-
-					<Tooltip.Root>
-						<Tooltip.Trigger>
-							<button
-								class="theme-swatch light-swatch"
-								class:active={settings.theme.mode === 'light'}
-								onclick={() => handleThemeModeChange('light')}
-								aria-label="Világos mód"
-								type="button"
-							>
-								{#if settings.theme.mode === 'light'}
-									<span class="checkmark">✓</span>
-								{/if}
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Content>Világos mód</Tooltip.Content>
-					</Tooltip.Root>
-
-					<!-- Sötét mód -->
-
-					<Tooltip.Root>
-						<Tooltip.Trigger>
-							<button
-								class="theme-swatch dark-swatch"
-								class:active={settings.theme.mode === 'dark'}
-								onclick={() => handleThemeModeChange('dark')}
-								aria-label="Sötét mód"
-								type="button"
-							>
-								{#if settings.theme.mode === 'dark'}
-									<span class="checkmark">✓</span>
-								{/if}
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Content>Sötét mód</Tooltip.Content>
-					</Tooltip.Root>
-
-					<!-- Automatikus mód -->
-
-					<Tooltip.Root>
-						<Tooltip.Trigger>
-							<button
-								class="theme-swatch auto-swatch"
-								class:active={settings.theme.mode === 'auto'}
-								onclick={() => handleThemeModeChange('auto')}
-								aria-label="Automatikus mód"
-								type="button"
-							>
-								{#if settings.theme.mode === 'auto'}
-									<span class="checkmark">✓</span>
-								{/if}
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Content>Automatikus mód</Tooltip.Content>
-					</Tooltip.Root>
-				</div>
-			</Tooltip.Provider>
-
-			<div class="info-block">
-				<p>
-					A desktop téma mód határozza meg az alkalmazás általános megjelenését. A világos mód
-					világos hátteret és sötét szöveget használ, míg a sötét mód sötét hátteret és világos
-					szöveget. Az automatikus mód a rendszer beállításait követi.
-				</p>
-			</div>
+<!-- Desktop Téma Mód Szekció -->
+<section>
+	<div class="setting-item">
+		<div class="setting-label-group">
+			<Label>Desktop téma mód</Label>
+			<p class="setting-description">Válaszd ki a desktop megjelenését</p>
 		</div>
-	</section>
 
-	<!-- Taskbar Mód Szekció -->
-	<section>
-		<div class="setting-item">
-			<div class="setting-label-group">
-				<Label>Taskbar téma mód</Label>
-				<p class="setting-description">A taskbar eltérő témát használhat a desktoptól</p>
+		<Tooltip.Provider delayDuration={200}>
+			<div class="theme-mode-swatches">
+				<!-- Világos mód -->
+
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<button
+							class="theme-swatch light-swatch"
+							class:active={settings.theme.mode === 'light'}
+							onclick={() => handleThemeModeChange('light')}
+							aria-label="Világos mód"
+							type="button"
+						>
+							{#if settings.theme.mode === 'light'}
+								<span class="checkmark">✓</span>
+							{/if}
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Content>Világos mód</Tooltip.Content>
+				</Tooltip.Root>
+
+				<!-- Sötét mód -->
+
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<button
+							class="theme-swatch dark-swatch"
+							class:active={settings.theme.mode === 'dark'}
+							onclick={() => handleThemeModeChange('dark')}
+							aria-label="Sötét mód"
+							type="button"
+						>
+							{#if settings.theme.mode === 'dark'}
+								<span class="checkmark">✓</span>
+							{/if}
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Content>Sötét mód</Tooltip.Content>
+				</Tooltip.Root>
+
+				<!-- Automatikus mód -->
+
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<button
+							class="theme-swatch auto-swatch"
+							class:active={settings.theme.mode === 'auto'}
+							onclick={() => handleThemeModeChange('auto')}
+							aria-label="Automatikus mód"
+							type="button"
+						>
+							{#if settings.theme.mode === 'auto'}
+								<span class="checkmark">✓</span>
+							{/if}
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Content>Automatikus mód</Tooltip.Content>
+				</Tooltip.Root>
 			</div>
+		</Tooltip.Provider>
 
-			<Tooltip.Provider delayDuration={200}>
-				<div class="theme-mode-swatches">
-					<!-- Világos mód -->
-					<Tooltip.Root>
-						<Tooltip.Trigger>
-							<button
-								class="theme-swatch light-swatch"
-								class:active={settings.theme.modeTaskbarStartMenu === 'light'}
-								onclick={() => handleTaskbarModeChange('light')}
-								aria-label="Világos mód"
-								type="button"
-							>
-								{#if settings.theme.modeTaskbarStartMenu === 'light'}
-									<span class="checkmark">✓</span>
-								{/if}
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Content>Világos mód</Tooltip.Content>
-					</Tooltip.Root>
-
-					<!-- Sötét mód -->
-					<Tooltip.Root>
-						<Tooltip.Trigger>
-							<button
-								class="theme-swatch dark-swatch"
-								class:active={settings.theme.modeTaskbarStartMenu === 'dark'}
-								onclick={() => handleTaskbarModeChange('dark')}
-								aria-label="Sötét mód"
-								type="button"
-							>
-								{#if settings.theme.modeTaskbarStartMenu === 'dark'}
-									<span class="checkmark">✓</span>
-								{/if}
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Content>Sötét mód</Tooltip.Content>
-					</Tooltip.Root>
-
-					<!-- Automatikus mód -->
-					<Tooltip.Root>
-						<Tooltip.Trigger>
-							<button
-								class="theme-swatch auto-swatch"
-								class:active={settings.theme.modeTaskbarStartMenu === 'auto'}
-								onclick={() => handleTaskbarModeChange('auto')}
-								aria-label="Automatikus mód"
-								type="button"
-							>
-								{#if settings.theme.modeTaskbarStartMenu === 'auto'}
-									<span class="checkmark">✓</span>
-								{/if}
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Content>Automatikus mód</Tooltip.Content>
-					</Tooltip.Root>
-				</div>
-			</Tooltip.Provider>
-
-			<div class="info-block">
-				<p>
-					Ez hasznos lehet, ha szeretnéd, hogy a taskbar jobban kiemelkedjen vagy kevésbé legyen
-					feltűnő.
-				</p>
-			</div>
+		<div class="info-block">
+			<p>
+				A desktop téma mód határozza meg az alkalmazás általános megjelenését. A világos mód világos
+				hátteret és sötét szöveget használ, míg a sötét mód sötét hátteret és világos szöveget. Az
+				automatikus mód a rendszer beállításait követi.
+			</p>
 		</div>
-	</section>
+	</div>
+</section>
 
-	<!-- Színek Szekció -->
-	<section>
-		<div class="setting-item">
-			<div class="setting-label-group">
-				<Label>Színek</Label>
-				<p class="setting-description">Válaszd ki az alkalmazás elsődleges színét</p>
-			</div>
-
-			<ColorHuePicker
-				currentHue={parseInt(settings.theme.colorPrimaryHue)}
-				onHueChange={handleColorChange}
-			/>
-
-			<div class="info-block">
-				<p>
-					Az elsődleges szín határozza meg az alkalmazás kiemelő színét, amely megjelenik a
-					gombokban, linkekben és más interaktív elemekben. Válassz egy előre definiált színt, vagy
-					hozz létre egyedi színt az árnyalat csúszkával.
-				</p>
-			</div>
+<!-- Taskbar Mód Szekció -->
+<section>
+	<div class="setting-item">
+		<div class="setting-label-group">
+			<Label>Taskbar téma mód</Label>
+			<p class="setting-description">A taskbar eltérő témát használhat a desktoptól</p>
 		</div>
-	</section>
 
-	<!-- Betűméret Szekció -->
-	<section>
-		<div class="setting-item">
-			<div class="setting-label-group">
-				<Label>Betűméret</Label>
-				<p class="setting-description">A rendszer betűméretének beállítása</p>
-			</div>
+		<Tooltip.Provider delayDuration={200}>
+			<div class="theme-mode-swatches">
+				<!-- Világos mód -->
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<button
+							class="theme-swatch light-swatch"
+							class:active={settings.theme.modeTaskbarStartMenu === 'light'}
+							onclick={() => handleTaskbarModeChange('light')}
+							aria-label="Világos mód"
+							type="button"
+						>
+							{#if settings.theme.modeTaskbarStartMenu === 'light'}
+								<span class="checkmark">✓</span>
+							{/if}
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Content>Világos mód</Tooltip.Content>
+				</Tooltip.Root>
 
-			<div class="font-size-buttons">
-				<Button
-					variant={settings.theme.fontSize === 'small' ? 'default' : 'outline'}
-					size="sm"
-					onclick={() => handleFontSizeChange('small')}
-				>
-					<Type size={14} />
-					Kicsi
-				</Button>
-				<Button
-					variant={settings.theme.fontSize === 'medium' ? 'default' : 'outline'}
-					size="sm"
-					onclick={() => handleFontSizeChange('medium')}
-				>
-					<Type size={16} />
-					Közepes
-				</Button>
-				<Button
-					variant={settings.theme.fontSize === 'large' ? 'default' : 'outline'}
-					size="sm"
-					onclick={() => handleFontSizeChange('large')}
-				>
-					<Type size={18} />
-					Nagy
-				</Button>
-			</div>
+				<!-- Sötét mód -->
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<button
+							class="theme-swatch dark-swatch"
+							class:active={settings.theme.modeTaskbarStartMenu === 'dark'}
+							onclick={() => handleTaskbarModeChange('dark')}
+							aria-label="Sötét mód"
+							type="button"
+						>
+							{#if settings.theme.modeTaskbarStartMenu === 'dark'}
+								<span class="checkmark">✓</span>
+							{/if}
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Content>Sötét mód</Tooltip.Content>
+				</Tooltip.Root>
 
-			<div class="info-block">
-				<p>
-					A betűméret beállítása hatással van az egész rendszer szövegeinek méretére. Nagyobb
-					betűméret könnyebb olvashatóságot biztosít, míg kisebb betűméret több információt jelenít
-					meg a képernyőn.
-				</p>
+				<!-- Automatikus mód -->
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<button
+							class="theme-swatch auto-swatch"
+							class:active={settings.theme.modeTaskbarStartMenu === 'auto'}
+							onclick={() => handleTaskbarModeChange('auto')}
+							aria-label="Automatikus mód"
+							type="button"
+						>
+							{#if settings.theme.modeTaskbarStartMenu === 'auto'}
+								<span class="checkmark">✓</span>
+							{/if}
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Content>Automatikus mód</Tooltip.Content>
+				</Tooltip.Root>
 			</div>
+		</Tooltip.Provider>
+
+		<div class="info-block">
+			<p>
+				Ez hasznos lehet, ha szeretnéd, hogy a taskbar jobban kiemelkedjen vagy kevésbé legyen
+				feltűnő.
+			</p>
 		</div>
-	</section>
-</div>
+	</div>
+</section>
+
+<!-- Színek Szekció -->
+<section>
+	<div class="setting-item">
+		<div class="setting-label-group">
+			<Label>Színek</Label>
+			<p class="setting-description">Válaszd ki az alkalmazás elsődleges színét</p>
+		</div>
+
+		<ColorHuePicker
+			currentHue={parseInt(settings.theme.colorPrimaryHue)}
+			onHueChange={handleColorChange}
+		/>
+
+		<div class="info-block">
+			<p>
+				Az elsődleges szín határozza meg az alkalmazás kiemelő színét, amely megjelenik a gombokban,
+				linkekben és más interaktív elemekben. Válassz egy előre definiált színt, vagy hozz létre
+				egyedi színt az árnyalat csúszkával.
+			</p>
+		</div>
+	</div>
+</section>
+
+<!-- Betűméret Szekció -->
+<section>
+	<div class="setting-item">
+		<div class="setting-label-group">
+			<Label>Betűméret</Label>
+			<p class="setting-description">A rendszer betűméretének beállítása</p>
+		</div>
+
+		<div class="font-size-buttons">
+			<Button
+				variant={settings.theme.fontSize === 'small' ? 'default' : 'outline'}
+				size="sm"
+				onclick={() => handleFontSizeChange('small')}
+			>
+				<Type size={14} />
+				Kicsi
+			</Button>
+			<Button
+				variant={settings.theme.fontSize === 'medium' ? 'default' : 'outline'}
+				size="sm"
+				onclick={() => handleFontSizeChange('medium')}
+			>
+				<Type size={16} />
+				Közepes
+			</Button>
+			<Button
+				variant={settings.theme.fontSize === 'large' ? 'default' : 'outline'}
+				size="sm"
+				onclick={() => handleFontSizeChange('large')}
+			>
+				<Type size={18} />
+				Nagy
+			</Button>
+		</div>
+
+		<div class="info-block">
+			<p>
+				A betűméret beállítása hatással van az egész rendszer szövegeinek méretére. Nagyobb
+				betűméret könnyebb olvashatóságot biztosít, míg kisebb betűméret több információt jelenít
+				meg a képernyőn.
+			</p>
+		</div>
+	</div>
+</section>
 
 <style>
 	/* Beállítási elemek */

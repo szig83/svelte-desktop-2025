@@ -22,7 +22,8 @@ const updateSettingsSchema = v.object({
 			colorPrimaryHue: v.optional(v.string()),
 			fontSize: v.optional(v.picklist(['small', 'medium', 'large']))
 		})
-	)
+	),
+	taskbarPosition: v.optional(v.picklist(['top', 'bottom', 'left', 'right']))
 });
 
 /**

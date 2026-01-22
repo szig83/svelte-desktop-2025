@@ -84,74 +84,72 @@
 	}
 </script>
 
-<div>
-	<h2>Teljesítmény beállítások</h2>
+<h2>Teljesítmény beállítások</h2>
 
-	<!-- Teljesítmény optimalizálás-->
-	<ContentSection
-		title="Teljesítmény optimalizálás"
-		description="Gyorsabb működés a vizuális effektek rovására"
-	>
-		{#snippet info()}
-			Ha be van kapcsolva, az ablakok mozgatása közben a tartalmuk el van rejtve, és az ablak
-			előnézet funkció is le van tiltva. Ez jelentősen javítja a teljesítményt lassabb eszközökön.
-		{/snippet}
+<!-- Teljesítmény optimalizálás-->
+<ContentSection
+	title="Teljesítmény optimalizálás"
+	description="Gyorsabb működés a vizuális effektek rovására"
+>
+	{#snippet info()}
+		Ha be van kapcsolva, az ablakok mozgatása közben a tartalmuk el van rejtve, és az ablak előnézet
+		funkció is le van tiltva. Ez jelentősen javítja a teljesítményt lassabb eszközökön.
+	{/snippet}
 
-		<Switch
-			id="prefer-performance"
-			checked={settings.preferPerformance}
-			onclick={handlePreferPerformanceChange}
-		/>
-	</ContentSection>
+	<Switch
+		id="prefer-performance"
+		checked={settings.preferPerformance}
+		onclick={handlePreferPerformanceChange}
+	/>
+</ContentSection>
 
-	<!-- Ablak előnézet -->
-	<ContentSection
-		title="Ablak előnézet"
-		description="Előnézeti képek megjelenítése a tálcán"
+<!-- Ablak előnézet -->
+<ContentSection
+	title="Ablak előnézet"
+	description="Előnézeti képek megjelenítése a tálcán"
+	disabled={isWindowPreviewDisabled}
+>
+	{#snippet info()}
+		Az ablak előnézet funkció lehetővé teszi, hogy a tálcán lévő alkalmazások ikonjára mutatva egy
+		kis előnézeti képet láss az ablak tartalmáról. Ez megkönnyíti a nyitott ablakok közötti
+		navigációt.
+	{/snippet}
+
+	<Switch
+		id="window-preview"
+		checked={settings.windowPreview}
 		disabled={isWindowPreviewDisabled}
-	>
-		{#snippet info()}
-			Az ablak előnézet funkció lehetővé teszi, hogy a tálcán lévő alkalmazások ikonjára mutatva egy
-			kis előnézeti képet láss az ablak tartalmáról. Ez megkönnyíti a nyitott ablakok közötti
-			navigációt.
-		{/snippet}
+		onclick={handleWindowPreviewChange}
+	/>
+</ContentSection>
 
-		<Switch
-			id="window-preview"
-			checked={settings.windowPreview}
-			disabled={isWindowPreviewDisabled}
-			onclick={handleWindowPreviewChange}
+<!-- Előnézeti kép magassága -->
+<ContentSection
+	title="Előnézeti kép magassága"
+	description="Az előnézeti képek magassága pixelben"
+	disabled={isScreenshotHeightDisabled}
+>
+	{#snippet info()}
+		Az előnézeti képek magasságának beállítása. Nagyobb értékek részletesebb előnézeteket
+		eredményeznek, de több memóriát és feldolgozási kapacitást igényelnek. Ajánlott érték:
+		{APP_CONSTANTS.DEFAULT_SCREENSHOT_HEIGHT}px.
+	{/snippet}
+
+	<div class="input-with-unit">
+		<Input
+			id="screenshot-height"
+			type="number"
+			min="100"
+			max="400"
+			step="10"
+			value={settings.screenshotThumbnailHeight}
+			disabled={isScreenshotHeightDisabled}
+			class="number-input"
+			onchange={handleScreenshotHeightChange}
 		/>
-	</ContentSection>
-
-	<!-- Előnézeti kép magassága -->
-	<ContentSection
-		title="Előnézeti kép magassága"
-		description="Az előnézeti képek magassága pixelben"
-		disabled={isScreenshotHeightDisabled}
-	>
-		{#snippet info()}
-			Az előnézeti képek magasságának beállítása. Nagyobb értékek részletesebb előnézeteket
-			eredményeznek, de több memóriát és feldolgozási kapacitást igényelnek. Ajánlott érték:
-			{APP_CONSTANTS.DEFAULT_SCREENSHOT_HEIGHT}px.
-		{/snippet}
-
-		<div class="input-with-unit">
-			<Input
-				id="screenshot-height"
-				type="number"
-				min="100"
-				max="400"
-				step="10"
-				value={settings.screenshotThumbnailHeight}
-				disabled={isScreenshotHeightDisabled}
-				class="number-input"
-				onchange={handleScreenshotHeightChange}
-			/>
-			<span class="unit" class:disabled={isScreenshotHeightDisabled}>px</span>
-		</div>
-	</ContentSection>
-</div>
+		<span class="unit" class:disabled={isScreenshotHeightDisabled}>px</span>
+	</div>
+</ContentSection>
 
 <style>
 	.input-with-unit {

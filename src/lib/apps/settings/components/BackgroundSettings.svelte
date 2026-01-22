@@ -119,153 +119,151 @@
 	}
 </script>
 
-<div>
-	<h2>Háttér beállítások</h2>
+<h2>Háttér beállítások</h2>
 
-	<!-- Háttér Típus Szekció -->
+<!-- Háttér Típus Szekció -->
+<section>
+	<div class="setting-item">
+		<div class="setting-label-group">
+			<Label>Háttér típusa</Label>
+			<p class="setting-description">Válaszd ki a desktop háttér típusát</p>
+		</div>
+
+		<div class="background-type-cards">
+			<button
+				class="background-card"
+				class:active={settings.background.type === 'color'}
+				onclick={() => handleBackgroundTypeChange('color')}
+			>
+				<div class="background-card-icon">
+					<Palette size={28} />
+				</div>
+				<span class="background-card-label">Szín</span>
+			</button>
+
+			<button
+				class="background-card"
+				class:active={settings.background.type === 'image'}
+				onclick={() => handleBackgroundTypeChange('image')}
+			>
+				<div class="background-card-icon">
+					<Image size={28} />
+				</div>
+				<span class="background-card-label">Kép</span>
+			</button>
+
+			<button
+				class="background-card"
+				class:active={settings.background.type === 'video'}
+				onclick={() => handleBackgroundTypeChange('video')}
+			>
+				<div class="background-card-icon">
+					<Video size={28} />
+				</div>
+				<span class="background-card-label">Videó</span>
+			</button>
+		</div>
+
+		<div class="info-block">
+			<p>
+				A háttér típusa határozza meg, hogy milyen módon jelenik meg a desktop háttere. A szín opció
+				egy egyszínű hátteret biztosít, a kép egy statikus háttérképet, míg a videó egy animált
+				hátteret.
+			</p>
+		</div>
+	</div>
+</section>
+
+<!-- Szín Beállítás Szekció -->
+{#if settings.background.type === 'color'}
 	<section>
 		<div class="setting-item">
 			<div class="setting-label-group">
-				<Label>Háttér típusa</Label>
-				<p class="setting-description">Válaszd ki a desktop háttér típusát</p>
+				<Label>Háttérszín</Label>
+				<p class="setting-description">Válassz egy színt a desktop hátteréhez</p>
 			</div>
 
-			<div class="background-type-cards">
-				<button
-					class="background-card"
-					class:active={settings.background.type === 'color'}
-					onclick={() => handleBackgroundTypeChange('color')}
-				>
-					<div class="background-card-icon">
-						<Palette size={28} />
-					</div>
-					<span class="background-card-label">Szín</span>
-				</button>
-
-				<button
-					class="background-card"
-					class:active={settings.background.type === 'image'}
-					onclick={() => handleBackgroundTypeChange('image')}
-				>
-					<div class="background-card-icon">
-						<Image size={28} />
-					</div>
-					<span class="background-card-label">Kép</span>
-				</button>
-
-				<button
-					class="background-card"
-					class:active={settings.background.type === 'video'}
-					onclick={() => handleBackgroundTypeChange('video')}
-				>
-					<div class="background-card-icon">
-						<Video size={28} />
-					</div>
-					<span class="background-card-label">Videó</span>
-				</button>
-			</div>
+			<ColorPicker currentColor={colorValue} onColorChange={handleColorChange} />
 
 			<div class="info-block">
 				<p>
-					A háttér típusa határozza meg, hogy milyen módon jelenik meg a desktop háttere. A szín
-					opció egy egyszínű hátteret biztosít, a kép egy statikus háttérképet, míg a videó egy
-					animált hátteret.
+					Válassz egy előre definiált színt, vagy hozz létre egyedi színt a színválasztóval. A
+					kiválasztott szín azonnal alkalmazásra kerül a desktop hátterén.
 				</p>
 			</div>
 		</div>
 	</section>
+{/if}
 
-	<!-- Szín Beállítás Szekció -->
-	{#if settings.background.type === 'color'}
-		<section>
-			<div class="setting-item">
-				<div class="setting-label-group">
-					<Label>Háttérszín</Label>
-					<p class="setting-description">Válassz egy színt a desktop hátteréhez</p>
-				</div>
-
-				<ColorPicker currentColor={colorValue} onColorChange={handleColorChange} />
-
-				<div class="info-block">
-					<p>
-						Válassz egy előre definiált színt, vagy hozz létre egyedi színt a színválasztóval. A
-						kiválasztott szín azonnal alkalmazásra kerül a desktop hátterén.
-					</p>
-				</div>
+<!-- Kép Beállítás Szekció -->
+{#if settings.background.type === 'image'}
+	<section>
+		<div class="setting-item">
+			<div class="setting-label-group">
+				<Label>Háttérkép</Label>
+				<p class="setting-description">Válassz egy képet a desktop hátteréhez</p>
 			</div>
-		</section>
-	{/if}
 
-	<!-- Kép Beállítás Szekció -->
-	{#if settings.background.type === 'image'}
-		<section>
-			<div class="setting-item">
-				<div class="setting-label-group">
-					<Label>Háttérkép</Label>
-					<p class="setting-description">Válassz egy képet a desktop hátteréhez</p>
-				</div>
-
-				<div class="image-selection">
-					{#each availableImages as image}
-						<button
-							class="image-option"
-							class:active={settings.background.value === image}
-							onclick={() => handleImageChange(image)}
-							aria-label="Háttérkép {image}"
-						>
-							<div
-								class="image-preview"
-								style="background-image: url('/backgrounds/image/{image}')"
-							></div>
-						</button>
-					{/each}
-				</div>
-
-				<div class="info-block">
-					<p>
-						Válassz egy előre definiált háttérképet a listából. A kép a teljes desktop területén
-						megjelenik, és automatikusan igazodik a képernyő méretéhez.
-					</p>
-				</div>
+			<div class="image-selection">
+				{#each availableImages as image}
+					<button
+						class="image-option"
+						class:active={settings.background.value === image}
+						onclick={() => handleImageChange(image)}
+						aria-label="Háttérkép {image}"
+					>
+						<div
+							class="image-preview"
+							style="background-image: url('/backgrounds/image/{image}')"
+						></div>
+					</button>
+				{/each}
 			</div>
-		</section>
-	{/if}
 
-	<!-- Videó Beállítás Szekció -->
-	{#if settings.background.type === 'video'}
-		<section>
-			<div class="setting-item">
-				<div class="setting-label-group">
-					<Label>Háttérvideó</Label>
-					<p class="setting-description">Válassz egy videót a desktop hátteréhez</p>
-				</div>
-
-				<div class="video-selection">
-					{#each availableVideos as video}
-						<button
-							class="video-option"
-							class:active={settings.background.value === video}
-							onclick={() => handleVideoChange(video)}
-						>
-							<div class="video-icon">
-								<Video size={32} />
-							</div>
-							<span class="video-name">{video}</span>
-						</button>
-					{/each}
-				</div>
-
-				<div class="info-block">
-					<p>
-						Válassz egy előre definiált háttérvideót a listából. A videó folyamatosan ismétlődik a
-						háttérben, és automatikusan igazodik a képernyő méretéhez. A videó némítva van, és nem
-						befolyásolja a rendszer teljesítményét jelentősen.
-					</p>
-				</div>
+			<div class="info-block">
+				<p>
+					Válassz egy előre definiált háttérképet a listából. A kép a teljes desktop területén
+					megjelenik, és automatikusan igazodik a képernyő méretéhez.
+				</p>
 			</div>
-		</section>
-	{/if}
-</div>
+		</div>
+	</section>
+{/if}
+
+<!-- Videó Beállítás Szekció -->
+{#if settings.background.type === 'video'}
+	<section>
+		<div class="setting-item">
+			<div class="setting-label-group">
+				<Label>Háttérvideó</Label>
+				<p class="setting-description">Válassz egy videót a desktop hátteréhez</p>
+			</div>
+
+			<div class="video-selection">
+				{#each availableVideos as video}
+					<button
+						class="video-option"
+						class:active={settings.background.value === video}
+						onclick={() => handleVideoChange(video)}
+					>
+						<div class="video-icon">
+							<Video size={32} />
+						</div>
+						<span class="video-name">{video}</span>
+					</button>
+				{/each}
+			</div>
+
+			<div class="info-block">
+				<p>
+					Válassz egy előre definiált háttérvideót a listából. A videó folyamatosan ismétlődik a
+					háttérben, és automatikusan igazodik a képernyő méretéhez. A videó némítva van, és nem
+					befolyásolja a rendszer teljesítményét jelentősen.
+				</p>
+			</div>
+		</div>
+	</section>
+{/if}
 
 <style>
 	/* Beállítási elemek */

@@ -99,20 +99,16 @@
 	}
 
 	.settings-content :global {
-		& > div {
-			width: 100%;
+		/* Szekciók */
+		section {
+			margin-bottom: 2.5rem;
+			border-bottom: 1px solid var(--color-neutral-200);
+			padding-bottom: 2.5rem;
 
-			/* Szekciók */
-			section {
-				margin-bottom: 2.5rem;
-				border-bottom: 1px solid var(--color-neutral-200);
-				padding-bottom: 2.5rem;
-
-				&:last-child {
-					margin-bottom: 0;
-					border-bottom: none;
-					padding-bottom: 0;
-				}
+			&:last-child {
+				margin-bottom: 0;
+				border-bottom: none;
+				padding-bottom: 0;
 			}
 		}
 
