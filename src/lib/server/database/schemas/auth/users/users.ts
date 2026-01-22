@@ -1,4 +1,4 @@
-import { varchar, boolean, timestamp, serial } from 'drizzle-orm/pg-core';
+import { varchar, boolean, timestamp, serial, jsonb } from 'drizzle-orm/pg-core';
 import { type InferSelectModel } from 'drizzle-orm';
 import { authSchema as schema } from '../schema';
 
@@ -12,6 +12,7 @@ export const users = schema.table('users', {
 	emailVerified: boolean('email_verified').default(false),
 	username: varchar('username', { length: 50 }).unique(),
 	image: varchar('image', { length: 255 }),
+	userSettings: jsonb('user_settings').default('{}'),
 	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 	deletedAt: timestamp('deleted_at', { withTimezone: true })
