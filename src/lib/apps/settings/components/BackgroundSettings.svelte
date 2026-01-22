@@ -119,11 +119,11 @@
 	}
 </script>
 
-<div class="background-settings">
+<div>
 	<h2>Háttér beállítások</h2>
 
 	<!-- Háttér Típus Szekció -->
-	<div class="settings-section">
+	<section>
 		<div class="setting-item">
 			<div class="setting-label-group">
 				<Label>Háttér típusa</Label>
@@ -173,11 +173,11 @@
 				</p>
 			</div>
 		</div>
-	</div>
+	</section>
 
 	<!-- Szín Beállítás Szekció -->
 	{#if settings.background.type === 'color'}
-		<div class="settings-section">
+		<section>
 			<div class="setting-item">
 				<div class="setting-label-group">
 					<Label>Háttérszín</Label>
@@ -193,12 +193,12 @@
 					</p>
 				</div>
 			</div>
-		</div>
+		</section>
 	{/if}
 
 	<!-- Kép Beállítás Szekció -->
 	{#if settings.background.type === 'image'}
-		<div class="settings-section">
+		<section>
 			<div class="setting-item">
 				<div class="setting-label-group">
 					<Label>Háttérkép</Label>
@@ -228,12 +228,12 @@
 					</p>
 				</div>
 			</div>
-		</div>
+		</section>
 	{/if}
 
 	<!-- Videó Beállítás Szekció -->
 	{#if settings.background.type === 'video'}
-		<div class="settings-section">
+		<section>
 			<div class="setting-item">
 				<div class="setting-label-group">
 					<Label>Háttérvideó</Label>
@@ -263,44 +263,11 @@
 					</p>
 				</div>
 			</div>
-		</div>
+		</section>
 	{/if}
 </div>
 
 <style>
-	.background-settings {
-		width: 100%;
-	}
-
-	h2 {
-		margin-bottom: 2rem;
-		color: var(--color-neutral-900);
-		font-weight: 600;
-		font-size: 1.5rem;
-		letter-spacing: -0.025em;
-	}
-
-	:global(.dark) h2 {
-		color: var(--color-neutral-100);
-	}
-
-	/* Szekciók */
-	.settings-section {
-		margin-bottom: 2.5rem;
-		border-bottom: 1px solid var(--color-neutral-200);
-		padding-bottom: 2.5rem;
-	}
-
-	:global(.dark) .settings-section {
-		border-bottom-color: var(--color-neutral-800);
-	}
-
-	.settings-section:last-child {
-		margin-bottom: 0;
-		border-bottom: none;
-		padding-bottom: 0;
-	}
-
 	/* Beállítási elemek */
 	.setting-item {
 		display: flex;

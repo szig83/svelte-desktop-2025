@@ -1,7 +1,8 @@
 import { command, getRequestEvent } from '$app/server';
 import * as v from 'valibot';
 import type { UserSettings } from '$lib/types/settings';
-import { APP_CONSTANTS } from '$lib/constants';
+import { DEFAULT_USER_SETTINGS } from '$lib/types/settings';
+import { userRepository } from '$lib/server/database/repositories';
 
 // Request validation schema
 const updateSettingsSchema = v.object({
@@ -31,78 +32,26 @@ const updateSettingsSchema = v.object({
  */
 export const updateSettings = command(updateSettingsSchema, async (updates) => {
 	const event = getRequestEvent();
-	const { cookies, locals } = event;
+	const { locals } = event;
 
-	// Inicializáljuk a settings-et, ha még nincs
-	if (!locals.settings) {
-		locals.settings = {
-			windowPreview: true,
-			screenshotThumbnailHeight: APP_CONSTANTS.DEFAULT_SCREENSHOT_HEIGHT,
-			preferPerformance: false,
-			background: {
-				type: 'video',
-				value: 'bg-video.mp4'
-			},
-			taskbarPosition: 'bottom',
-			theme: {
-				mode: 'dark',
-				modeTaskbarStartMenu: 'dark',
-				colorPrimaryHue: '225',
-				fontSize: 'medium'
-			}
+	// Ellenőrizzük, hogy be van-e jelentkezve a felhasználó
+	if (!locals.user?.id) {
+		return {
+			success: false,
+			error: 'User not authenticated',
+			settings: locals.settings || DEFAULT_USER_SETTINGS
 		};
 	}
 
-	// Frissítjük a locals.settings objektumot
-	if (updates.preferPerformance !== undefined) {
-		locals.settings.preferPerformance = updates.preferPerformance;
+	const userId = parseInt(locals.user.id);
 
-		// Ha preferPerformance true, akkor windowPreview automatikusan false
-		if (updates.preferPerformance) {
-			locals.settings.windowPreview = false;
-		}
-	}
+	// Adatbázisba mentjük a beállításokat a repository-n keresztül
+	const result = await userRepository.patchUserSettings(userId, updates as Partial<UserSettings>);
 
-	if (updates.windowPreview !== undefined && !locals.settings.preferPerformance) {
-		locals.settings.windowPreview = updates.windowPreview;
-	}
+	// Frissítjük a locals.settings-et is, hogy a jelenlegi request-ben is elérhető legyen
+	locals.settings = result.settings;
 
-	if (updates.screenshotThumbnailHeight !== undefined) {
-		// Csak akkor frissítjük, ha windowPreview engedélyezve van
-		if (locals.settings.windowPreview && !locals.settings.preferPerformance) {
-			locals.settings.screenshotThumbnailHeight = updates.screenshotThumbnailHeight;
-		}
-	}
+	console.log('Settings updated:', result.settings);
 
-	// Háttér beállítások frissítése
-	if (updates.background !== undefined) {
-		locals.settings.background = {
-			...locals.settings.background,
-			...updates.background
-		};
-	}
-
-	// Téma beállítások frissítése
-	if (updates.theme !== undefined) {
-		locals.settings.theme = {
-			...locals.settings.theme,
-			...updates.theme
-		};
-	}
-
-	// Mentjük cookie-ban
-	cookies.set('app.user_settings', JSON.stringify(locals.settings), {
-		path: '/',
-		httpOnly: true,
-		sameSite: 'strict',
-		secure: process.env.NODE_ENV === 'production',
-		maxAge: 60 * 60 * 24 * 365 // 1 év
-	});
-
-	console.log('Settings updated:', locals.settings);
-
-	return {
-		success: true,
-		settings: locals.settings as UserSettings
-	};
+	return result;
 });

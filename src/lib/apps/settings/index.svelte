@@ -49,8 +49,8 @@
 			onItemClick={handleMenuItemClick}
 		/>
 	</AppSideBar>
-	<div class="settings-content">
-		<div class="max-w-3xl">
+	<div class="settings-content-wrapper">
+		<div class="settings-content max-w-3xl">
 			<AppContentArea appName="settings" component={activeComponent} props={componentProps} />
 		</div>
 	</div>
@@ -64,35 +64,72 @@
 		overflow: hidden;
 	}
 
-	.settings-content {
+	.settings-content-wrapper {
 		flex: 1;
 		padding: 24px;
 		overflow-y: auto;
+
+		/* Scrollbar styling */
+		&::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			border-radius: 3px;
+			background: var(--color-neutral-300);
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background: var(--color-neutral-400);
+		}
 	}
 
-	/* Scrollbar styling */
-	.settings-content::-webkit-scrollbar {
-		width: 8px;
+	:global(.dark) .settings-content-wrapper {
+		&::-webkit-scrollbar-thumb {
+			background: var(--color-neutral-600);
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background: var(--color-neutral-500);
+		}
 	}
 
-	.settings-content::-webkit-scrollbar-track {
-		background: transparent;
+	.settings-content :global {
+		& > div {
+			width: 100%;
+
+			/* Szekciók */
+			section {
+				margin-bottom: 2.5rem;
+				border-bottom: 1px solid var(--color-neutral-200);
+				padding-bottom: 2.5rem;
+
+				&:last-child {
+					margin-bottom: 0;
+					border-bottom: none;
+					padding-bottom: 0;
+				}
+			}
+		}
+
+		h2 {
+			margin-bottom: 2rem;
+			color: var(--color-neutral-900);
+			font-weight: 600;
+			font-size: 1.5rem;
+			letter-spacing: -0.025em;
+		}
 	}
 
-	.settings-content::-webkit-scrollbar-thumb {
-		border-radius: 4px;
-		background: var(--color-neutral-300);
-	}
+	:global(.dark) .settings-content :global {
+		border-bottom-color: var(--color-neutral-800);
 
-	.settings-content::-webkit-scrollbar-thumb:hover {
-		background: var(--color-neutral-400);
-	}
-
-	:global(.dark) .settings-content::-webkit-scrollbar-thumb {
-		background: var(--color-neutral-600);
-	}
-
-	:global(.dark) .settings-content::-webkit-scrollbar-thumb:hover {
-		background: var(--color-neutral-500);
+		h2 {
+			color: var(--color-neutral-100);
+		}
 	}
 </style>

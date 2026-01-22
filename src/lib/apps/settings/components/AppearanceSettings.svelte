@@ -99,11 +99,11 @@
 	}
 </script>
 
-<div class="appearance-settings">
+<div>
 	<h2>Megjelenés beállítások</h2>
 
 	<!-- Desktop Téma Mód Szekció -->
-	<div class="settings-section">
+	<section>
 		<div class="setting-item">
 			<div class="setting-label-group">
 				<Label>Desktop téma mód</Label>
@@ -179,10 +179,10 @@
 				</p>
 			</div>
 		</div>
-	</div>
+	</section>
 
 	<!-- Taskbar Mód Szekció -->
-	<div class="settings-section">
+	<section>
 		<div class="setting-item">
 			<div class="setting-label-group">
 				<Label>Taskbar téma mód</Label>
@@ -254,10 +254,10 @@
 				</p>
 			</div>
 		</div>
-	</div>
+	</section>
 
 	<!-- Színek Szekció -->
-	<div class="settings-section">
+	<section>
 		<div class="setting-item">
 			<div class="setting-label-group">
 				<Label>Színek</Label>
@@ -277,10 +277,10 @@
 				</p>
 			</div>
 		</div>
-	</div>
+	</section>
 
 	<!-- Betűméret Szekció -->
-	<div class="settings-section">
+	<section>
 		<div class="setting-item">
 			<div class="setting-label-group">
 				<Label>Betűméret</Label>
@@ -322,43 +322,10 @@
 				</p>
 			</div>
 		</div>
-	</div>
+	</section>
 </div>
 
 <style>
-	.appearance-settings {
-		width: 100%;
-	}
-
-	h2 {
-		margin-bottom: 2rem;
-		color: var(--color-neutral-900);
-		font-weight: 600;
-		font-size: 1.5rem;
-		letter-spacing: -0.025em;
-	}
-
-	:global(.dark) h2 {
-		color: var(--color-neutral-100);
-	}
-
-	/* Szekciók */
-	.settings-section {
-		margin-bottom: 2.5rem;
-		border-bottom: 1px solid var(--color-neutral-200);
-		padding-bottom: 2.5rem;
-	}
-
-	:global(.dark) .settings-section {
-		border-bottom-color: var(--color-neutral-800);
-	}
-
-	.settings-section:last-child {
-		margin-bottom: 0;
-		border-bottom: none;
-		padding-bottom: 0;
-	}
-
 	/* Beállítási elemek */
 	.setting-item {
 		display: flex;

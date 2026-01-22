@@ -26,6 +26,12 @@
 		"component": "BackgroundSettings"
 	},
 	{
+		"label": "Tálca",
+		"href": "#taskbar",
+		"icon": "Dock",
+		"component": "TaskbarSettings"
+	},
+	{
 		"separator": true,
 		"label": "",
 		"href": ""

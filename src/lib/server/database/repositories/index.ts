@@ -1,3 +1,6 @@
+// User repository exports
+export { UserRepository, userRepository } from './user-repository';
+
 // Email template repository exports
 export { DatabaseTemplateRepository } from './email-template-repository';
 export { TemplateCache, CACHE_KEYS } from './email-template-cache';
