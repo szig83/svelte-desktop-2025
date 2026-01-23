@@ -101,9 +101,9 @@
 	.settings-content :global {
 		/* Szekciók */
 		section {
-			margin-bottom: 2.5rem;
+			margin-bottom: 1.5rem;
 			border-bottom: 1px solid var(--color-neutral-200);
-			padding-bottom: 2.5rem;
+			padding-bottom: 1.5rem;
 
 			&:last-child {
 				margin-bottom: 0;

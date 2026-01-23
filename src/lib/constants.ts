@@ -22,6 +22,7 @@ export const APP_CONSTANTS = {
 	// Taskbar konstansok
 	TASKBAR_HEIGHT: 48,
 	TASKBAR_POSITIONS: ['top', 'bottom', 'left', 'right'] as const,
+	TASKBAR_STYLES: ['classic', 'modern'] as const,
 
 	// Téma konstansok
 	THEME_MODES: ['light', 'dark', 'auto'] as const,
@@ -70,6 +71,7 @@ export const APP_CONSTANTS = {
 
 // Típus definíciók a konstansokhoz
 export type TaskbarPosition = (typeof APP_CONSTANTS.TASKBAR_POSITIONS)[number];
+export type TaskbarStyle = (typeof APP_CONSTANTS.TASKBAR_STYLES)[number];
 export type ThemeMode = (typeof APP_CONSTANTS.THEME_MODES)[number];
 export type FontSize = (typeof APP_CONSTANTS.FONT_SIZES)[number];
 export type AppCategory = (typeof APP_CONSTANTS.APP_CATEGORIES)[number];
@@ -144,6 +146,12 @@ export const DEFAULTS = {
 	// Taskbar alapértelmezett értékek
 	TASKBAR: {
 		position: 'bottom' as TaskbarPosition,
-		height: APP_CONSTANTS.TASKBAR_HEIGHT
+		height: APP_CONSTANTS.TASKBAR_HEIGHT,
+		style: 'classic' as TaskbarStyle,
+		itemVisibility: {
+			clock: true,
+			themeSwitcher: true,
+			appGuidLink: true
+		}
 	}
 } as const;

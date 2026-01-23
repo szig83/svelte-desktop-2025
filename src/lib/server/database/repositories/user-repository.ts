@@ -52,6 +52,14 @@ export class UserRepository {
 			theme: {
 				...DEFAULT_USER_SETTINGS.theme,
 				...((user.userSettings as Partial<UserSettings>)?.theme || {})
+			},
+			taskbar: {
+				...DEFAULT_USER_SETTINGS.taskbar,
+				...((user.userSettings as Partial<UserSettings>)?.taskbar || {}),
+				itemVisibility: {
+					...DEFAULT_USER_SETTINGS.taskbar.itemVisibility,
+					...((user.userSettings as Partial<UserSettings>)?.taskbar?.itemVisibility || {})
+				}
 			}
 		};
 	}
@@ -98,6 +106,14 @@ export class UserRepository {
 			theme: {
 				...currentSettings.theme,
 				...(updates.theme || {})
+			},
+			taskbar: {
+				...currentSettings.taskbar,
+				...(updates.taskbar || {}),
+				itemVisibility: {
+					...currentSettings.taskbar.itemVisibility,
+					...(updates.taskbar?.itemVisibility || {})
+				}
 			}
 		};
 

@@ -12,25 +12,28 @@
 
 	let { children, data } = $props();
 
+	// Settings state - reaktív állapot a data.settings alapján
+	const settings = $derived(data.settings);
+
 	// Settings kontextus beállítása - use a getter to maintain reactivity
 	const settingsContext = {
 		get windowPreview() {
-			return data.settings.windowPreview;
+			return settings.windowPreview;
 		},
 		get screenshotThumbnailHeight() {
-			return data.settings.screenshotThumbnailHeight;
+			return settings.screenshotThumbnailHeight;
 		},
 		get preferPerformance() {
-			return data.settings.preferPerformance;
+			return settings.preferPerformance;
 		},
 		get background() {
-			return data.settings.background;
+			return settings.background;
 		},
-		get taskbarPosition() {
-			return data.settings.taskbarPosition;
+		get taskbar() {
+			return settings.taskbar;
 		},
 		get theme() {
-			return data.settings.theme;
+			return settings.theme;
 		}
 	};
 	setContext('settings', settingsContext);
@@ -43,7 +46,7 @@
 		// Inicializáljuk és frissítjük a ThemeManager-t
 		$effect(() => {
 			if (!themeManager) {
-				themeManager = createThemeManager(data.settings.theme);
+				themeManager = createThemeManager(settings.theme);
 
 				// Beállítjuk a mentési callback-et, ami cookie-ba menti
 				themeManager.setSaveCallback(async (themeSettings) => {
@@ -51,7 +54,7 @@
 				});
 			} else {
 				// Frissítjük a ThemeManager settings-ét közvetlenül, mentés nélkül
-				const currentSettings = data.settings.theme;
+				const currentSettings = settings.theme;
 				if (JSON.stringify(themeManager.settings) !== JSON.stringify(currentSettings)) {
 					themeManager.settings = { ...currentSettings };
 				}

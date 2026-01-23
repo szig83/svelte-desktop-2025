@@ -23,7 +23,13 @@ const updateSettingsSchema = v.object({
 			fontSize: v.optional(v.picklist(['small', 'medium', 'large']))
 		})
 	),
-	taskbarPosition: v.optional(v.picklist(['top', 'bottom', 'left', 'right']))
+	taskbar: v.optional(
+		v.object({
+			position: v.optional(v.picklist(['top', 'bottom', 'left', 'right'])),
+			style: v.optional(v.picklist(['classic', 'modern'])),
+			itemVisibility: v.optional(v.record(v.string(), v.boolean()))
+		})
+	)
 });
 
 /**

@@ -10,7 +10,6 @@
 	import WindowLink from '$lib/components/ui/WindowLink.svelte';
 	import { getContext } from 'svelte';
 	import { takeWindowScreenshot } from '$lib/services/client/screenshot';
-	import type { TaskbarPosition } from '$lib/types/desktopEnviroment.ts';
 	import { browser } from '$app/environment';
 
 	let { windowManager }: { windowManager: WindowManager } = $props();
@@ -19,12 +18,20 @@
 		screenshotThumbnailHeight: number;
 		windowPreview: boolean;
 		preferPerformance: boolean;
-		taskbarPosition: TaskbarPosition;
 		theme: {
 			mode: 'light' | 'dark' | 'auto';
 			modeTaskbarStartMenu: 'light' | 'dark' | 'auto';
 			colorPrimaryHue: string;
 			fontSize: 'small' | 'medium' | 'large';
+		};
+		taskbar: {
+			position: 'top' | 'bottom' | 'left' | 'right';
+			style: 'classic' | 'modern';
+			itemVisibility: {
+				showWindowLinks: boolean;
+				showThemeSwitcher: boolean;
+				showClock: boolean;
+			};
 		};
 	}>('settings');
 
@@ -98,7 +105,12 @@
 </script>
 
 <div
-	class={['taskbar', settings.taskbarPosition === 'top' ? 'order-1' : 'order-3', taskbarCssClasses]}
+	class={[
+		'taskbar',
+		settings.taskbar.position === 'top' ? 'order-1' : 'order-3',
+		settings.taskbar.style === 'modern' ? 'modern' : '',
+		taskbarCssClasses
+	]}
 	style:--taskbar-background={taskbarCssVariables['--taskbar-background']}
 	style:--taskbar-foreground={taskbarCssVariables['--taskbar-foreground']}
 	style:--color-taskbar-background={taskbarCssVariables['--color-taskbar-background']}
@@ -164,9 +176,15 @@
 		{/each}
 	</div>
 	<div class="taskbar-right">
-		<WindowLink />
-		<ThemeSwitcher />
-		<Clock />
+		{#if settings.taskbar.itemVisibility.showWindowLinks ?? true}
+			<WindowLink />
+		{/if}
+		{#if settings.taskbar.itemVisibility.showThemeSwitcher ?? true}
+			<ThemeSwitcher />
+		{/if}
+		{#if settings.taskbar.itemVisibility.showClock ?? true}
+			<Clock />
+		{/if}
 	</div>
 </div>
 
@@ -181,8 +199,12 @@
 		backdrop-filter: blur(10px);
 		border-radius: 0;
 		background-color: var(--color-taskbar-background);
-		width: 100%;
 		color: var(--color-taskbar-foreground);
+
+		&.modern {
+			margin: 5px 15px 15px 15px;
+			border-radius: 999px;
+		}
 
 		.taskbar-left {
 			display: flex;
@@ -313,5 +335,10 @@
 			background-color: var(--color-primary-alpha-80);
 			color: var(--color-neutral-100);
 		}
+	}
+
+	:global(.modern .btn-startmenu) {
+		border-radius: 999px;
+		@apply mx-1;
 	}
 </style>
