@@ -14,7 +14,7 @@
 
 	let { windowManager }: { windowManager: WindowManager } = $props();
 
-	const settings = getContext<{
+	const settingsContext = getContext<{
 		screenshotThumbnailHeight: number;
 		windowPreview: boolean;
 		preferPerformance: boolean;
@@ -28,12 +28,21 @@
 			position: 'top' | 'bottom' | 'left' | 'right';
 			style: 'classic' | 'modern';
 			itemVisibility: {
-				showWindowLinks: boolean;
-				showThemeSwitcher: boolean;
-				showClock: boolean;
+				clock: boolean;
+				themeSwitcher: boolean;
+				appGuidLink: boolean;
 			};
 		};
 	}>('settings');
+
+	// Reaktív settings objektum a kontextusból
+	const settings = $derived({
+		screenshotThumbnailHeight: settingsContext.screenshotThumbnailHeight,
+		windowPreview: settingsContext.windowPreview,
+		preferPerformance: settingsContext.preferPerformance,
+		theme: settingsContext.theme,
+		taskbar: settingsContext.taskbar
+	});
 
 	let startMenuOpen = $state(false);
 
@@ -176,13 +185,13 @@
 		{/each}
 	</div>
 	<div class="taskbar-right">
-		{#if settings.taskbar.itemVisibility.showWindowLinks ?? true}
+		{#if settings.taskbar.itemVisibility.appGuidLink ?? true}
 			<WindowLink />
 		{/if}
-		{#if settings.taskbar.itemVisibility.showThemeSwitcher ?? true}
+		{#if settings.taskbar.itemVisibility.themeSwitcher ?? true}
 			<ThemeSwitcher />
 		{/if}
-		{#if settings.taskbar.itemVisibility.showClock ?? true}
+		{#if settings.taskbar.itemVisibility.clock ?? true}
 			<Clock />
 		{/if}
 	</div>

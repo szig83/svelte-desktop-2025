@@ -51,6 +51,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			// Betöltjük a beállításokat az adatbázisból
 			const userId = parseInt(session.user.id);
 			event.locals.settings = await userRepository.getUserSettings(userId);
+			console.log(event.locals.settings);
 
 			// Effektív téma mód kiszámítása (auto esetén a rendszer beállítás alapján)
 			let effectiveMode = event.locals.settings.theme.mode;
