@@ -7,15 +7,23 @@
 		description?: string;
 		info?: Snippet;
 		disabled?: boolean;
+		contentPosition?: 'bottom' | 'right';
 		children?: Snippet;
 	}
 
-	let { title, description, info, disabled = false, children }: Props = $props();
+	let {
+		title,
+		description,
+		info,
+		disabled = false,
+		contentPosition = 'right',
+		children
+	}: Props = $props();
 </script>
 
 <section>
 	<div class="item">
-		<div class="header">
+		<div class={['header', contentPosition === 'bottom' && 'flex-col items-start!']}>
 			<div class="label-group" class:disabled>
 				<Label>{title}</Label>
 				{#if description}

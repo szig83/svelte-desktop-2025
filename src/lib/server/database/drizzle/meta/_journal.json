@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1767962242151,
-      "tag": "0000_solid_excalibur",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1769088283557,
-      "tag": "0001_gorgeous_blur",
+      "when": 1769115661547,
+      "tag": "0000_lowly_nocturne",
       "breakpoints": true
     }
   ]

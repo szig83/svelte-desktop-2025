@@ -31,50 +31,11 @@ CREATE TABLE "auth"."audit_logs" (
 	"created_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "platform"."email_logs" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"message_id" varchar(255),
-	"recipient" varchar(255) NOT NULL,
-	"subject" varchar(500) NOT NULL,
-	"template_type" varchar(100),
-	"status" varchar(50) NOT NULL,
-	"error_message" text,
-	"sent_at" timestamp with time zone DEFAULT now(),
-	"delivered_at" timestamp with time zone,
-	"opened_at" timestamp with time zone,
-	"clicked_at" timestamp with time zone,
-	"created_at" timestamp with time zone DEFAULT now(),
-	"updated_at" timestamp with time zone DEFAULT now()
-);
---> statement-breakpoint
-CREATE TABLE "platform"."email_templates" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"template_type" varchar(100) NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"subject_template" text NOT NULL,
-	"html_template" text NOT NULL,
-	"text_template" text NOT NULL,
-	"required_data" jsonb DEFAULT '[]'::jsonb NOT NULL,
-	"optional_data" jsonb DEFAULT '[]'::jsonb,
-	"is_active" boolean DEFAULT true,
-	"created_at" timestamp with time zone DEFAULT now(),
-	"updated_at" timestamp with time zone DEFAULT now(),
-	CONSTRAINT "email_templates_template_type_unique" UNIQUE("template_type")
-);
---> statement-breakpoint
 CREATE TABLE "auth"."group_permissions" (
 	"group_id" serial NOT NULL,
 	"permission_id" integer,
 	"created_at" timestamp with time zone DEFAULT now(),
 	CONSTRAINT "group_permissions_group_id_permission_id_pk" PRIMARY KEY("group_id","permission_id")
-);
---> statement-breakpoint
-CREATE TABLE "auth"."groups" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" jsonb NOT NULL,
-	"description" jsonb,
-	"created_at" timestamp with time zone DEFAULT now(),
-	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "auth"."permissions" (
@@ -132,13 +93,6 @@ CREATE TABLE "auth"."sessions" (
 	CONSTRAINT "sessions_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "auth"."user_groups" (
-	"user_id" integer,
-	"group_id" integer,
-	"created_at" timestamp with time zone DEFAULT now(),
-	CONSTRAINT "user_groups_user_id_group_id_pk" PRIMARY KEY("user_id","group_id")
-);
---> statement-breakpoint
 CREATE TABLE "auth"."user_roles" (
 	"user_id" integer,
 	"role_id" integer,
@@ -146,12 +100,28 @@ CREATE TABLE "auth"."user_roles" (
 	CONSTRAINT "user_roles_user_id_role_id_pk" PRIMARY KEY("user_id","role_id")
 );
 --> statement-breakpoint
-CREATE TABLE "platform"."user_settings" (
+CREATE TABLE "auth"."verifications" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
-	"settings" jsonb NOT NULL,
+	"identifier" varchar(255) NOT NULL,
+	"value" varchar(255) NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "auth"."groups" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" jsonb NOT NULL,
+	"description" jsonb,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "auth"."user_groups" (
+	"user_id" integer,
+	"group_id" integer,
+	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "user_groups_user_id_group_id_pk" PRIMARY KEY("user_id","group_id")
 );
 --> statement-breakpoint
 CREATE TABLE "auth"."users" (
@@ -161,6 +131,7 @@ CREATE TABLE "auth"."users" (
 	"email_verified" boolean DEFAULT false,
 	"username" varchar(50),
 	"image" varchar(255),
+	"user_settings" jsonb DEFAULT '{}',
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"deleted_at" timestamp with time zone,
@@ -168,11 +139,41 @@ CREATE TABLE "auth"."users" (
 	CONSTRAINT "users_username_unique" UNIQUE("username")
 );
 --> statement-breakpoint
-CREATE TABLE "auth"."verifications" (
+CREATE TABLE "platform"."email_logs" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"message_id" varchar(255),
+	"recipient" varchar(255) NOT NULL,
+	"subject" varchar(500) NOT NULL,
+	"template_type" varchar(100),
+	"status" varchar(50) NOT NULL,
+	"error_message" text,
+	"sent_at" timestamp with time zone DEFAULT now(),
+	"delivered_at" timestamp with time zone,
+	"opened_at" timestamp with time zone,
+	"clicked_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "platform"."email_templates" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"template_type" varchar(100) NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"subject_template" text NOT NULL,
+	"html_template" text NOT NULL,
+	"text_template" text NOT NULL,
+	"required_data" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"optional_data" jsonb DEFAULT '[]'::jsonb,
+	"is_active" boolean DEFAULT true,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "email_templates_template_type_unique" UNIQUE("template_type")
+);
+--> statement-breakpoint
+CREATE TABLE "platform"."user_settings" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"identifier" varchar(255) NOT NULL,
-	"value" varchar(255) NOT NULL,
-	"expires_at" timestamp with time zone NOT NULL,
+	"user_id" integer NOT NULL,
+	"settings" jsonb NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now()
 );
@@ -186,10 +187,10 @@ ALTER TABLE "auth"."permissions" ADD CONSTRAINT "permissions_resource_id_resourc
 ALTER TABLE "auth"."role_permissions" ADD CONSTRAINT "role_permissions_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "auth"."roles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "auth"."role_permissions" ADD CONSTRAINT "role_permissions_permission_id_permissions_id_fk" FOREIGN KEY ("permission_id") REFERENCES "auth"."permissions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "auth"."user_groups" ADD CONSTRAINT "user_groups_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "auth"."user_groups" ADD CONSTRAINT "user_groups_group_id_groups_id_fk" FOREIGN KEY ("group_id") REFERENCES "auth"."groups"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "auth"."user_roles" ADD CONSTRAINT "user_roles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "auth"."user_roles" ADD CONSTRAINT "user_roles_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "auth"."roles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "auth"."user_groups" ADD CONSTRAINT "user_groups_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "auth"."user_groups" ADD CONSTRAINT "user_groups_group_id_groups_id_fk" FOREIGN KEY ("group_id") REFERENCES "auth"."groups"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "platform"."user_settings" ADD CONSTRAINT "user_settings_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "email_logs_recipient_idx" ON "platform"."email_logs" USING btree ("recipient");--> statement-breakpoint
 CREATE INDEX "email_logs_status_idx" ON "platform"."email_logs" USING btree ("status");--> statement-breakpoint

@@ -41,7 +41,15 @@
 
 <h2>Tálca beállítások</h2>
 
-<ContentSection title="Tálca pozíció" description="">
+<ContentSection
+	title="Tálca pozíció"
+	description="A tálca pozíciója a képernyőn."
+	contentPosition="bottom"
+>
+	{#snippet info()}
+		Tetszés szerint állítható a tálca pozíciója a képernyőn. Elhelyezhető a képernyő alján vagy
+		felső részén.
+	{/snippet}
 	<div class="button-groups">
 		<Button
 			variant={settings.taskbarPosition === 'top' ? 'default' : 'outline'}
