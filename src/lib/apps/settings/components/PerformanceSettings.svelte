@@ -125,9 +125,10 @@
 
 <!-- Előnézeti kép magassága -->
 <ContentSection
-	title="Előnézeti kép magassága"
-	description="Az előnézeti képek magassága pixelben"
+	title="Előnézeti kép"
+	description="Az előnézeti képek méretének kezelése"
 	disabled={isScreenshotHeightDisabled}
+	contentPosition="bottom"
 >
 	{#snippet info()}
 		Az előnézeti képek magasságának beállítása. Nagyobb értékek részletesebb előnézeteket

@@ -79,7 +79,7 @@
 </script>
 
 <div
-	class={['desktop', cssClasses]}
+	class={['desktop select-none', cssClasses]}
 	style:background-color={settings.background.type === 'color' &&
 	settings.background.value &&
 	settings.background.value.length > 0
