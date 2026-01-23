@@ -63,6 +63,12 @@ export class WindowManager {
 			if (existingWindow) {
 				// Ha már nyitva van, akkor aktiváljuk és visszaállítjuk a minimalizálásból
 				existingWindow.isMinimized = false;
+				// Frissítjük a paramétereket, ha vannak újak
+				if (Object.keys(parameters).length > 0) {
+					existingWindow.parameters = { ...existingWindow.parameters, ...parameters };
+					// Trigger reactivity
+					this.windows = [...this.windows];
+				}
 				this.activateWindow(existingWindow.id);
 				return existingWindow.id;
 			}
