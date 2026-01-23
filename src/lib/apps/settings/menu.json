@@ -1,5 +1,15 @@
 [
 	{
+		"label": "Saját profil",
+		"href": "#profile",
+		"icon": "UserPen",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Saját profil",
+			"message": "A saját profil beállítások kezelése fejlesztés alatt áll."
+		}
+	},
+	{
 		"label": "Általános",
 		"href": "#general",
 		"icon": "Settings",
@@ -30,6 +40,16 @@
 				"href": "#taskbar",
 				"icon": "Dock",
 				"component": "TaskbarSettings"
+			},
+			{
+				"label": "Indító panel",
+				"href": "#start",
+				"icon": "Menu",
+				"component": "PlaceholderSettings",
+				"props": {
+					"title": "Indító panel",
+					"message": "Az indító panel kezelése fejlesztés alatt áll."
+				}
 			}
 		]
 	},
@@ -41,6 +61,16 @@
 		"props": {
 			"title": "Teljesítmény",
 			"message": "A teljesítmény beállítások kezelése fejlesztés alatt áll."
+		}
+	},
+	{
+		"label": "Rendszer információk",
+		"href": "#system-info",
+		"icon": "Info",
+		"component": "PlaceholderSettings",
+		"props": {
+			"title": "Rendszer információk",
+			"message": "A rendszer információk kezelése fejlesztés alatt áll."
 		}
 	}
 ]

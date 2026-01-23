@@ -92,6 +92,7 @@
 				<!-- Children submenu with smooth animation -->
 				<div class="submenu-wrapper" class:expanded={isExpanded(item.label)}>
 					<div class="submenu">
+						<div class="submenu-indicator"></div>
 						{#each item.children as child}
 							<button
 								class="menu-item child"
@@ -153,7 +154,6 @@
 		border-radius: var(--radius-sm, 0.375rem);
 		background: transparent;
 		padding: 0.625rem 0.75rem;
-		width: 100%;
 		color: var(--color-neutral-700);
 		font-weight: 500;
 		font-size: 0.95rem;
@@ -177,7 +177,8 @@
 	}
 
 	.menu-item.child {
-		padding: 0.5rem 0.625rem 0.5rem 2.25rem;
+		margin-left: 2rem;
+		padding: 0.5rem 0.625rem 0.5rem 0.625rem;
 		color: var(--color-neutral-600);
 		font-weight: 400;
 		font-size: 0.9rem;
@@ -249,10 +250,21 @@
 
 	.submenu {
 		display: flex;
+		position: relative;
 		flex-direction: column;
 		gap: 0.0625rem;
 		padding-top: 0.125rem;
 		min-height: 0;
+	}
+
+	.submenu-indicator {
+		position: absolute;
+		top: 0.25rem;
+		bottom: 0.25rem;
+		left: 1.2rem;
+		opacity: 0.6;
+		background-color: var(--color-neutral-400);
+		width: 1px;
 	}
 
 	/* Separator styles */
@@ -314,5 +326,10 @@
 
 	:global(.dark) .menu-separator {
 		background-color: var(--color-neutral-700);
+	}
+
+	:global(.dark) .submenu-indicator {
+		opacity: 0.5;
+		background-color: var(--color-neutral-600);
 	}
 </style>

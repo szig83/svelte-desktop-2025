@@ -244,7 +244,7 @@
 		color: var(--color-taskbar-foreground);
 
 		&.modern {
-			margin: 5px 15px 15px 15px;
+			margin: 10px;
 			border-radius: 999px;
 		}
 
