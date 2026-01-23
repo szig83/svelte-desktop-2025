@@ -6,6 +6,7 @@
 	import StartMenu from './startmenu/StartMenu.svelte';
 	import Clock from '$lib/components/ui/Clock.svelte';
 	import * as Popover from '$lib/components/ui/popover';
+	import * as ContextMenu from '$lib/components/ui/context-menu';
 	import ThemeSwitcher from '$lib/components/ui/ThemeSwitcher.svelte';
 	import WindowLink from '$lib/components/ui/WindowLink.svelte';
 	import { getContext } from 'svelte';
@@ -130,60 +131,82 @@
 	style:--taskbar-accent={taskbarCssVariables['--taskbar-accent']}
 	style:--color-taskbar-accent={taskbarCssVariables['--color-taskbar-accent']}
 >
-	<div class="taskbar-left">
-		<Popover.Root bind:open={startMenuOpen}>
-			<Popover.Trigger class="btn-startmenu btn-click-effect"><Menu size={24} /></Popover.Trigger>
-			<Popover.Content class="z-1000 mx-2 my-2 flex w-(--startmenu-width) items-stretch"
-				><StartMenu bind:open={startMenuOpen} /></Popover.Content
-			>
-		</Popover.Root>
-
-		{#each windowManager.windows as window (window.id)}
-			<div class="taskbar-item-wrapper">
-				<button
-					class="taskbar-item"
-					class:active={window.isActive}
-					class:minimized={window.isMinimized}
-					onclick={async () => {
-						if (window.isMinimized) {
-							// Ha minimalizált, visszaállítjuk és aktiváljuk
-							await windowManager.minimizeWindow(window.id);
-						} else if (window.isActive) {
-							// Ha aktív, minimalizáljuk (screenshot-tal)
-							await windowManager.minimizeWindow(window.id, async () => {
-								if (settings.windowPreview && !settings.preferPerformance) {
-									await takeWindowScreenshot(
-										window.id,
-										windowManager,
-										settings.screenshotThumbnailHeight
-									);
-								}
-							});
-						} else {
-							// Ha inaktív (de nem minimalizált), aktiváljuk
-							windowManager.activateWindow(window.id);
-						}
+	<ContextMenu.Root>
+		<ContextMenu.Trigger class="taskbar-left-trigger">
+			<div class="taskbar-left">
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					oncontextmenu={(e) => {
+						e.stopPropagation();
 					}}
 				>
-					<div class="taskbar-item-icon">
-						<UniversalIcon icon={window.icon ?? ''} size={24} appName={window.appName} />
+					<Popover.Root bind:open={startMenuOpen}>
+						<Popover.Trigger class="btn-startmenu btn-click-effect"
+							><Menu size={24} /></Popover.Trigger
+						>
+						<Popover.Content class="z-1000 mx-2 my-2 flex w-(--startmenu-width) items-stretch"
+							><StartMenu bind:open={startMenuOpen} /></Popover.Content
+						>
+					</Popover.Root>
+				</div>
+
+				{#each windowManager.windows as window (window.id)}
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div
+						class="taskbar-item-wrapper"
+						oncontextmenu={(e) => {
+							e.stopPropagation();
+						}}
+					>
+						<button
+							class="taskbar-item"
+							class:active={window.isActive}
+							class:minimized={window.isMinimized}
+							onclick={async () => {
+								if (window.isMinimized) {
+									// Ha minimalizált, visszaállítjuk és aktiváljuk
+									await windowManager.minimizeWindow(window.id);
+								} else if (window.isActive) {
+									// Ha aktív, minimalizáljuk (screenshot-tal)
+									await windowManager.minimizeWindow(window.id, async () => {
+										if (settings.windowPreview && !settings.preferPerformance) {
+											await takeWindowScreenshot(
+												window.id,
+												windowManager,
+												settings.screenshotThumbnailHeight
+											);
+										}
+									});
+								} else {
+									// Ha inaktív (de nem minimalizált), aktiváljuk
+									windowManager.activateWindow(window.id);
+								}
+							}}
+						>
+							<div class="taskbar-item-icon">
+								<UniversalIcon icon={window.icon ?? ''} size={24} appName={window.appName} />
+							</div>
+							<div class="taskbar-item-title">
+								<span>{window.title}</span>
+							</div>
+						</button>
+						{#if window.screenshot && settings.windowPreview && !settings.preferPerformance}
+							<div class="screenshot-preview">
+								<img
+									style:height="{settings.screenshotThumbnailHeight}px"
+									src={window.screenshot}
+									alt="{window.title} preview"
+								/>
+							</div>
+						{/if}
 					</div>
-					<div class="taskbar-item-title">
-						<span>{window.title}</span>
-					</div>
-				</button>
-				{#if window.screenshot && settings.windowPreview && !settings.preferPerformance}
-					<div class="screenshot-preview">
-						<img
-							style:height="{settings.screenshotThumbnailHeight}px"
-							src={window.screenshot}
-							alt="{window.title} preview"
-						/>
-					</div>
-				{/if}
+				{/each}
 			</div>
-		{/each}
-	</div>
+		</ContextMenu.Trigger>
+		<ContextMenu.Content class="z-1000">
+			<ContextMenu.Item>Tálca testreszabása</ContextMenu.Item>
+		</ContextMenu.Content>
+	</ContextMenu.Root>
 	<div class="taskbar-right">
 		{#if settings.taskbar.itemVisibility.appGuidLink ?? true}
 			<WindowLink />
@@ -213,6 +236,11 @@
 		&.modern {
 			margin: 5px 15px 15px 15px;
 			border-radius: 999px;
+		}
+
+		:global(.taskbar-left-trigger) {
+			display: flex;
+			flex-grow: 1;
 		}
 
 		.taskbar-left {
