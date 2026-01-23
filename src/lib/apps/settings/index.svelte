@@ -15,6 +15,7 @@
 	let activeMenuItem = $state<string | null>(null);
 	let activeComponent = $state<string | null>(null);
 	let componentProps = $state<Record<string, any>>({});
+	let expandedParents = $state<string[]>([]);
 
 	// Paraméterként kapott section - reaktívan olvassuk ki
 	const section = $derived(appContext?.parameters?.section as string | undefined);
@@ -22,10 +23,13 @@
 	// Alapértelmezett vagy paraméterezett menüpont beállítása
 	$effect(() => {
 		let targetItem: MenuItem | null = null;
+		let parentPath: string[] = [];
 
 		// Ha van section paraméter, keressük meg a megfelelő menüpontot
 		if (section) {
-			targetItem = findMenuItemByHref(menuItems, `#${section}`);
+			const result = findMenuItemByHref(menuItems, `#${section}`);
+			targetItem = result.item;
+			parentPath = result.parentPath;
 		}
 
 		// Ha nincs section vagy nem találtuk, használjuk az alapértelmezettet
@@ -34,6 +38,8 @@
 		}
 
 		if (targetItem) {
+			// Nyissuk ki a szülő menüket
+			expandedParents = parentPath;
 			handleMenuItemClick(targetItem);
 		}
 	});
@@ -51,17 +57,23 @@
 		return null;
 	}
 
-	function findMenuItemByHref(items: MenuItem[], href: string): MenuItem | null {
+	function findMenuItemByHref(
+		items: MenuItem[],
+		href: string,
+		parentPath: string[] = []
+	): { item: MenuItem | null; parentPath: string[] } {
 		for (const item of items) {
 			if (item.href === href && item.component) {
-				return item;
+				return { item, parentPath };
 			}
 			if (item.children) {
-				const found = findMenuItemByHref(item.children, href);
-				if (found) return found;
+				const result = findMenuItemByHref(item.children, href, [...parentPath, item.label]);
+				if (result.item) {
+					return result;
+				}
 			}
 		}
-		return null;
+		return { item: null, parentPath: [] };
 	}
 
 	function handleMenuItemClick(item: MenuItem) {
@@ -78,6 +90,7 @@
 			items={menuItems}
 			activeHref={activeMenuItem ?? undefined}
 			onItemClick={handleMenuItemClick}
+			initialExpandedParents={expandedParents}
 		/>
 	</AppSideBar>
 	<div class="settings-content-wrapper">
@@ -133,7 +146,7 @@
 		/* Szekciók */
 		section {
 			margin-bottom: 1.5rem;
-			border-bottom: 1px solid var(--color-neutral-200);
+			border-bottom: 1px solid var(--color-neutral-400);
 			padding-bottom: 1.5rem;
 
 			&:last-child {
@@ -153,10 +166,12 @@
 	}
 
 	:global(.dark) .settings-content :global {
-		border-bottom-color: var(--color-neutral-800);
+		section {
+			border-bottom-color: var(--color-neutral-700);
+		}
 
 		h2 {
-			color: var(--color-neutral-100);
+			color: var(--color-neutral-300);
 		}
 	}
 </style>

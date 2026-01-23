@@ -96,7 +96,7 @@
 	}
 
 	:global(.dark) .label-group :global(label) {
-		color: var(--color-neutral-100);
+		color: var(--color-neutral-300);
 	}
 
 	.description {

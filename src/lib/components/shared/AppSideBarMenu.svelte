@@ -6,12 +6,18 @@
 		items: MenuItem[];
 		activeHref?: string;
 		onItemClick?: (item: MenuItem) => void;
+		initialExpandedParents?: string[];
 	}
 
-	let { items = [], activeHref, onItemClick }: Props = $props();
+	let { items = [], activeHref, onItemClick, initialExpandedParents = [] }: Props = $props();
 
 	// Track which menu items are expanded
 	let expandedItems = $state<Set<string>>(new Set());
+
+	// Reaktívan frissítjük az expandált elemeket, ha változik az initialExpandedParents
+	$effect(() => {
+		expandedItems = new Set(initialExpandedParents);
+	});
 
 	function toggleExpand(label: string) {
 		const newExpanded = new Set(expandedItems);
@@ -94,7 +100,7 @@
 							>
 								<div class="menu-item-content">
 									{#if child.icon}
-										<UniversalIcon icon={child.icon} size={14} />
+										<UniversalIcon icon={child.icon} size={16} />
 									{:else}
 										<div class="icon-placeholder small"></div>
 									{/if}
@@ -150,7 +156,7 @@
 		width: 100%;
 		color: var(--color-neutral-700);
 		font-weight: 500;
-		font-size: 0.8rem;
+		font-size: 0.95rem;
 		text-decoration: none;
 	}
 
@@ -172,9 +178,9 @@
 
 	.menu-item.child {
 		padding: 0.5rem 0.625rem 0.5rem 2.25rem;
-		color: var(--color-neutral-500);
+		color: var(--color-neutral-600);
 		font-weight: 400;
-		font-size: 0.75rem;
+		font-size: 0.9rem;
 	}
 
 	.menu-item.child:hover {
@@ -277,7 +283,7 @@
 	}
 
 	:global(.dark) .menu-item.child {
-		color: var(--color-neutral-500);
+		color: var(--color-neutral-400);
 	}
 
 	:global(.dark) .menu-item.child:hover {

@@ -6,35 +6,32 @@
 		"component": "GeneralSettings"
 	},
 	{
-		"separator": true,
-		"label": "",
-		"href": ""
-	},
-	{
-		"label": "Megjelenés",
-		"href": "#appearance",
-		"icon": "Palette",
-		"component": "AppearanceSettings",
-		"props": {
-			"defaultTab": "colors"
-		}
-	},
-	{
-		"label": "Háttér",
-		"href": "#background",
-		"icon": "Image",
-		"component": "BackgroundSettings"
-	},
-	{
-		"label": "Tálca",
-		"href": "#taskbar",
-		"icon": "Dock",
-		"component": "TaskbarSettings"
-	},
-	{
-		"separator": true,
-		"label": "",
-		"href": ""
+		"label": "Személyre szabás",
+		"href": "#",
+		"icon": "Paintbrush",
+		"children": [
+			{
+				"label": "Megjelenés",
+				"href": "#appearance",
+				"icon": "Palette",
+				"component": "AppearanceSettings",
+				"props": {
+					"defaultTab": "colors"
+				}
+			},
+			{
+				"label": "Háttér",
+				"href": "#background",
+				"icon": "Image",
+				"component": "BackgroundSettings"
+			},
+			{
+				"label": "Tálca",
+				"href": "#taskbar",
+				"icon": "Dock",
+				"component": "TaskbarSettings"
+			}
+		]
 	},
 	{
 		"label": "Teljesítmény",

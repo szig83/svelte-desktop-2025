@@ -2,6 +2,7 @@
 	import { Switch } from '$lib/components/ui/switch';
 	import { Label } from '$lib/components/ui/label';
 	import { Slider } from 'bits-ui';
+	import { Image } from 'lucide-svelte';
 	import { APP_CONSTANTS } from '$lib/constants';
 	import { toast } from 'svelte-sonner';
 	import { updateSettings } from '../settings.remote';
@@ -58,6 +59,20 @@
 
 	const thumbnailHeights = [100, 200, 300, 400];
 
+	// Icon méret meghatározása az érték alapján
+	function getIconSize(value: number): number {
+		const index = thumbnailHeights.indexOf(value);
+		const sizes = [14, 18, 22, 26]; // Növekvő méretek
+		return sizes[index] ?? 18;
+	}
+
+	// Szöveges címke meghatározása az érték alapján
+	function getLabel(value: number): string {
+		const index = thumbnailHeights.indexOf(value);
+		const labels = ['kicsi', 'közepes', 'nagy', 'hatalmas'];
+		return labels[index] ?? '';
+	}
+
 	// Csak akkor mentünk, amikor a felhasználó befejezi a slider mozgatását
 	async function handleScreenshotHeightCommit(newValue: number) {
 		if (isScreenshotHeightDisabled) return;
@@ -99,68 +114,73 @@
 	/>
 </ContentSection>
 
-<!-- Ablak előnézet -->
-<ContentSection
-	title="Ablak előnézet"
-	description="Előnézeti képek megjelenítése a tálcán"
-	disabled={isWindowPreviewDisabled}
->
-	{#snippet info()}
-		Az ablak előnézet funkció lehetővé teszi, hogy a tálcán lévő alkalmazások ikonjára mutatva egy
-		kis előnézeti képet láss az ablak tartalmáról. Ez megkönnyíti a nyitott ablakok közötti
-		navigációt.
-	{/snippet}
-
-	<Switch
-		id="window-preview"
-		checked={settings.windowPreview}
+{#if !settings.preferPerformance}
+	<!-- Ablak előnézet -->
+	<ContentSection
+		title="Ablak előnézet"
+		description="Előnézeti képek megjelenítése a tálcán"
 		disabled={isWindowPreviewDisabled}
-		onclick={handleWindowPreviewChange}
-	/>
-</ContentSection>
+	>
+		{#snippet info()}
+			Az ablak előnézet funkció lehetővé teszi, hogy a tálcán lévő alkalmazások ikonjára mutatva egy
+			kis előnézeti képet láss az ablak tartalmáról. Ez megkönnyíti a nyitott ablakok közötti
+			navigációt.
+		{/snippet}
 
-<!-- Előnézeti kép magassága -->
-<ContentSection
-	title="Előnézeti kép"
-	description="Az előnézeti képek méretének kezelése"
-	disabled={isScreenshotHeightDisabled}
-	contentPosition="bottom"
->
-	{#snippet info()}
-		Az előnézeti képek magasságának beállítása. Nagyobb értékek részletesebb előnézeteket
-		eredményeznek, de több memóriát és feldolgozási kapacitást igényelnek. Ajánlott érték:
-		{APP_CONSTANTS.DEFAULT_SCREENSHOT_HEIGHT}px.
-	{/snippet}
+		<Switch
+			id="window-preview"
+			checked={settings.windowPreview}
+			disabled={isWindowPreviewDisabled}
+			onclick={handleWindowPreviewChange}
+		/>
+	</ContentSection>
 
-	<div class="slider-container">
-		<Slider.Root
-			type="single"
-			step={thumbnailHeights}
-			value={settings.screenshotThumbnailHeight}
-			disabled={isScreenshotHeightDisabled}
-			onValueCommit={(value) => handleScreenshotHeightCommit(value)}
-			class="slider-root"
-			trackPadding={3}
-		>
-			{#snippet children({ tickItems })}
-				<span class="slider-track">
-					<Slider.Range class="slider-range" />
-				</span>
-				<Slider.Thumb index={0} class="slider-thumb" />
-				{#each tickItems as { index, value } (index)}
-					<Slider.Tick {index} class="slider-tick" />
-					<Slider.TickLabel {index} class="slider-tick-label">
-						{value}px
-					</Slider.TickLabel>
-				{/each}
-			{/snippet}
-		</Slider.Root>
-	</div>
-</ContentSection>
+	<!-- Előnézeti kép magassága -->
+	<ContentSection
+		title="Előnézeti kép"
+		description="Az előnézeti képek méretének kezelése"
+		disabled={isScreenshotHeightDisabled}
+		contentPosition="bottom"
+	>
+		{#snippet info()}
+			Az előnézeti képek méretének beállítása. Nagyobb értékek részletesebb előnézeteket
+			eredményeznek, de több memóriát és feldolgozási kapacitást igényelnek. Ajánlott érték:
+			közepes.
+		{/snippet}
+
+		<div class="slider-container">
+			<Slider.Root
+				type="single"
+				step={thumbnailHeights}
+				value={settings.screenshotThumbnailHeight}
+				disabled={isScreenshotHeightDisabled}
+				onValueCommit={(value) => handleScreenshotHeightCommit(value)}
+				class="slider-root"
+				trackPadding={3}
+			>
+				{#snippet children({ tickItems })}
+					<span class="slider-track">
+						<Slider.Range class="slider-range" />
+					</span>
+					<Slider.Thumb index={0} class="slider-thumb" />
+					{#each tickItems as { index, value } (index)}
+						<Slider.Tick {index} class="slider-tick" />
+						<Slider.TickLabel {index} class="slider-tick-label">
+							<div class="tick-content">
+								<Image size={getIconSize(value)} strokeWidth={2} />
+								<span class="tick-text">{getLabel(value)}</span>
+							</div>
+						</Slider.TickLabel>
+					{/each}
+				{/snippet}
+			</Slider.Root>
+		</div>
+	</ContentSection>
+{/if}
 
 <style>
 	.slider-container {
-		margin-top: 2rem;
+		margin-top: 4rem;
 		padding: 0 0.5rem;
 		width: 100%;
 	}
@@ -239,5 +259,17 @@
 
 	.slider-container :global(.slider-tick-label[data-selected]) {
 		color: var(--color-foreground);
+	}
+
+	.slider-container :global(.tick-content) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.slider-container :global(.tick-text) {
+		font-size: 0.75rem;
+		white-space: nowrap;
 	}
 </style>
