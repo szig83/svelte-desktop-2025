@@ -3,20 +3,38 @@
 	import { AppSideBar, AppSideBarMenu, AppContentArea } from '$lib/components/shared';
 	import menuItems from './menu.json';
 	import { getContext } from 'svelte';
+	import { getAppContext } from '$lib/services/client/appContext';
 
 	// Settings betöltése a kontextusból
 	const settings = getContext('settings');
+
+	// App context a paraméterekhez
+	const appContext = getAppContext();
 
 	// Állapotkezelés
 	let activeMenuItem = $state<string | null>(null);
 	let activeComponent = $state<string | null>(null);
 	let componentProps = $state<Record<string, any>>({});
 
-	// Alapértelmezett menüpont beállítása
+	// Paraméterként kapott section - reaktívan olvassuk ki
+	const section = $derived(appContext?.parameters?.section as string | undefined);
+
+	// Alapértelmezett vagy paraméterezett menüpont beállítása
 	$effect(() => {
-		const defaultItem = findDefaultMenuItem(menuItems);
-		if (defaultItem) {
-			handleMenuItemClick(defaultItem);
+		let targetItem: MenuItem | null = null;
+
+		// Ha van section paraméter, keressük meg a megfelelő menüpontot
+		if (section) {
+			targetItem = findMenuItemByHref(menuItems, `#${section}`);
+		}
+
+		// Ha nincs section vagy nem találtuk, használjuk az alapértelmezettet
+		if (!targetItem) {
+			targetItem = findDefaultMenuItem(menuItems);
+		}
+
+		if (targetItem) {
+			handleMenuItemClick(targetItem);
 		}
 	});
 
@@ -27,6 +45,19 @@
 			}
 			if (item.children) {
 				const found = findDefaultMenuItem(item.children);
+				if (found) return found;
+			}
+		}
+		return null;
+	}
+
+	function findMenuItemByHref(items: MenuItem[], href: string): MenuItem | null {
+		for (const item of items) {
+			if (item.href === href && item.component) {
+				return item;
+			}
+			if (item.children) {
+				const found = findMenuItemByHref(item.children, href);
 				if (found) return found;
 			}
 		}

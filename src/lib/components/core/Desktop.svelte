@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { createWindowManager, setWindowManager, getThemeManager } from '$lib/stores';
+	import { getAppByName } from '$lib/services/client/appRegistry';
+	import * as ContextMenu from '$lib/components/ui/context-menu';
 	import Window from '$lib/components/core/window/Window.svelte';
 	import Taskbar from '$lib/components/core/Taskbar.svelte';
 	import type { BackgroundType } from '$lib/types/desktopEnviroment.ts';
@@ -100,23 +102,39 @@
 			{/key}
 		</div>
 	{/if}
-	<div
-		id="workspace"
-		class="workspace"
-		onclick={handleWorkspaceClick}
-		onkeydown={handleWorkspaceKeydown}
-		role="button"
-		tabindex="-1"
-	>
-		{#if children}
-			{@render children()}
-		{/if}
+	<ContextMenu.Root>
+		<ContextMenu.Trigger class="workspace-trigger">
+			<div
+				id="workspace"
+				class="workspace"
+				onclick={handleWorkspaceClick}
+				onkeydown={handleWorkspaceKeydown}
+				role="button"
+				tabindex="-1"
+			>
+				{#if children}
+					{@render children()}
+				{/if}
 
-		<!-- Ablakok renderelése -->
-		{#each windowManager.windows as window (window.id)}
-			<Window windowState={window} />
-		{/each}
-	</div>
+				<!-- Ablakok renderelése -->
+				{#each windowManager.windows as window (window.id)}
+					<Window windowState={window} />
+				{/each}
+			</div>
+		</ContextMenu.Trigger>
+		<ContextMenu.Content class="z-1000">
+			<ContextMenu.Item
+				onclick={async () => {
+					const settingsApp = await getAppByName('settings');
+					if (settingsApp) {
+						windowManager.openWindow(settingsApp.appName, settingsApp.title, settingsApp, {
+							section: 'background'
+						});
+					}
+				}}>Háttér testreszabása</ContextMenu.Item
+			>
+		</ContextMenu.Content>
+	</ContextMenu.Root>
 
 	<Taskbar {windowManager} />
 </div>
@@ -136,10 +154,15 @@
 		overflow: hidden;
 	}
 
+	:global(.workspace-trigger) {
+		display: flex;
+		flex-grow: 1;
+		order: 2;
+	}
+
 	.workspace {
 		position: relative;
 		flex-grow: 1;
-		order: 2;
 		overflow: hidden;
 	}
 

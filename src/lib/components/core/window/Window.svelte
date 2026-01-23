@@ -707,6 +707,7 @@
 	style={windowStyle}
 	data-window-id={windowState.id}
 	onclick={() => windowManager.activateWindow(windowState.id)}
+	oncontextmenu={(e) => e.stopPropagation()}
 	onkeydown={handleWindowKeydown}
 	role="button"
 	tabindex="0"

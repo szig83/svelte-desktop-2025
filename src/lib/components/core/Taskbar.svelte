@@ -2,6 +2,7 @@
 	import { Menu } from 'lucide-svelte';
 	import type { WindowManager } from '$lib/stores';
 	import { getThemeManager } from '$lib/stores';
+	import { getAppByName } from '$lib/services/client/appRegistry';
 	import { UniversalIcon } from '$lib/components/shared';
 	import StartMenu from './startmenu/StartMenu.svelte';
 	import Clock from '$lib/components/ui/Clock.svelte';
@@ -204,7 +205,16 @@
 			</div>
 		</ContextMenu.Trigger>
 		<ContextMenu.Content class="z-1000">
-			<ContextMenu.Item>Tálca testreszabása</ContextMenu.Item>
+			<ContextMenu.Item
+				onclick={async () => {
+					const settingsApp = await getAppByName('settings');
+					if (settingsApp) {
+						windowManager.openWindow(settingsApp.appName, settingsApp.title, settingsApp, {
+							section: 'taskbar'
+						});
+					}
+				}}>Tálca testreszabása</ContextMenu.Item
+			>
 		</ContextMenu.Content>
 	</ContextMenu.Root>
 	<div class="taskbar-right">
