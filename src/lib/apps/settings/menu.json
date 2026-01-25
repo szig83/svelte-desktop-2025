@@ -67,10 +67,6 @@
 		"label": "Rendszer információk",
 		"href": "#system-info",
 		"icon": "Info",
-		"component": "PlaceholderSettings",
-		"props": {
-			"title": "Rendszer információk",
-			"message": "A rendszer információk kezelése fejlesztés alatt áll."
-		}
+		"component": "About"
 	}
 ]
