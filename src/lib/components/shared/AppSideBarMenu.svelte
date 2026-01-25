@@ -154,6 +154,7 @@
 		border-radius: var(--radius-sm, 0.375rem);
 		background: transparent;
 		padding: 0.625rem 0.75rem;
+		width: 100%;
 		color: var(--color-neutral-700);
 		font-weight: 500;
 		font-size: 0.95rem;
@@ -177,8 +178,7 @@
 	}
 
 	.menu-item.child {
-		margin-left: 2rem;
-		padding: 0.5rem 0.625rem 0.5rem 0.625rem;
+		padding: 0.5rem 0.625rem 0.5rem 2.25rem;
 		color: var(--color-neutral-600);
 		font-weight: 400;
 		font-size: 0.9rem;
@@ -261,7 +261,7 @@
 		position: absolute;
 		top: 0.25rem;
 		bottom: 0.25rem;
-		left: 1.2rem;
+		left: 0.875rem;
 		opacity: 0.6;
 		background-color: var(--color-neutral-400);
 		width: 1px;
@@ -326,10 +326,5 @@
 
 	:global(.dark) .menu-separator {
 		background-color: var(--color-neutral-700);
-	}
-
-	:global(.dark) .submenu-indicator {
-		opacity: 0.5;
-		background-color: var(--color-neutral-600);
 	}
 </style>

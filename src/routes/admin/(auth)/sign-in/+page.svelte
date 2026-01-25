@@ -5,7 +5,8 @@
 	import { Label } from '$lib/components/ui/label';
 	import type { PageData } from './$types';
 	import Decor from './Decor.svelte';
-	import Logo from '$lib/components/shared/Logo.svelte';
+	import Logo from '$lib/components/shared/LogoImage.svelte';
+	import LogoVideo from '$lib/components/shared/LogoVideo.svelte';
 	import '@fontsource-variable/quicksand';
 
 	let { data }: { data: PageData } = $props();
@@ -86,7 +87,7 @@
 	<!-- Bal oldal - Form -->
 	<div class="left-side flex w-full flex-col justify-between bg-white p-8 lg:w-2/5 lg:p-10">
 		<!-- Logo -->
-		<Logo title="Svelte Desktop" />
+		<LogoVideo width={250} />
 
 		<div class="mt-8 grid gap-4">
 			<!-- Email verification info notice - only show when relevant -->
@@ -218,9 +219,7 @@
 
 		<!-- Szöveg tartalom -->
 		<div class="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
-			<h1 class="mb-4 text-3xl font-light tracking-wide text-white">
-				Üdvözöljünk a <span class="block font-normal text-white">Svelte Desktop</span> rendszerben
-			</h1>
+			<h1 class="mb-4 text-3xl font-light tracking-wide text-white">Üdvözöljük</h1>
 			<p class="text-base text-gray-300">Fiókja eléréshez kérjük jelentkezzen be.</p>
 		</div>
 	</div>
