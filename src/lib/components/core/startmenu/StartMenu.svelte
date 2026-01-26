@@ -121,6 +121,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
+		gap: 2rem;
 
 		.header {
 			display: flex;
@@ -145,7 +146,6 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			padding: 20px 10px;
 
 			.apps {
 				display: inline-grid;

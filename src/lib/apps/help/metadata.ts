@@ -5,7 +5,7 @@ export const metadata: AppMetadata = {
 	name: 'Súgó',
 	description: 'Rendszer dokumentáció és felhasználói útmutatók',
 	version: '1.0.0',
-	icon: 'icon.svg',
+	icon: 'MessageCircleQuestionMark',
 	category: 'utilities',
 	permissions: [{ resource: 'documentation', action: 'read' }],
 	multiInstance: true,

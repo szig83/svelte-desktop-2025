@@ -5,7 +5,7 @@ export const metadata: AppMetadata = {
 	name: 'Beállítások',
 	description: 'Rendszer beállítások és testreszabási lehetőségek',
 	version: '1.0.0',
-	icon: 'icon.svg',
+	icon: 'Settings',
 	category: 'system',
 	permissions: [
 		{ resource: 'system', action: 'read' },

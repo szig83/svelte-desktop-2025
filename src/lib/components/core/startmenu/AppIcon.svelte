@@ -14,7 +14,7 @@ Start menüben megjelenő ikonokat mutatja.
 
 <button {onclick} class="btn-click-effect">
 	<div class="app-icon">
-		<UniversalIcon icon={app.icon ?? ''} size={56} appName={app.appName} />
+		<UniversalIcon icon={app.icon ?? ''} size={40} appName={app.appName} />
 	</div>
 	<div class="app-title"><div>{app.title}</div></div>
 </button>
@@ -27,7 +27,7 @@ Start menüben megjelenő ikonokat mutatja.
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		gap: 2px;
+		gap: 5px;
 		z-index: 100;
 		cursor: pointer;
 		aspect-ratio: 1;
@@ -36,14 +36,30 @@ Start menüben megjelenő ikonokat mutatja.
 
 		.app-icon {
 			display: flex;
+			position: relative;
 			justify-content: center;
 			align-items: center;
-			transition: background-color 0.35s ease-out;
-			border-radius: var(--radius-sm);
-			/*background-color: hsl(from var(--panel-bg-color) h s calc(l - 5));*/
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+			/* Elemelkedő árnyék - primary szín nélkül */
+			box-shadow:
+				inset 0 1px 1px rgba(255, 255, 255, 0.2),
+				0 4px 12px rgba(0, 0, 0, 0.15),
+				0 2px 4px rgba(0, 0, 0, 0.1);
+			border: 1px solid rgba(255, 255, 255, 0.4);
+			border-radius: 20px;
+
+			/* Világos mód - fehérebb háttér */
+			background: linear-gradient(145deg, #f5f5f8, #e8e8f0);
 			aspect-ratio: 1;
 			width: 100%;
+
+			/* Világos módban tompítjuk az ikont */
+			:global(svg) {
+				opacity: 0.7;
+			}
 		}
+
 		.app-title {
 			width: var(--btn-size);
 
@@ -63,12 +79,65 @@ Start menüben megjelenő ikonokat mutatja.
 
 		&:hover {
 			.app-icon {
-				background-color: var(--color-primary-alpha-70);
+				transform: translateY(-1px);
+
+				box-shadow:
+					inset 0 1px 2px rgba(255, 255, 255, 0.3),
+					0 6px 16px rgba(0, 0, 0, 0.2),
+					0 3px 6px rgba(0, 0, 0, 0.12);
+				border-color: rgba(255, 255, 255, 0.6);
+
+				/* Átlós primary színű átmenet */
+				background:
+					linear-gradient(
+						135deg,
+						color-mix(in srgb, var(--color-primary) 15%, transparent) 0%,
+						transparent 50%
+					),
+					linear-gradient(145deg, #fafafa, #f0f0f8);
 			}
 			.app-title {
 				& > div {
-					color: var(--color-primary-alpha-70);
+					color: var(--color-primary);
 				}
+			}
+		}
+
+		&:active {
+			.app-icon {
+				transform: translateY(0);
+				box-shadow:
+					inset 0 1px 1px rgba(255, 255, 255, 0.15),
+					inset 0 -15px 15px -10px color-mix(in srgb, var(--color-primary) 30%, transparent),
+					0 2px 6px rgba(0, 0, 0, 0.15);
+			}
+		}
+	}
+
+	/* Sötét mód - sötét szürkés-feketés */
+	:global(.dark) button {
+		.app-icon {
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
+
+			/* Sötét módban teljes opacity */
+			:global(svg) {
+				opacity: 1;
+			}
+		}
+
+		&:hover {
+			.app-icon {
+				border-color: rgba(255, 255, 255, 0.15);
+
+				/* Átlós primary színű átmenet sötét módban */
+				background:
+					linear-gradient(
+						135deg,
+						color-mix(in srgb, var(--color-primary) 20%, transparent) 0%,
+						transparent 50%
+					),
+					linear-gradient(145deg, #353535, #282828);
 			}
 		}
 	}

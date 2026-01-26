@@ -42,11 +42,11 @@ export const baseAuthConfig: Omit<BetterAuthOptions, 'plugins'> = {
 	},
 	emailAndPassword: {
 		enabled: true,
-		requireEmailVerification: true,
-		disableSignUp: false
+		requireEmailVerification: config.FEATURES.EMAIL_VERIFICATION_ENABLED,
+		disableSignUp: !config.REGISTRATION_ENABLED
 	},
 	emailVerification: {
-		autoSignInAfterVerification: true,
+		autoSignInAfterVerification: config.FEATURES.AUTO_SIGNIN_AFTER_VERIFICATION,
 		sendVerificationEmail: async ({ user, url, token }) => {
 			const emailManager = new EmailManager();
 
@@ -58,7 +58,7 @@ export const baseAuthConfig: Omit<BetterAuthOptions, 'plugins'> = {
 					email: user.email,
 					verificationUrl: url,
 					token: token,
-					appName: 'Desktop Environment',
+					appName: config.APP_NAME,
 					expirationTime: '24 óra'
 				}
 			});
@@ -75,7 +75,7 @@ export const baseAuthConfig: Omit<BetterAuthOptions, 'plugins'> = {
 			const templateData = {
 				name: user.name,
 				email: user.email,
-				appName: 'Desktop Environment (TEST)',
+				appName: `${config.APP_NAME} (TEST)`,
 				dashboardUrl: '/admin',
 				userId: 'test-user-id'
 			};
@@ -93,8 +93,8 @@ export const baseAuthConfig: Omit<BetterAuthOptions, 'plugins'> = {
 	},
 	socialProviders: {
 		google: {
-			accessType: 'offline',
-			prompt: 'select_account consent',
+			//accessType: 'offline',
+			//prompt: 'select_account consent',
 			clientId: config.GOOGLE_CLIENT_ID as string,
 			clientSecret: config.GOOGLE_CLIENT_SECRET as string
 		}

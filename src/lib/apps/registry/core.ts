@@ -76,7 +76,7 @@ export class AppRegistryManager implements AppRegistryCore {
 	 */
 	private async loadAppsFromMetadata(): Promise<void> {
 		// Known app IDs - in a real implementation this could be discovered dynamically
-		const appIds = ['app1', 'app2', 'help', 'settings', 'users'];
+		const appIds = ['users', 'settings', 'help'];
 
 		for (const appId of appIds) {
 			try {

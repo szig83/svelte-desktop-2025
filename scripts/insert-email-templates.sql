@@ -587,7 +587,7 @@ INSERT INTO platform.email_templates (
         </p>
 
         <p>
-            Köszönjük, hogy regisztráltál a {{appName}} rendszerbe. Az email címed megerősítéséhez kattints az alábbi gombra:
+            Köszönjük, hogy regisztráltál rendszerünkbe. Az email címed megerősítéséhez kattints az alábbi gombra:
         </p>
 
         <p>
@@ -613,7 +613,7 @@ INSERT INTO platform.email_templates (
 
         <p>
             Üdvözlettel,<br>
-            A {{appName}} csapata
+            {{appName}}csapata
         </p>
     </div>
 

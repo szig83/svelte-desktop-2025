@@ -5,7 +5,7 @@ export const metadata: AppMetadata = {
 	name: 'Felhasználók',
 	description: 'Felhasználói fiókok kezelése és adminisztráció',
 	version: '1.0.0',
-	icon: 'icon.svg',
+	icon: 'UsersRound',
 	category: 'system',
 	permissions: [
 		{ resource: 'users', action: 'read' },

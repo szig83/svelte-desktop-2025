@@ -5,7 +5,7 @@ const app_config = {
 	SESSION_COOKIE_PREFIX: APP_CONSTANTS.SESSION_COOKIE_PREFIX,
 
 	// Application Settings
-	APP_NAME: 'Desktop Environment',
+	APP_NAME: 'ElyOS',
 
 	// Email Verification Settings
 	EMAIL_VERIFICATION: {
