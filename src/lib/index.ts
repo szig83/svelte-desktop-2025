@@ -69,7 +69,6 @@ export {
 	getWindowManager,
 	ThemeManager,
 	createThemeManager,
-	setThemeManager,
 	getThemeManager,
 	RESTORE_SIZE_THRESHOLD,
 	RESTORE_SIZE_RATIO

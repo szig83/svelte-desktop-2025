@@ -9,6 +9,7 @@ export const authForSeed = betterAuth({
 	...baseAuthConfig,
 	// Seed környezetben nem kérünk email megerősítést
 	emailAndPassword: {
+		enabled: true,
 		...baseAuthConfig.emailAndPassword,
 		requireEmailVerification: false
 	},

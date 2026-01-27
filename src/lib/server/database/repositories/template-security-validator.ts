@@ -1,3 +1,4 @@
+import DOMPurify from 'isomorphic-dompurify';
 import type { CreateTemplateData, UpdateTemplateData } from '../types/email-templates';
 
 /**
@@ -163,30 +164,16 @@ export class TemplateSecurityValidator {
 	 * @returns Sanitized HTML content.
 	 */
 	sanitizeHtmlContent(htmlContent: string): string {
-		// Check if DOMPurify is available (browser environment)
-		if (typeof DOMPurify !== 'undefined') {
-			// Configure DOMPurify with allowed tags and attributes
-			const config = {
-				ALLOWED_TAGS: this.allowedHtmlTags,
-				ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'style'],
-				ALLOW_DATA_ATTR: false,
-				FORBID_SCRIPT: true,
-				FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'meta', 'link'],
-				FORBID_ATTR: ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus', 'onblur']
-			};
+		// Configure DOMPurify with allowed tags and attributes
+		const config = {
+			ALLOWED_TAGS: this.allowedHtmlTags,
+			ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'style'],
+			ALLOW_DATA_ATTR: false,
+			FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'meta', 'link'],
+			FORBID_ATTR: ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus', 'onblur']
+		};
 
-			return DOMPurify.sanitize(htmlContent, config);
-		}
-
-		// Fallback for Node.js environment: basic regex-based sanitization
-		let sanitized = htmlContent;
-
-		// Remove blocked patterns
-		this.blockedPatterns.forEach((pattern) => {
-			sanitized = sanitized.replace(pattern, '');
-		});
-
-		return sanitized;
+		return DOMPurify.sanitize(htmlContent, config);
 	}
 
 	/**

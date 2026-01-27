@@ -900,8 +900,6 @@
 		padding: 8px 12px;
 		color: var(--color-primary-alpha-90);
 		user-select: none;
-		&:hover {
-		}
 	}
 
 	.window.maximized .window-header {
